@@ -5,8 +5,8 @@ import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract PartialRefund is ERC20 {
     address payable private _centralAuthority;
-    uint64 private tokenDecimals = 10 ** 18;
-    uint80 private maxTokens = 1_000_000 * tokenDecimals;
+    uint private tokenDecimals = 10 ** decimals();
+    uint private maxTokens = 1_000_000 * tokenDecimals;
     bool private saleIsClosed = false;
     
     constructor(address specialAddress) ERC20("MetanaToken", "MTK") {
@@ -39,8 +39,6 @@ contract PartialRefund is ERC20 {
         require(success, "Failed to withdraw");
     }
 
-// 1 eth = 1000 tokens 
-// 1000, 
     function sellBack(uint amount) external {
         // Check token balance of user
         require(balanceOf(msg.sender) >= amount * tokenDecimals, "Not enough tokens in balance");
