@@ -39,9 +39,13 @@ contract Sanctioned is ERC20 {
         blacklisted[target] = status;
     }
 
+    function getAddressBlacklistStatus(address target) public view returns (bool) {
+        return blacklisted[target];
+    }
+
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-        require(blacklisted[from] == false, 'Address is blacklisted(from)');
-        require(blacklisted[to] == false, 'Address is blacklisted(to)');
+        require(blacklisted[from] == false, "Address is blacklisted(from)");
+        require(blacklisted[to] == false, "Address is blacklisted(to)");
         super._beforeTokenTransfer(from, to, amount);
     }
 
