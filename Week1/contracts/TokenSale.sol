@@ -1,20 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract TokenSale is ERC20 {
     address payable private _centralAuthority;
-    uint64 private tokenDecimals = 10 ** 18;
-    uint80 private maxTokens = 1_000_000 * tokenDecimals;
+    uint256 private tokenDecimals = 10**decimals();
+    uint256 private maxTokens = 1_000_000 * tokenDecimals;
     bool private saleIsClosed = false;
-    
+
     constructor(address specialAddress) ERC20("MetanaToken", "MTK") {
         _centralAuthority = payable(specialAddress);
     }
 
-    modifier onlySpecialAddress {
-        require(msg.sender == _centralAuthority, "Only special address can modify data");
+    modifier onlySpecialAddress() {
+        require(
+            msg.sender == _centralAuthority,
+            "Only special address can modify data"
+        );
         _;
     }
 
@@ -23,23 +26,21 @@ contract TokenSale is ERC20 {
         return 18;
     }
 
-    function mint1000() public payable {
-        require(msg.value == 1 ether, "Value must be 1 ether");
+    function buy(uint256 amount) public payable {
         require(!saleIsClosed, "Sorry, the sale is closed");
-        _mint(msg.sender, 1000 * tokenDecimals);
+        if ((amount * tokenDecimals) + totalSupply() > maxTokens) {
+            revert("Supply will exceed maximum");
+        }
+        _mint(msg.sender, amount * tokenDecimals);
         if (totalSupply() >= maxTokens) {
             saleIsClosed = true;
         }
     }
 
-    function withdraw(address payable to) public onlySpecialAddress{
-        uint amount = address(this).balance;
-        require(amount >= 1 ether, "Nothing to withdraw!");
+    function withdraw(address payable to) public onlySpecialAddress {
+        uint256 amount = address(this).balance;
+        // require(amount >= 1 ether, "Nothing to withdraw!");
         (bool success, ) = to.call{value: amount}("");
         require(success, "Failed to withdraw");
     }
-
-    
-
-
 }
