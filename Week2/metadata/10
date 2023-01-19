@@ -1,0 +1,23 @@
+{
+    "description": "A dwelling",
+    "image": "https://bafybeia6vxtrpcprkgvylupjvwbvevsea45at23yd3lmn7qq26mz23xltm.ipfs.nftstorage.link/ipfs/bafybeia6vxtrpcprkgvylupjvwbvevsea45at23yd3lmn7qq26mz23xltm/images/10.png",
+    "name": "16BIT Home",
+    "attributes": [
+        {
+            "trait_type": "Type",
+            "value": "House"
+        },
+        {
+            "trait_type": "Climate",
+            "value": "Snow"
+        },
+        {
+            "trait_type": "Time of Day",
+            "value": "Sunrise"
+        },
+        {
+            "trait_type": "Land Type",
+            "value": "Hill"
+        }
+    ]
+}
