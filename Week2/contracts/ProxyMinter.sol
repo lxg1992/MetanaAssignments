@@ -44,6 +44,8 @@ contract ERC20Contract is ERC20, Ownable {
         _mint(msg.sender, amount * 10**decimals());
     }
 
+    function transfer()
+
     function approve(address spender, uint256 amount)
         public
         virtual
