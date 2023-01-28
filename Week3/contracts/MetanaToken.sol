@@ -3,10 +3,10 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MetanaMultiToken is ERC1155, ERC1155Burnable, Ownable {
+contract MetanaMultiToken is ERC1155, Ownable {
     mapping(address => bool) private isSpecial;
 
     // Base Tokens
@@ -51,6 +51,22 @@ contract MetanaMultiToken is ERC1155, ERC1155Burnable, Ownable {
         bytes memory data
     ) public onlySpecial {
         _mintBatch(to, ids, amounts, data);
+    }
+
+    function burn(
+        address from,
+        uint256 id,
+        uint256 amount
+    ) public onlySpecial {
+        _burn(from, id, amount);
+    }
+
+    function burnBatch(
+        address from,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) public onlySpecial {
+        _burnBatch(from, ids, amounts);
     }
 }
 
