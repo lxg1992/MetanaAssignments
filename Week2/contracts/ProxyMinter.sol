@@ -57,9 +57,9 @@ contract ERC20Contract is ERC20, Ownable {
 }
 
 contract ProxyMinter {
-    ERC20Contract public token;
-    ERC721Contract public nft;
-    address public proxyAddress;
+    ERC20Contract public immutable token;
+    ERC721Contract public immutable nft;
+    address public immutable proxyAddress;
 
     constructor(address erc20Addr, address erc721Addr) {
         token = ERC20Contract(erc20Addr);

@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // Access
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ERC721Contract is ERC721, Ownable {
+contract NFTContract is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private currentTokenId;
 
@@ -34,32 +34,41 @@ contract ERC721Contract is ERC721, Ownable {
     }
 }
 
-contract ERC20Contract is ERC20, Ownable {
+contract TokenContract is ERC20, Ownable {
     constructor() ERC20("MetanaToken", "MTK") {}
 
     function mint(address to, uint256 displayAmount) public {
-        _mint(to, displayAmount * 10 ** decimals());
+        _mint(to, displayAmount * 10**decimals());
     }
 
     function selfMint(uint256 displayAmount) public {
-        _mint(msg.sender, displayAmount * 10 ** decimals());
+        _mint(msg.sender, displayAmount * 10**decimals());
     }
 
-    function approve(address spender, uint256 displayAmount) public virtual override returns (bool) {
+    function approve(address spender, uint256 displayAmount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
         address owner = _msgSender();
-        _approve(owner, spender, displayAmount * 10 ** decimals());
+        _approve(owner, spender, displayAmount * 10**decimals());
         return true;
     }
 
-    function adminTransfer(address from, address to, uint256 displayAmount) public {
-        _transfer(from, to, displayAmount * 10 ** decimals());
+    function adminTransfer(
+        address from,
+        address to,
+        uint256 displayAmount
+    ) public {
+        _transfer(from, to, displayAmount * 10**decimals());
     }
 }
 
 contract ProxyContract {
-    ERC20Contract public token;
-    ERC721Contract public nft;
-    address public proxyAddress;
+    TokenContract public immutable token;
+    NFTContract public immutable nft;
+    address public immutable proxyAddress;
 
     mapping(uint256 => address) public originalOwner;
 
@@ -67,22 +76,22 @@ contract ProxyContract {
     mapping(address => uint256) public allowedWithdrawAmount;
 
     mapping(address => bool) public ownerHasStakedNFT;
+    mapping(address => bool) public isLocked;
 
     constructor(address erc20Addr, address erc721Addr) {
-        token = ERC20Contract(erc20Addr);
-        nft = ERC721Contract(erc721Addr);
+        token = TokenContract(erc20Addr);
+        nft = NFTContract(erc721Addr);
         proxyAddress = address(this);
         token.selfMint(1000); // minting 1000 * 10 ** 18
     }
 
     function onERC721Received(
-        address operator,
         address from,
         uint256 tokenId,
         bytes calldata data
     ) external returns (bytes4) {
         originalOwner[tokenId] = from;
-       return IERC721Receiver.onERC721Received.selector;
+        return IERC721Receiver.onERC721Received.selector;
     }
 
     function proxyTokenMint(uint256 displayAmount) public {
@@ -90,7 +99,10 @@ contract ProxyContract {
     }
 
     function depositNFT(uint256 tokenId) external {
-        require(ownerHasStakedNFT[msg.sender] == false, "You already have a staked NFT, cannot have another");
+        require(
+            ownerHasStakedNFT[msg.sender] == false,
+            "You already have a staked NFT, cannot have another"
+        );
         nft.safeTransferFrom(msg.sender, address(this), tokenId);
         ownerHasStakedNFT[msg.sender] = true;
         if (latestWithdrawTimer[msg.sender] <= block.timestamp) {
@@ -100,33 +112,36 @@ contract ProxyContract {
     }
 
     function withdrawNFT(uint256 tokenId) external {
+        require(isLocked[msg.sender] == false, "Reentrancy attempt");
+        isLocked[msg.sender] = true;
         require(originalOwner[tokenId] == msg.sender, "not original owner");
         nft.safeTransferFrom(address(this), msg.sender, tokenId);
         ownerHasStakedNFT[msg.sender] = false;
+        isLocked[msg.sender] = false;
     }
 
     function withdrawTokens(uint256 displayAmount) external {
-        require(ownerHasStakedNFT[msg.sender] == true, "Your NFT is not staked!");
-        require(displayAmount <= allowedWithdrawAmount[msg.sender], "Exceeding your allowance to withdraw");
-        require(token.balanceOf(address(this)) >= displayAmount * 10 ** token.decimals(), "Contract doesn't have enough tokens");
+        require(isLocked[msg.sender] == false, "Reentrancy attempt");
+        isLocked[msg.sender] = true;
+        require(
+            ownerHasStakedNFT[msg.sender] == true,
+            "Your NFT is not staked!"
+        );
+        require(
+            displayAmount <= allowedWithdrawAmount[msg.sender],
+            "Exceeding your allowance to withdraw"
+        );
+        require(
+            token.balanceOf(address(this)) >=
+                displayAmount * 10**token.decimals(),
+            "Contract doesn't have enough tokens"
+        );
         if (block.timestamp > latestWithdrawTimer[msg.sender]) {
             latestWithdrawTimer[msg.sender] = block.timestamp + 1 days;
             allowedWithdrawAmount[msg.sender] = 10;
         }
         token.adminTransfer(address(this), msg.sender, displayAmount);
         allowedWithdrawAmount[msg.sender] -= displayAmount;
+        isLocked[msg.sender] = false;
     }
-
-
-
-
-
-    // Called by a user who wants to buy 10 tokens to mint
-    // function proxyMint() public {
-    //     address originalCaller = msg.sender;
-    //     require(token.allowance(originalCaller, proxyAddress) >= 10 * 10 ** token.decimals(), "Need at least 10 tokens");
-    //     bool sent = token.transferFrom(originalCaller, proxyAddress, 10 * 10 ** token.decimals());
-    //     require(sent, "Token transfer failed");
-    //     nft.mint(originalCaller);
-    // }
 }
