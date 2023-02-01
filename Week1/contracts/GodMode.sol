@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract GodMode is ERC20 {
-    address private _specialAddress;
+    address private immutable _specialAddress;
 
     constructor(address specialAddress) ERC20("MetanaToken", "MTK") {
         _specialAddress = specialAddress;

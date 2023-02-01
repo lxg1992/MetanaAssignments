@@ -4,9 +4,9 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract PartialRefund is ERC20 {
-    address payable private _centralAuthority;
-    uint256 private tokenDecimals = 10**decimals();
-    uint256 private maxTokens = 1_000_000 * tokenDecimals;
+    address payable private immutable _centralAuthority;
+    uint256 private immutable tokenDecimals = 10**decimals();
+    uint256 private immutable maxTokens = 1_000_000 * tokenDecimals;
     bool private saleIsClosed = false;
 
     constructor(address specialAddress) ERC20("MetanaToken", "MTK") {
