@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/alex/Metana/Weekly/Week1/contracts/GodMode.sol": {
-      "lastModificationDate": 1673833416173,
-      "contentHash": "b29b036805e57918c67a3f06f4736076",
+      "lastModificationDate": 1675272259289,
+      "contentHash": "2ba5182d8c8c72881eee66a7ebc2f74a",
       "sourceName": "contracts/GodMode.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -39,7 +39,7 @@
       ]
     },
     "/home/alex/Metana/Weekly/Week1/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
-      "lastModificationDate": 1673396869547,
+      "lastModificationDate": 1675543825804,
       "contentHash": "834a0dde221759af42b030253315b086",
       "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "solcConfig": {
@@ -112,41 +112,6 @@
         "Context"
       ]
     },
-    "/home/alex/Metana/Weekly/Week1/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-      "lastModificationDate": 1673396869597,
-      "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "solcConfig": {
-        "version": "0.8.17",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "IERC20"
-      ]
-    },
     "/home/alex/Metana/Weekly/Week1/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
       "lastModificationDate": 1673396869597,
       "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
@@ -184,9 +149,44 @@
         "IERC20Metadata"
       ]
     },
+    "/home/alex/Metana/Weekly/Week1/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1673396869597,
+      "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
     "/home/alex/Metana/Weekly/Week1/contracts/TokenSale.sol": {
-      "lastModificationDate": 1673721849509,
-      "contentHash": "d3323dfa1fd2464885470efa8038aa74",
+      "lastModificationDate": 1675708975923,
+      "contentHash": "5efe1dc6f79dcba481f474e2525371dd",
       "sourceName": "contracts/TokenSale.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -222,8 +222,8 @@
       ]
     },
     "/home/alex/Metana/Weekly/Week1/contracts/Sanctioned.sol": {
-      "lastModificationDate": 1673710997499,
-      "contentHash": "64a998e59fdffcd3964ec0a05103fe59",
+      "lastModificationDate": 1675272250159,
+      "contentHash": "e64ad752cf8b355a917dc7d3f7c8bad0",
       "sourceName": "contracts/Sanctioned.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -259,8 +259,8 @@
       ]
     },
     "/home/alex/Metana/Weekly/Week1/contracts/PartialRefund.sol": {
-      "lastModificationDate": 1673836326393,
-      "contentHash": "c52bee1e55dc9805c5e14f85e79d73e8",
+      "lastModificationDate": 1675707623653,
+      "contentHash": "e7f6450f1bc96350495f9376b9780bde",
       "sourceName": "contracts/PartialRefund.sol",
       "solcConfig": {
         "version": "0.8.17",

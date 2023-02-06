@@ -5,12 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract PartialRefund is ERC20 {
     address payable private immutable _centralAuthority;
-    uint256 private immutable tokenDecimals = 10**decimals();
-    uint256 private immutable maxTokens = 1_000_000 * tokenDecimals;
-    bool private saleIsClosed = false;
+    uint256 private immutable tokenDecimals;
+    uint256 private immutable maxTokens;
+    bool private saleIsClosed;
 
     constructor(address specialAddress) ERC20("MetanaToken", "MTK") {
         _centralAuthority = payable(specialAddress);
+        tokenDecimals = 10**decimals();
+        maxTokens = 1_000_000 * tokenDecimals;
+        saleIsClosed = false;
     }
 
     modifier onlySpecialAddress() {
