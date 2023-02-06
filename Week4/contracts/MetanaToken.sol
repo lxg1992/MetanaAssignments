@@ -7,23 +7,23 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MetanaMultiToken is ERC1155, Ownable {
-    mapping(address => bool) private isSpecial;
+    mapping(address => bool) public isSpecial;
 
-    // Base Tokens
-    uint256 public constant token0b = 0;
-    uint256 public constant token1b = 1;
-    uint256 public constant token2b = 2;
+    // // Base Tokens
+    // uint256 public constant token0b = 0;
+    // uint256 public constant token1b = 1;
+    // uint256 public constant token2b = 2;
 
-    // Improved Tokens
-    uint256 public constant token3i = 3;
-    uint256 public constant token4i = 4;
-    uint256 public constant token5i = 5;
+    // // Improved Tokens
+    // uint256 public constant token3i = 3;
+    // uint256 public constant token4i = 4;
+    // uint256 public constant token5i = 5;
 
-    // Supreme Token
-    uint256 public constant token6s = 6;
+    // // Supreme Token
+    // uint256 public constant token6s = 6;
 
     constructor() ERC1155("") {
-        isSpecial[msg.sender] = true;
+        setSpecialAccess(msg.sender, true);
     }
 
     modifier onlySpecial() {
@@ -33,6 +33,10 @@ contract MetanaMultiToken is ERC1155, Ownable {
 
     function setSpecialAccess(address to, bool access) public onlyOwner {
         isSpecial[to] = access;
+    }
+
+    function getSpecialAccess(address addr) public view returns (bool) {
+        return isSpecial[addr];
     }
 
     function mint(

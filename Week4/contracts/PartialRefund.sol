@@ -81,3 +81,6 @@ contract PartialRefund is ERC20 {
         );
     }
 }
+
+//Write at least 3 slither incorrectly flagged items
+//Write tests for ForgeContract (90%+ coverage);
