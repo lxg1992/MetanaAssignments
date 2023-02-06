@@ -11,7 +11,7 @@ chai.use(require("chai-bn")(BN));
 
 const { expect } = chai;
 
-xdescribe("PartialRefund", function () {
+describe("PartialRefund", function () {
   let partialRefund;
   let owner;
   let nonOwner1;

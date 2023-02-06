@@ -48,15 +48,6 @@ contract MetanaMultiToken is ERC1155, Ownable {
         _mint(account, id, amount, data);
     }
 
-    function mintBatch(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public onlySpecial {
-        _mintBatch(to, ids, amounts, data);
-    }
-
     function burn(
         address from,
         uint256 id,
@@ -101,12 +92,14 @@ contract Forger {
             "Need to wait at least a minute between transactions"
         );
         timeoutExpires[msg.sender] = block.timestamp + 1 minutes;
-        if (tokenId == 0 || tokenId == 1 || tokenId == 2) {
+        if (tokenId <= 2) {
             mmToken.mint(msg.sender, tokenId, amount, "");
-        } else if (tokenId == 3 || tokenId == 4 || tokenId == 5) {
+        } else if (tokenId <= 5) {
             forgeImproved(tokenId, amount);
         } else if (tokenId == 6) {
             forgeSupreme(amount);
+        } else {
+            revert("No such token");
         }
     }
 
