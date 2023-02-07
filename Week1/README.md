@@ -1,8 +1,8 @@
-#Slither
+# Slither
 
 The following were detected as flags during `slither` testing
 
-##Low Level
+## Low Level
 
 Low level call in PartialRefund.withdrawEthereum(address) (contracts/PartialRefund.sol#55-60):
         - (success) = to.call{value: amount}() (contracts/PartialRefund.sol#58)
@@ -34,7 +34,7 @@ Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing
 
 * In these cases, in the constructor assigning central authority to a 0x0 address will make the contract unusable. But transferring the Ether to a non existing address will cause it to be lost forever, so it is a valuable flag.
 
-##Different Versions
+## Different Versions
 
 Different versions of Solidity are used:
         - Version used: ['^0.8.0', '^0.8.9']
