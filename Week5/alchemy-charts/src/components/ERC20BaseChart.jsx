@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./ERC20Chart.css";
-import erc20abi from "./erc20abi.json";
+import "./ERC20BaseChart.css";
 import { ethers } from "ethers";
 import {
   Chart as ChartJS,
@@ -14,8 +13,6 @@ import {
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import { SHIBA_INU_TOKEN, TETHER_TOKEN } from "../constants/tokens";
 
 ChartJS.register(
   CategoryScale,
@@ -36,35 +33,25 @@ const options = {
     },
     title: {
       display: true,
-      text: "Volume of Token-related Transactions per Block",
+      text: "Base Fee per block",
     },
   },
 };
 
-function ERC20Chart() {
+function ERC20BaseChart() {
   const [provider, setProvider] = useState("");
   const startBlock = useRef(0);
-  const [endBlock, setEndBlock] = useState("");
   const [labels, setLabels] = useState([]);
   const [data, setData] = useState([]);
-  const [address, setAddress] = useState(SHIBA_INU_TOKEN);
-  const [timer, setTimer] = useState(0);
 
   useEffect(() => {
     const updateInterval = setInterval(() => {
       asyncAction(true).catch(console.log);
       toast(`Updated at ${new Date().toLocaleTimeString()}`);
     }, 10000);
-
-    const timeInterval = setInterval(() => {
-      if (timer <= 0) {
-        setTimer(5);
-      } else {
-        setTimer((prev) => prev - 1);
-      }
-    }, 1000);
     const asyncAction = async (isUpdate = false) => {
       const xLabels = [];
+      const requestPromises = [];
 
       const fetchedProvider = new ethers.providers.JsonRpcProvider(
         import.meta.env.VITE_ALCHEMY_HTTPS,
@@ -74,36 +61,31 @@ function ERC20Chart() {
 
       const latestBlock = await fetchedProvider.getBlockNumber();
       if (!isUpdate) {
+        // initial run
         startBlock.current = latestBlock - 10;
       }
-      setEndBlock(latestBlock);
-
-      const token = new ethers.Contract(address, erc20abi, fetchedProvider);
-
-      const events = await token.queryFilter(
-        "Transfer",
-        startBlock.current,
-        latestBlock
-      );
 
       for (let i = startBlock.current; i < latestBlock; i++) {
         xLabels.push(i);
+        requestPromises.push(fetchedProvider.getBlock(i));
       }
       setLabels(xLabels);
-      const eventsDictionary = events.reduce((acc, cur) => {
-        if (acc[cur.blockNumber]) {
-          acc[cur.blockNumber] += 1;
-        } else {
-          acc[cur.blockNumber] = 1;
-        }
+
+      const results = await Promise.all(requestPromises);
+      const baseFeeDict = results.reduce((acc, cur) => {
+        acc[cur.number] = Number(
+          ethers.utils.formatUnits(cur.baseFeePerGas, "gwei")
+        );
         return acc;
       }, {});
+
+
       const data = {
         labels: xLabels,
         datasets: [
           {
-            data: xLabels.map((val) => eventsDictionary[val] || 0),
-            label: "Volume",
+            data: xLabels.map((val) => baseFeeDict[val]),
+            label: "Base fee in Gwei",
             backgroundColor: "rgba(15, 99, 132, 0.9)",
           },
         ],
@@ -113,32 +95,15 @@ function ERC20Chart() {
 
     asyncAction().catch(console.log);
 
-    return () => {
-      clearInterval(updateInterval);
-      clearInterval(timeInterval);
-    };
-  }, [address]);
+    return () => clearInterval(updateInterval);
+  }, []);
 
-  // useEffect(() => {
-  //   const updateInterval = setInterval(() => {
-
-  //   }, 5000);
-
-  //   const asyncUpdate = async () => {
-
-  //   }
-
-  //   return () => {
-  //     clearInterval(updateInterval);
-  //   }
-  // })
-
-  if (!(provider && startBlock && endBlock && labels.length)) {
+  if (!(data.datasets && labels.length)) {
     return <div>Loading</div>;
   }
 
   return (
-    <div className="ERC20Chart">
+    <div className="ERC20BaseChart">
       <ToastContainer
         position="top-center"
         autoClose={1000}
@@ -151,18 +116,9 @@ function ERC20Chart() {
         pauseOnHover
         theme="light"
       />
-      <div className="card">
-        <p>ShibaInu: {SHIBA_INU_TOKEN}</p>
-        <p>Tether: {TETHER_TOKEN}</p>
-      </div>
       <Bar data={data} options={options} />
-      <input
-        type="text"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-      />
     </div>
   );
 }
 
-export default ERC20Chart;
+export default ERC20BaseChart;

@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import { ethers } from "ethers";
 import ERC20Chart from "./components/ERC20Chart";
+import ERC20BaseChart from "./components/ERC20BaseChart";
+import { SHIBA_INU_TOKEN, TETHER_TOKEN } from "./constants/tokens";
 
 function App() {
   return (
     <div className="App">
-      <div className="card">
-        <p>ShibaInuToken: 0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE</p>
-      </div>
-      <ERC20Chart />
+
+      {/* <ERC20Chart /> */}
+      <ERC20BaseChart />
     </div>
   );
 }
