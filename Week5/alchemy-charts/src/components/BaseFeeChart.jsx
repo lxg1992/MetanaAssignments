@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./ERC20BaseChart.css";
+import "./BaseFeeChart.css";
 import { ethers } from "ethers";
 import {
   Chart as ChartJS,
@@ -38,7 +38,7 @@ const options = {
   },
 };
 
-function ERC20BaseChart() {
+function BaseFeeChart() {
   const [provider, setProvider] = useState("");
   const startBlock = useRef(0);
   const [labels, setLabels] = useState([]);
@@ -79,14 +79,13 @@ function ERC20BaseChart() {
         return acc;
       }, {});
 
-
       const data = {
         labels: xLabels,
         datasets: [
           {
             data: xLabels.map((val) => baseFeeDict[val]),
             label: "Base fee in Gwei",
-            backgroundColor: "rgba(15, 99, 132, 0.9)",
+            backgroundColor: "rgba(15, 150, 132, 0.9)",
           },
         ],
       };
@@ -103,7 +102,7 @@ function ERC20BaseChart() {
   }
 
   return (
-    <div className="ERC20BaseChart">
+    <div className="BaseFeeChart">
       <ToastContainer
         position="top-center"
         autoClose={1000}
@@ -121,4 +120,4 @@ function ERC20BaseChart() {
   );
 }
 
-export default ERC20BaseChart;
+export default BaseFeeChart;
