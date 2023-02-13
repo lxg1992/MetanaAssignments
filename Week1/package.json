@@ -4,14 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier --write 'contracts/**/*.sol'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "hardhat": "^2.12.5"
+    "hardhat": "^2.12.5",
+    "prettier": "^2.8.4",
+    "prettier-plugin-solidity": "^1.1.2"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.0"
