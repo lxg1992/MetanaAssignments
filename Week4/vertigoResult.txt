@@ -1,0 +1,30 @@
+Mutation testing report:
+Number of mutations:    100
+Killed:                 3 / 100
+
+Mutations:
+
+[+] Survivors
+Mutation:
+    File: /home/alex/Metana/Weekly/Week4/contracts/PartialRefund.sol
+    Line nr: 85
+    Result: Lived
+    Original line:
+         //Write tests for ForgeContract (90%+ coverage);
+
+    Mutated line:
+         //Write tests for ForgeContract (90%+ < erage);
+
+Mutation:
+    File: /home/alex/Metana/Weekly/Week4/contracts/PartialRefund.sol
+    Line nr: 31
+    Result: Lived
+    Original line:
+                 and multiply by (10 ** 18) (decimal points in token), but since those numbers
+
+    Mutated line:
+                 and multiply by (10 ** 18) (decimal points in token), but since  / se numbers
+
+Mutation:
+    File: /home/alex/Metana/Weekly/Week4/contracts/PartialRefund.sol
+    Line nr: 84
