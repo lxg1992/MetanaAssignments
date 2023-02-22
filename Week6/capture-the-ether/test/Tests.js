@@ -115,14 +115,15 @@ describe("Tests", function () {
       });
       counter(`${gtnn.address}`);
 
-      const attack = await ATTACK.deploy(gtnn.address);
+      const attack = await ATTACK.deploy();
       counter("attack");
 
-      await attack.hack({
+      expect(await gtnn.isComplete()).to.equal(false);
+      await attack.guess(gtnn.address, {
         value: ethers.utils.parseEther("1"),
         gasLimit: 50000,
       });
-      counter("hack");
+      counter("guess");
 
       expect(await gtnn.isComplete()).to.equal(true);
     });

