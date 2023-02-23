@@ -152,5 +152,25 @@ describe("Tests", function () {
     }).timeout(500000);
   });
 
-  
+  describe("PredictsTheBlockHash", () => {
+    it("Predicts the hash", async () => {
+      const zeroHash =
+        "0x0000000000000000000000000000000000000000000000000000000000000000";
+      const PTBH = await ethers.getContractFactory(
+        "PredictTheBlockHashChallenge"
+      );
+
+      const ptbh = await PTBH.deploy({ value: ethers.utils.parseEther("1") });
+
+      await ptbh.lockInGuess(zeroHash, {
+        value: ethers.utils.parseEther("1"),
+      });
+
+      await mine(258, 1);
+
+      await ptbh.settle();
+
+      expect(await ptbh.isComplete()).to.equal(true);
+    });
+  });
 });
