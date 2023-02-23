@@ -1,6 +1,7 @@
 const {
   time,
   loadFixture,
+  mine,
 } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
@@ -103,9 +104,7 @@ describe("Tests", function () {
   });
 
   describe("GuessNewNumber", () => {
-    const counter = container();
-
-    it.only("Guesses the newly generated number", async () => {
+    it("Guesses the newly generated number", async () => {
       const GTNN = await ethers.getContractFactory(
         "GuessTheNewNumberChallenge"
       );
@@ -113,19 +112,45 @@ describe("Tests", function () {
       const gtnn = await GTNN.deploy({
         value: ethers.utils.parseEther("1"),
       });
-      counter(`${gtnn.address}`);
 
       const attack = await ATTACK.deploy();
-      counter("attack");
 
       expect(await gtnn.isComplete()).to.equal(false);
       await attack.guess(gtnn.address, {
         value: ethers.utils.parseEther("1"),
         gasLimit: 50000,
       });
-      counter("guess");
 
       expect(await gtnn.isComplete()).to.equal(true);
     });
   });
+
+  describe("PredictTheFuture", () => {
+    it("Predicts the number", async () => {
+      const guessN = 0;
+      const PTF = await ethers.getContractFactory("PredictTheFutureChallenge");
+      const Attack = await ethers.getContractFactory("PTFAttack");
+
+      const ptf = await PTF.deploy({ value: ethers.utils.parseEther("1") });
+      const attack = await Attack.deploy(ptf.address);
+
+      await attack.lockInGuess(guessN, {
+        value: ethers.utils.parseEther("1"),
+      });
+
+      while (await ptf.isComplete()) {
+        console.log({
+          before: await ethers.provider.getBlockNumber("latest"),
+        });
+        await attack.guess(guessN, { gasLimit: 50000 });
+        console.log({
+          after: await ethers.provider.getBlockNumber("latest"),
+        });
+      }
+
+      expect(!(await ptf.isComplete())).to.equal(true);
+    }).timeout(500000);
+  });
+
+  
 });
