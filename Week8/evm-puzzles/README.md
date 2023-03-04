@@ -131,3 +131,9 @@ Reusing the previous example's answer lets us make a contract that will return 0
 next, we need to make it so that while being greater than 03 bytes (so 04 and above) CALLDATASIZE \* CALLVALUE must equal 08
 
 For this CALLDATA of 0x00000001 is 4 bytes, multiplied by 2 CALLVALUE which returns 8. Since 8 = 8, all the subsequent instructions give the desired result.
+
+### 10
+
+0x000000000001
+15
+https://www.evm.codes/playground?fork=merge&callValue=15&unit=Wei&callData=0x000000000001&codeType=Bytecode&code='38349011600857FD5B3661000390061534600A0157FDFDFDFD5B00'_
