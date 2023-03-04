@@ -89,3 +89,62 @@ And PUSH1 1f the offset of 31 Bytes of MEMORY
 F3 (return) uses the previous two parameters as arguments.
 (60016000526001601ff3)
 So, feeding 0x60016000526001601ff3 as call data gives us the EXTCODESIZE of 1 which then satisfies the equation of EQ 1 which lets us get to the JUMPDEST.
+
+### 8
+
+Again this block:
+
+00 36 CALLDATASIZE
+01 6000 PUSH1 00
+03 80 DUP1
+04 37 CALLDATACOPY
+
+Copies the CALLDATA into memory
+
+This block:
+
+05 36 CALLDATASIZE
+06 6000 PUSH1 00
+08 6000 PUSH1 00
+0A F0 CREATE
+
+Creates a contract FROM memory and puts the address on the stack
+
+[addr_dep] <- current stack
+
+[0 0 0 0 0 addr_dep] = PUSH1 00 and 5xDUP1 create this
+
+[addr_dep 0 0 0 0 0] = SWAP5 (1st <=> 6th) creates this
+
+[gas_left addr_dep 0 0 0 0 0] = GAS
+
+We know that CALL function has to return 0 because subsequent instructions compare 00 = 00 if the JUMPI instruction is to succeed.
+
+Reusing the previous example's answer lets us make a contract that will return 01 which is the OPCODE for ADD, and since there are no items on the stack, it will REVERT, thereby making the result of CALL = 0, which is what we want.
+
+60016000526001601ff3 is the answer
+
+### 9
+
+[03 call_data_size] we need to make call_data_size more than 3 the JUMPI works as it should
+
+next, we need to make it so that while being greater than 03 bytes (so 04 and above) CALLDATASIZE \* CALLVALUE must equal 08
+
+For this CALLDATA of 0x00000001 is 4 bytes, multiplied by 2 CALLVALUE which returns 8. Since 8 = 8, all the subsequent instructions give the desired result.
+
+### 10
+
+First 3 instructions create [1b callvalue]
+So we need CALLVALUE to be less than 1b (27 in decimal) in order to have instruction JUMPI work properly
+
+Then:
+
+CALLDATASIZE
+PUSH2 0003
+SWAP1
+
+creates the following stack
+
+[call_data_size 3];
+
+MOD divides the first (topmost) value in the stack by the 2nd which remainder is then fed into the ISZERO instruction (which returns 1 if fed value is 0)
