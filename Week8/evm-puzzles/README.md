@@ -28,16 +28,64 @@ In this example, we have to figure out how the SUBtraction of (CODESIZE - CALLVA
 
 ### 3
 
-In hexadecimal, we know that each byte takes up two hexadecimal digits (00 to ff = 0 to 255). For as long as the hexadecimal number input as calldata takes up 8 characters, the test will pass. (i.e. 0xffffffff and 0x10000000 will work the same); 
+In hexadecimal, we know that each byte takes up two hexadecimal digits (00 to ff = 0 to 255). For as long as the hexadecimal number input as calldata takes up 8 characters, the test will pass. (i.e. 0xffffffff and 0x10000000 will work the same);
 
 ### 4
+
 CODESIZE = 12 = 0c = 00001100
 JUMPDEST = 10 = 0a = 00001010
 XOR above binary values (one or the other but not BOTH same value)
-CALLVALUE ?        = 00000110 = 6 = 06
+CALLVALUE ? = 00000110 = 6 = 06
 
 CALLVALUE of 6 will resolve the JUMP instruction to take 10 as input.
 
 ### 5
 
+<-top - bottom->
+Answer is decimal 16 (hex 0010)
+[0010] val
+[0010 0010] dup1
+[0100] mul
+[0100 0100] push2
+[1] eq
+[0c = a, 1 = b] push1
+[] jumpi (jump to a if b > 0)
+[] jumpdest
+[] stop
 
+### 6
+
+<-top - bottom->
+[00]
+[0x000000000000000000000000000000000000000000000000000000000000000a]
+
+We need to enter a 32byte sequence such that the 0th byte of it (from the right to the left) will be '0a'
+That's then used as the instruction for JUMP => JUMPDEST and then STOPs the program
+
+### 7
+
+00 36 CALLDATASIZE
+01 6000 PUSH1 00
+03 80 DUP1
+04 37 CALLDATACOPY
+
+These instructions simply copy the CALLDATA into memory
+
+05 36 CALLDATASIZE
+06 6000 PUSH1 00
+08 6000 PUSH1 00
+0A F0 CREATE
+
+These create a contract from memory using the length of CALLDATA as the number of bytes to use for creation (with 0 offset and 0 wei) (so just CALLDATA)
+
+The goal is to create a contract which when fed into the EXTCODESIZE will return 01
+
+We first have to PUSH1 01 (6001) as VALUE
+Then PUSH1 00 (6000) as OFFSET
+for MSTORE instruction (52)
+Now our Memory is 0x0000000000000000000000000000000000000000000000000000000000000001
+Which we get by PUSH1 01 (6001) for BYTE LENGTH (so just 1 byte)
+And PUSH1 1f the offset of 31 Bytes of MEMORY
+F3 (return) uses the previous two parameters as arguments.
+(60016000526001601ff3)
+So, feeding 0x60016000526001601ff3 as call data gives us the EXTCODESIZE of 1 which then satisfies the equation of EQ 1 which lets us get to the JUMPDEST.
