@@ -131,20 +131,3 @@ Reusing the previous example's answer lets us make a contract that will return 0
 next, we need to make it so that while being greater than 03 bytes (so 04 and above) CALLDATASIZE \* CALLVALUE must equal 08
 
 For this CALLDATA of 0x00000001 is 4 bytes, multiplied by 2 CALLVALUE which returns 8. Since 8 = 8, all the subsequent instructions give the desired result.
-
-### 10
-
-First 3 instructions create [1b callvalue]
-So we need CALLVALUE to be less than 1b (27 in decimal) in order to have instruction JUMPI work properly
-
-Then:
-
-CALLDATASIZE
-PUSH2 0003
-SWAP1
-
-creates the following stack
-
-[call_data_size 3];
-
-MOD divides the first (topmost) value in the stack by the 2nd which remainder is then fed into the ISZERO instruction (which returns 1 if fed value is 0)
