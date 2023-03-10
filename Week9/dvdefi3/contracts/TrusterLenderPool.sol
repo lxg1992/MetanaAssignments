@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "../DamnValuableToken.sol";
+import "./DamnValuableToken.sol";
 
 /**
  * @title TrusterLenderPool
@@ -38,3 +38,4 @@ contract TrusterLenderPool is ReentrancyGuard {
         return true;
     }
 }
+
