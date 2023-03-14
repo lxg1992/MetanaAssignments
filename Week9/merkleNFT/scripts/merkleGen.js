@@ -2,10 +2,10 @@ const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 const hre = require("hardhat");
 
-function hashToken(idx, account) {
+function hashToken(account, idx) {
   return Buffer.from(
     hre.ethers.utils
-      .solidityKeccak256(["uint256", "address"], [idx, account])
+      .solidityKeccak256(["address", "uint8"], [account, idx])
       .slice(2),
     "hex"
   );
