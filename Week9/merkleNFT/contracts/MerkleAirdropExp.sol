@@ -46,7 +46,16 @@ contract MyNFT is ERC721, Ownable {
     //Counter to count the bits.
 
     constructor() ERC721("MyNFT", "NFT") {
-
+        // bitmap.setTo(0, true); //0x70a85c13Ca3c79C5d5e0452Da91A6E64f8c7Db80
+        // bitmap.setTo(1, true); //0xbc190065f7CDb10C970CBF57cB24401c4c86d4CC
+        // bitmap.setTo(2, true); //0xf10c2Fbc92BC4490aec8D93859762f10E6893884
+        // bitmap.setTo(3, true); //0x1116793a28Cbdfa5182f24366fFCbbbC3094CF40
+        // bitmap.setTo(4, true); //0x667F1F3947e152C0d517Fd0D2a0E81dd9390FEdD
+        // bitmap.setTo(5, true); //0xeBB35336d5bA07C788973D6f8C8496E5bA779840
+        // bitmap.setTo(6, true); //0xC3f753A136EF893a24972635a4cA29EFAaA94729
+        // bitmap.setTo(7, true); //0x6990f0AC60f306A630EA2CD4BcB868119E4B7353
+        // bitmap.setTo(8, true); //0x1591E22EBF19bFcd234FC04cdA03E41d6Dc963B0
+        // bitmap.setTo(9, true); //0xFe0985F3e4175487fB948A906867EbE9f307c6E4
     }
 
     modifier atStage(Stages _stage) {
@@ -63,6 +72,7 @@ contract MyNFT is ERC721, Ownable {
         require(idx < max, "Out of range");
         commits[msg.sender].commit = idx;
         commits[msg.sender].block = uint64(block.number);
+        // commits[msg.sender].revealed = false;
         commits[msg.sender].id = 255; //outside of max range. This is changed in 'reveal' function
         totalCommits += 1;
         if (totalCommits == maxParticipants) {
@@ -83,11 +93,11 @@ contract MyNFT is ERC721, Ownable {
     }
 
     function redeem(uint8 indexN, bytes32[] calldata proof) external atStage(Stages.Mintable) {
-        require(bitmap.get(indexN) == false, "Already claimed");
+        require(bitmap.get(indexN) == true, "Already claimed");
         require(_verify(_leaf(msg.sender, indexN), proof), "Invalid merkle proof");
         require(commits[msg.sender].revealed, "NFT ID Not revealed");
         _safeMint(msg.sender, commits[msg.sender].id);
-        bitmap.setTo(indexN, true);
+        bitmap.setTo(indexN, false);
         if (totalMints == maxParticipants) nextStage();
     }
 
@@ -101,23 +111,6 @@ contract MyNFT is ERC721, Ownable {
     
     function nextStage() internal {
         stage = Stages(uint(stage) + 1);
-    }
-
-    function mint(uint8 tokenId) external payable {
-        require(msg.value == 0.01 ether);
-        _mint(msg.sender, uint256(tokenId));
-    }
-
-    function withdraw() external onlyOwner {
-        require(totalMints >= maxParticipants / 2, "50% of NFTs have not yet minted");
-        payable(msg.sender).call{value: addres(this).balance}("");
-    }
-
-    function multiTransfer(address[] to, uint8[] ids) external {
-        require(to.length == ids.length, "Mismatch of array lengths");
-        for(uint i; i < to.length; i++) {
-            transferFrom(msg.sender, to[i], ids[i]);
-        }
     }
 }
 
