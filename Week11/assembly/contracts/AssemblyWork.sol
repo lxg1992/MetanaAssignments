@@ -25,3 +25,32 @@ contract BitWise {
         }
     }
 }
+
+contract Charazar {
+    // Add following test cases for String contract: 
+// charAt(“abcdef”, 2) should return 0x6300
+// charAt(“”, 0) should return 0x0000
+// charAt(“george”, 10) should return 0x0000
+
+   function charAt(string memory input, uint index) public pure returns(bytes2) {
+        assembly {
+            let strPtr := add(input, 0x20)  // Get pointer to string data
+            let strLen := mload(input)  // Get length of string
+
+            // Check if index is within bounds
+            if gt(index, sub(strLen, 1)) {
+                revert(0, 0)
+            }
+
+            // Get pointer to the byte at the specified index
+            let bytePtr := add(strPtr, index)
+            // Load the byte value at the specified index
+            let byteVal := mload(bytePtr)
+            // Return the byte value
+            mstore(0, byteVal)
+            mstore(1, 0)
+            return(0, 32)
+        }
+
+   }
+}
