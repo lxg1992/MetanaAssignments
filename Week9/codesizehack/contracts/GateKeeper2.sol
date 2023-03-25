@@ -35,7 +35,7 @@ contract GatekeeperTwo {
     }
 }
 
-contract LetMeInTwo {
+contract Hack {
     constructor(address _addr) {
         bytes8 key = bytes8(
             type(uint64).max ^

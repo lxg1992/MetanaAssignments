@@ -5,16 +5,16 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
-contract MyNFT is ERC721, Ownable {
+contract MyNFT is ERC721, Ownable, ReentrancyGuard {
     event RevealNum(uint8 random);
     event ShowHash(bytes32 _hash);
 
     using BitMaps for BitMaps.BitMap;
     
     bytes32 constant rootFor3 = 0x03c18bb8e5674709cec55ca40ebee39ec9c69dc52a98271721cdcfa2314e5371;
-    // bytes32 constant rootFor10 = 0x7650aafbf2a9b18e825df7c1fc708a853f9523a08d8397c6674a30f667136300;
     uint constant maxParticipants = 3;
     uint totalMints = 0;
     uint totalCommits = 0;
