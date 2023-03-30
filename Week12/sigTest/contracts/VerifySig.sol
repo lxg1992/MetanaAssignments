@@ -25,7 +25,7 @@ contract VerifySig {
         return ecrecover(_ethSignedMsgHash, v, r, s);
     }
 
-    function _split(bytes moemory _sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
+    function _split(bytes memory _sig) internal pure returns (bytes32 r, bytes32 s, uint8 v) {
         require(_sig.length == 65, "invalid signature length");
 
         assembly {
@@ -35,6 +35,14 @@ contract VerifySig {
         }
     }
 }
+
+//ethereum.enable
+//account '0xmyacc'
+//hash = 'resultOfGetMessageHash'
+//signature = ethereum.request({method: 'personal_sign', params: [account, hash ]})
+//ethSignedHash =  getEthSignedMessage(hash)
+//address = recover(ethSignedHash, signature)
+//isVerified = verify(address, message, signature)
 
 //ethereum.enable
 //account '0xmyacc'
