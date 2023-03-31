@@ -2,16 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "semantic-ui-css/semantic.min.css";
 import App from "./App";
-import { AccountCtx } from "./context/AccountCtx";
+import { MyContext, MyContextProvider } from "./context/Ctx";
 
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AccountCtx.Provider >
+    <MyContextProvider>
       <App />
-    </AccountCtx.Provider>
+    </MyContextProvider>
   </React.StrictMode>
 );
 

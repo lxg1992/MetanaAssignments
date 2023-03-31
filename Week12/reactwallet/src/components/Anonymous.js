@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 
-const Anonymous = () => {
-    
-}
+// const Anonymous = () => {
 
-export default Anonymous;
+// }
+
+// export default Anonymous;

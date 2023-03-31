@@ -1,15 +1,15 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { useContext } from "react";
-import { AccountCtx } from "./context/AccountCtx";
+import { MyContext } from "./context/Ctx";
 
 function App() {
-  const ctx = useContext(AccountCtx);
+  const ctx = useContext(MyContext);
+  console.log(ctx);
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Is set {ctx.account.isSet}</p>
         <a
           className="App-link"
           href="https://reactjs.org"
