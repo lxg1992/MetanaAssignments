@@ -2,7 +2,7 @@ import React, { useState, useEffect, createContext } from "react";
 
 const MyContext = createContext();
 
-const init = {
+const INITIAL = {
   isSet: false,
   priKey: "",
   pubKey: "",
@@ -10,7 +10,7 @@ const init = {
 };
 
 function MyContextProvider({ children }) {
-  const [account, setAccount] = useState(init);
+  const [account, setAccount] = useState(INITIAL);
 
   // Local Storage: setting & getting data
   useEffect(() => {
@@ -18,14 +18,16 @@ function MyContextProvider({ children }) {
 
     if (accountData) {
       setAccount(accountData);
-    } else {
-      localStorage.setItem()
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem("wallet_account", JSON.stringify(account));
   }, [account]);
+
+  const resetAccount = () => {
+    setAccount(INITIAL);
+  }
 
   // function toggleFavorite(id) {
   //   const updatedArr = allPhotos.map((photo) => {
@@ -51,6 +53,7 @@ function MyContextProvider({ children }) {
       value={{
         account,
         setAccount,
+        resetAccount
       }}
     >
       {children}
