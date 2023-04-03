@@ -7,8 +7,6 @@ import Known from "./components/Known";
 
 function App() {
   const ctx = useContext(MyContext);
-  console.log(ctx);
-
   return ctx.account.isSet ? <Known /> : <Anonymous />;
 }
 

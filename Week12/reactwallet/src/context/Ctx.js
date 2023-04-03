@@ -7,6 +7,7 @@ const INITIAL = {
   priKey: "",
   pubKey: "",
   address: "",
+  ERC20Balances: [],
 };
 
 function MyContextProvider({ children }) {
@@ -16,7 +17,7 @@ function MyContextProvider({ children }) {
   useEffect(() => {
     const accountData = JSON.parse(localStorage.getItem("wallet_account"));
 
-    if (accountData) {
+    if (accountData.isSet) {
       setAccount(accountData);
     }
   }, []);
@@ -27,7 +28,7 @@ function MyContextProvider({ children }) {
 
   const resetAccount = () => {
     setAccount(INITIAL);
-  }
+  };
 
   // function toggleFavorite(id) {
   //   const updatedArr = allPhotos.map((photo) => {
@@ -53,7 +54,7 @@ function MyContextProvider({ children }) {
       value={{
         account,
         setAccount,
-        resetAccount
+        resetAccount,
       }}
     >
       {children}
