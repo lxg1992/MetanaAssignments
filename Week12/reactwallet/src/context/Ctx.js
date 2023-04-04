@@ -4,8 +4,9 @@ const MyContext = createContext();
 
 const INITIAL = {
   isSet: false,
-  priKey: "",
-  pubKey: "",
+  privateKey: "",
+  privateKeyBuffer: {},
+  publicKey: "",
   address: "",
   ERC20Balances: [],
 };

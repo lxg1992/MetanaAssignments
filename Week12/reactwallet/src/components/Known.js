@@ -14,6 +14,7 @@ import { MyContext } from "../context/Ctx";
 import { infuraNode } from "../helpers/constants";
 import { f4l4 } from "../helpers/utils";
 import { signMessage } from "../scripts/ethUtils.mjs";
+import EthTransaction from "./SendEth";
 
 const Known = () => {
   const { account, resetAccount } = useContext(MyContext);
@@ -43,6 +44,7 @@ const Known = () => {
       setBalance(balanceInEth.toFixed(4));
     }
     getBalance();
+    console.log(account);
   }, [account.address]);
 
   useEffect(() => {
@@ -83,7 +85,7 @@ const Known = () => {
             </Card>
             <Card fluid>
               <Card.Description>
-                Public Key: {f4l4(account.pubKey)}
+                Public Key: {f4l4(account.publicKey)}
               </Card.Description>
             </Card>
             <Card fluid>
@@ -98,7 +100,7 @@ const Known = () => {
               <Input onChange={(e) => setMessageToSign(e.target.value)} />
               <Button
                 onClick={() => {
-                  const sig = signMessage(messageToSign, account.priKey);
+                  const sig = signMessage(messageToSign, account.privateKey);
                   console.log(sig);
                   // setLastSignature(sig);
                 }}
@@ -121,6 +123,9 @@ const Known = () => {
             <Card fluid>
               <Card.Header>Ethereum balance</Card.Header>
               <Card.Description>{balance}</Card.Description>
+            </Card>
+            <Card fluid>
+              <EthTransaction nonce={nonce} />
             </Card>
           </Grid.Column>
         </Grid.Row>
