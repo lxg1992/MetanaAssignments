@@ -5,10 +5,14 @@ const MyContext = createContext();
 const INITIAL = {
   isSet: false,
   privateKey: "",
-  privateKeyBuffer: {},
+  privateKeyBuffer: "",
   publicKey: "",
   address: "",
-  ERC20Balances: [],
+  lastTx: "",
+  ERC20Contracts: {
+    USDC: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
+    CHAINLINK: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+  },
 };
 
 function MyContextProvider({ children }) {
@@ -18,7 +22,7 @@ function MyContextProvider({ children }) {
   useEffect(() => {
     const accountData = JSON.parse(localStorage.getItem("wallet_account"));
 
-    if (accountData.isSet) {
+    if (accountData && accountData.isSet) {
       setAccount(accountData);
     }
   }, []);
@@ -30,26 +34,6 @@ function MyContextProvider({ children }) {
   const resetAccount = () => {
     setAccount(INITIAL);
   };
-
-  // function toggleFavorite(id) {
-  //   const updatedArr = allPhotos.map((photo) => {
-  //     if (photo.id === id) {
-  //       return { ...photo, isFavorite: !photo.isFavorite };
-  //     }
-  //     return photo;
-  //   });
-
-  //   setAllPhotos(updatedArr);
-  // }
-
-  // function addToCart(newItem) {
-  //   setAccount((prevItems) => [...prevItems, newItem]);
-  // }
-
-  // function removeFromCart(id) {
-  //   setAccount((prevItems) => prevItems.filter((item) => item.id !== id));
-  // }
-
   return (
     <MyContext.Provider
       value={{

@@ -11,17 +11,16 @@ import {
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
-import { infuraNode } from "../helpers/constants";
+import { goerliScanTx, infuraNode } from "../helpers/constants";
 import { f4l4 } from "../helpers/utils";
 import { signMessage } from "../scripts/ethUtils.mjs";
 import EthTransaction from "./SendEth";
+import ERC20Container from "./ERC20Container";
 
 const Known = () => {
-  const { account, resetAccount } = useContext(MyContext);
+  const { account, resetAccount, setAccount } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
-  const [messageToSign, setMessageToSign] = useState("");
-  const [lastSignature, setLastSignature] = useState("");
 
   useEffect(() => {
     async function getBalance() {
@@ -44,8 +43,8 @@ const Known = () => {
       setBalance(balanceInEth.toFixed(4));
     }
     getBalance();
-    console.log(account);
-  }, [account.address]);
+    // console.log(account);
+  }, [account]);
 
   useEffect(() => {
     async function getNonce() {
@@ -68,68 +67,68 @@ const Known = () => {
     }
 
     getNonce();
-  }, [account.address]);
+  }, [account]);
 
   return (
     <Container textAlign="center">
-      <Grid container columns={3} verticalAlign="center">
-        <Grid.Row>
-          <Grid.Column>
-            <Button onClick={resetAccount}>Reset</Button>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Card fluid>
-              <Card.Description>Address: {account.address}</Card.Description>
-            </Card>
-            <Card fluid>
-              <Card.Description>
-                Public Key: {f4l4(account.publicKey)}
-              </Card.Description>
-            </Card>
-            <Card fluid>
-              <Card.Description>Nonce: {nonce}</Card.Description>
-            </Card>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Card fluid>
-              <Card.Header>Sign Message</Card.Header>
-              <Input onChange={(e) => setMessageToSign(e.target.value)} />
-              <Button
-                onClick={() => {
-                  const sig = signMessage(messageToSign, account.privateKey);
-                  console.log(sig);
-                  // setLastSignature(sig);
-                }}
-              >
-                Sign
-              </Button>
-            </Card>
-          </Grid.Column>
-          <Grid.Column>
-            <Card fluid>
-              <Card.Header>Last Signature</Card.Header>
-              <Card.Description>
-                {lastSignature ? lastSignature : "[no signature yet]"}
-              </Card.Description>
-            </Card>
-          </Grid.Column>
-        </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Card fluid>
-              <Card.Header>Ethereum balance</Card.Header>
-              <Card.Description>{balance}</Card.Description>
-            </Card>
-            <Card fluid>
-              <EthTransaction nonce={nonce} />
-            </Card>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+      <Card fluid>
+        <Grid container columns={2} verticalAlign="center">
+          <Grid.Row>
+            <Grid.Column>
+              <Button onClick={resetAccount}>Reset</Button>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Card fluid>
+                <Card.Content>
+                  <Card.Description>
+                    Address: {account.address}
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+
+              <Card fluid>
+                <Card.Content>
+                  <Card.Description>Nonce: {nonce}</Card.Description>
+                </Card.Content>
+              </Card>
+              <Card fluid>
+                <Card.Content>
+                  <Card.Header>Ethereum balance</Card.Header>
+                  <Card.Description>{balance}</Card.Description>
+                </Card.Content>
+              </Card>
+            </Grid.Column>
+            <GridColumn>
+              <Card fluid>
+                <Card.Content>
+                  <Card.Description>
+                    Public Key: {f4l4(account.publicKey)}
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+              <Card fluid>
+                <Card.Content>
+                  {account.lastTx ? (
+                    <Card.Description href={`${goerliScanTx}${account.lastTx}`}>
+                      Last Tx: {f4l4(account.lastTx)}{" "}
+                    </Card.Description>
+                  ) : (
+                    <Card.Description>LastTx: none detected</Card.Description>
+                  )}
+                </Card.Content>
+              </Card>
+              <Card fluid>
+                <Card.Content>
+                  <EthTransaction nonce={nonce} />
+                </Card.Content>
+              </Card>
+            </GridColumn>
+          </Grid.Row>
+        </Grid>
+      </Card>
+      <ERC20Container />
     </Container>
   );
 };

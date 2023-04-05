@@ -5,8 +5,7 @@ import { Chain, Common, Hardfork } from "@ethereumjs/common";
 import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
-  priKeyBuffer,
-  signTransaction,
+  generateSendRawTxPayload,
 } from "../scripts/ethUtils.mjs";
 import { infuraNode, network } from "../helpers/constants";
 import { Button, Card, Input } from "semantic-ui-react";
@@ -15,7 +14,7 @@ import { Button, Card, Input } from "semantic-ui-react";
 const common = new Common({ chain: Chain.Goerli });
 
 const EthTransaction = ({ nonce }) => {
-  const { account } = useContext(MyContext);
+  const { account, setAccount } = useContext(MyContext);
   const [to, setTo] = useState("");
   const [value, setValue] = useState("");
   const [data, setData] = useState("");
@@ -25,7 +24,7 @@ const EthTransaction = ({ nonce }) => {
   };
 
   const handleValueChange = (event) => {
-    setValue(parseFloat(event.target.value));
+    setValue(event.target.value);
   };
 
   const handleDataChange = (event) => {
@@ -34,8 +33,29 @@ const EthTransaction = ({ nonce }) => {
 
   const handleSubmit = async () => {
     const txData = generateTxData(nonce, to, value, data);
-    const signedPayload = signTransaction(txData, account.privateKey);
-    console.log(signedPayload);
+    console.log({ txData });
+    const signedPayload = generateSendRawTxPayload(txData, account.privateKey);
+    const response = await fetch(infuraNode, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_sendRawTransaction",
+        params: ["0x" + signedPayload],
+        id: 1,
+      }),
+    });
+
+    const returnData = await response.json();
+    if (returnData.error) {
+      console.error(returnData.error);
+      throw new Error(returnData.error.message);
+    }
+    setAccount((prevState) => ({ ...prevState, lastTx: returnData.result }));
+    console.log(returnData.result);
+    return returnData.result;
   };
 
   return (

@@ -23,13 +23,14 @@ const Anonymous = () => {
         onClick={() => {
           const { publicKey, privateKey, ethAddress, privateKeyBuffer } =
             generateCredentials();
-          setAccount({
+          setAccount((prev) => ({
+            ...prev,
             isSet: true,
             privateKey: privateKey,
             publicKey: publicKey,
             address: ethAddress,
             privateKeyBuffer,
-          });
+          }));
         }}
       >
         Create New
@@ -88,13 +89,14 @@ const Anonymous = () => {
                 }
 
                 // At this point we can see that import is fine
-                setAccount({
+                setAccount((prev) => ({
+                  ...prev,
                   isSet: true,
                   privateKey: privateKey,
                   publicKey: publicKey,
                   address: ethAddress,
                   privateKeyBuffer,
-                });
+                }));
 
                 setError("");
                 setOpen(false);
