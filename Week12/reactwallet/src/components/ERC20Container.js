@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
 import { Card } from "semantic-ui-react";
+import BigNumber from "bignumber.js";
 import { MyContext } from "../context/Ctx";
 import ERC20Item from "./ERC20Item";
-import BigNumber from "bignumber.js";
 import { infuraNode } from "../helpers/constants";
 
-const ERC20Container = () => {
+const ERC20Container = ({ nonce }) => {
   const { account } = useContext(MyContext);
 
   async function getERC20Balance(contractAddress, decimals) {
@@ -70,21 +70,6 @@ const ERC20Container = () => {
     return decimals;
   }
 
-  async function createTransferPayload(recipient, amount) {
-    // ERC20 transfer function signature
-    const transferSignature = "0xa9059cbb";
-
-    // Convert the recipient address to a hexadecimal string
-    const recipientHex = recipient.substring(2).padStart(64, "0");
-
-    // Convert the amount to a hexadecimal string
-    const amountHex = BigInt(amount).toString(16).padStart(64, "0");
-
-    // Concatenate the function signature, recipient, and amount to create the payload
-    const payload = transferSignature + recipientHex + amountHex;
-
-    return payload;
-  }
   return (
     <Card fluid>
       <Card.Content>
@@ -96,7 +81,7 @@ const ERC20Container = () => {
             address={entry[1]}
             getERC20Balance={getERC20Balance}
             getERC20Decimals={getERC20Decimals}
-            createTransferPayload={createTransferPayload}
+            nonce={nonce}
           />
         ))}
       </Card.Content>

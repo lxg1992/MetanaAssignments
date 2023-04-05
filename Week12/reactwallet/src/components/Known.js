@@ -128,7 +128,7 @@ const Known = () => {
           </Grid.Row>
         </Grid>
       </Card>
-      <ERC20Container />
+      <ERC20Container nonce={nonce} />
     </Container>
   );
 };

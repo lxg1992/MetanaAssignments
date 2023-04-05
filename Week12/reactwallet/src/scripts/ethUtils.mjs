@@ -4,6 +4,7 @@ import { Buffer } from "buffer";
 import { ecsign, toBuffer } from "ethereumjs-util";
 import { Transaction } from "@ethereumjs/tx";
 import { network } from "../helpers/constants.js";
+import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 
 const common = new Common({ chain: network });
@@ -101,4 +102,23 @@ export function generateSendRawTxPayload(txParams, privateKey) {
   const signedTx = tx.sign(pkBuffer);
   const serializedTx = signedTx.serialize();
   return serializedTx.toString("hex");
+}
+
+export function createTransferPayload(recipient, amount, decimals) {
+  // ERC20 transfer function signature
+  const transferSignature = "0xa9059cbb";
+
+  // Convert the recipient address to a hexadecimal string
+  const recipientHex = recipient.substring(2).padStart(64, "0");
+
+  // Convert the amount to a hexadecimal string
+  const amountHex = new BigNumber(amount)
+    .multipliedBy(new BigNumber(10).exponentiatedBy(decimals))
+    .toString(16)
+    .padStart(64, "0");
+
+  // Concatenate the function signature, recipient, and amount to create the payload
+  const payload = transferSignature + recipientHex + amountHex;
+
+  return payload;
 }

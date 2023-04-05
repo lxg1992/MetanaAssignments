@@ -11,8 +11,6 @@ import { infuraNode, network } from "../helpers/constants";
 import { Button, Card, Input } from "semantic-ui-react";
 // local
 
-const common = new Common({ chain: Chain.Goerli });
-
 const EthTransaction = ({ nonce }) => {
   const { account, setAccount } = useContext(MyContext);
   const [to, setTo] = useState("");
