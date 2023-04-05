@@ -1,12 +1,14 @@
 import React, { useState, useContext } from "react";
-import { Card } from "semantic-ui-react";
+import { Card, Input, Button } from "semantic-ui-react";
 import BigNumber from "bignumber.js";
 import { MyContext } from "../context/Ctx";
 import ERC20Item from "./ERC20Item";
 import { infuraNode } from "../helpers/constants";
 
 const ERC20Container = ({ nonce }) => {
-  const { account } = useContext(MyContext);
+  const { account, setAccount } = useContext(MyContext);
+  const [newTokenName, setNewTokenName] = useState("");
+  const [newTokenAddr, setNewTokenAddr] = useState("");
 
   async function getERC20Balance(contractAddress, decimals) {
     const balanceOfMethodId = "0x70a08231";
@@ -39,6 +41,13 @@ const ERC20Container = ({ nonce }) => {
       new BigNumber(10).exponentiatedBy(decimals)
     ); // Convert from wei to tokens
     return balance.toFixed(18);
+  }
+
+  function addToken() {
+    setAccount((prev) => {
+      prev.ERC20Contracts[newTokenName] = newTokenAddr;
+      return { ...prev };
+    });
   }
 
   async function getERC20Decimals(contractAddress) {
@@ -84,6 +93,20 @@ const ERC20Container = ({ nonce }) => {
             nonce={nonce}
           />
         ))}
+      </Card.Content>
+      <Card.Content>
+        <Card.Header>Add Tokens</Card.Header>
+        <Input
+          value={newTokenName}
+          onChange={(e) => setNewTokenName(e.target.value)}
+          placeholder={"Name of token"}
+        />
+        <Input
+          value={newTokenAddr}
+          onChange={(e) => setNewTokenAddr(e.target.value)}
+          placeholder={"Token Address"}
+        />
+        <Button onClick={addToken}>Add</Button>
       </Card.Content>
     </Card>
   );
