@@ -8,6 +8,7 @@ console.log(process.env.PRIVATE_KEY);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.17",
+  defaultNetwork: "goerli",
   networks: {
     goerli: {
       url: process.env.GOERLI_EP,
