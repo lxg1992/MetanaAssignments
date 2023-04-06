@@ -34,12 +34,29 @@ function MyContextProvider({ children }) {
   const resetAccount = () => {
     setAccount(INITIAL);
   };
+
+  const addToken = (newTokenName, newTokenAddr) => {
+    setAccount((state) => {
+      state.ERC20Contracts[newTokenName] = newTokenAddr;
+      return { ...state };
+    });
+  };
+
+  const removeToken = (tokenNameToRemove) => {
+    setAccount((state) => {
+      delete state.ERC20Contracts[tokenNameToRemove];
+      return { ...state };
+    });
+  };
+
   return (
     <MyContext.Provider
       value={{
         account,
         setAccount,
         resetAccount,
+        addToken,
+        removeToken,
       }}
     >
       {children}

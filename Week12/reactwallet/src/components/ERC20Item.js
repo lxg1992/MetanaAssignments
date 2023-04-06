@@ -15,7 +15,7 @@ const ERC20Item = ({
   getERC20Decimals,
   nonce,
 }) => {
-  const { account, setAccount } = useContext(MyContext);
+  const { account, setAccount, removeToken } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState(0);
@@ -33,12 +33,8 @@ const ERC20Item = ({
       100,
       100000
     );
-    console.log({ txData });
-    console.log(1);
 
     const signedPayload = generateSendRawTxPayload(txData, account.privateKey);
-    console.log({ signedPayload });
-    console.log(2);
 
     const response = await fetch(infuraNode, {
       method: "POST",
@@ -95,6 +91,13 @@ const ERC20Item = ({
           onChange={(e) => setAmount(e.target.value)}
         ></Input>
         <Button onClick={sendTransfer}>Send</Button>
+        {/* <Button
+          onClick={(e) => {
+            removeToken(name);
+          }}
+        > MAKE SURE THIS WORKS BEFORE COMMIT
+          Remove Token
+        </Button> */}
       </Card.Content>
     </Card>
   );

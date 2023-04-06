@@ -6,7 +6,7 @@ import ERC20Item from "./ERC20Item";
 import { infuraNode } from "../helpers/constants";
 
 const ERC20Container = ({ nonce }) => {
-  const { account, setAccount } = useContext(MyContext);
+  const { account, setAccount, addToken } = useContext(MyContext);
   const [newTokenName, setNewTokenName] = useState("");
   const [newTokenAddr, setNewTokenAddr] = useState("");
 
@@ -43,12 +43,12 @@ const ERC20Container = ({ nonce }) => {
     return balance.toFixed(18);
   }
 
-  function addToken() {
-    setAccount((prev) => {
-      prev.ERC20Contracts[newTokenName] = newTokenAddr;
-      return { ...prev };
-    });
-  }
+  // function addToken() {
+  //   setAccount((prev) => {
+  //     prev.ERC20Contracts[newTokenName] = newTokenAddr;
+  //     return { ...prev };
+  //   });
+  // }
 
   async function getERC20Decimals(contractAddress) {
     const decimalsMethodId = "0x313ce567";
@@ -106,7 +106,9 @@ const ERC20Container = ({ nonce }) => {
           onChange={(e) => setNewTokenAddr(e.target.value)}
           placeholder={"Token Address"}
         />
-        <Button onClick={addToken}>Add</Button>
+        <Button onClick={() => addToken(newTokenName, newTokenAddr)}>
+          Add
+        </Button>
       </Card.Content>
     </Card>
   );

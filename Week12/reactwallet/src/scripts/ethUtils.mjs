@@ -59,6 +59,8 @@ export const importWithPrivateKey = (pkInput) => {
   }
 };
 
+//NEED TO SET UP ENCRYPTION FOR PRIVATE KEY
+
 export const signMessage = (msg, privateKey) => {
   const msgHash = keccak256(msg);
   const signature = ec.sign(msgHash, privateKey, { canonical: true });
