@@ -5,6 +5,7 @@
     "hardhat": "^2.13.0"
   },
   "dependencies": {
-    "ethereumjs-util": "^7.1.5"
+    "ethereumjs-util": "^7.1.5",
+    "ethers": "^5.4.0"
   }
 }
