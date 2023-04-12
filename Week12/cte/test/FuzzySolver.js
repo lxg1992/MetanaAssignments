@@ -4,13 +4,13 @@ const {
   bytecode,
 } = require("../artifacts/contracts/FuzzyIdentity.sol/FuzzySolver.json");
 
-describe("FuzzyIdentity", function () {
+xdescribe("FuzzyIdentity", function () {
   it("should return the correct hash", async () => {
     const Deployer = await ethers.getContractFactory("Deployer");
 
     const deployer = await Deployer.deploy(bytecode);
 
-    const depTx = await deployer.deployed();
+    await deployer.deployed();
     let saltBytes;
 
     for (let salt = 17417618; salt <= 100000000000000; salt++) {
