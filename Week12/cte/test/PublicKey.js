@@ -1,58 +1,54 @@
 const eth = require("ethereumjs-util");
 const { expect } = require("chai");
-const EC = require("elliptic").ec;
-// function getSenderPublicKey(txData) {
-//   // Extract the relevant values from the transaction data
-//   const { from, r, s, v, chainId } = txData;
+const ejsUtil = require("ethereumjs-util");
+const hre = require("hardhat");
 
-//   // Create an instance of the elliptic curve secp256k1
-//   const curve = new ec("secp256k1");
+function computePublicKey(transaction) {
+  const signature = {
+    r: transaction.r,
+    s: transaction.s,
+    v: transaction.v,
+  };
 
-//   // Prepare the transaction hash for signing
-//   const txHash = `0x${txData.hash.slice(2)}${chainId
-//     .toString(16)
-//     .padStart(2, "0")}${r.slice(2)}${s.slice(2)}`;
+  const serializedTransaction = ethers.utils.serializeTransaction(
+    transaction,
+    signature
+  );
+  const msg = ethers.utils.keccak256(serializedTransaction);
+  const publicKey = ethers.utils.recoverPublicKey(msg, signature);
 
-//   // Convert the v value to an integer
-//   const vValue = parseInt(v, 10);
-//   console.log({ v, vValue });
-
-//   // Determine the recovery parameter (y-parity) from the v value
-//   const recoveryParam = vValue; //- 27;
-
-//   // Derive the public key from the transaction hash and recovery parameter
-//   const publicKey = curve.recoverPubKey(
-//     Buffer.from(txHash, "hex"),
-//     recoveryParam,
-//     Buffer.from(r, "hex"),
-//     Buffer.from(s, "hex")
-//   );
-
-//   // Convert the public key to uncompressed format and return it as a hexadecimal string
-//   return `0x${publicKey.encode("hex", false)}`;
-// }
-
-function extractSenderPublicKey(transactionObject) {
-  // Get the "r", "s", and "v" values from the transactionObject
-  const r = transactionObject.r.slice(2); // Remove the "0x" prefix
-  const s = transactionObject.s.slice(2); // Remove the "0x" prefix
-  const v = transactionObject.v;
-
-  // Concatenate the "r", "s", and "v" values into a single string
-  const concatenated = r + s + v.toString(16);
-
-  // Convert the concatenated string into a Buffer
-  const buffer = Buffer.from(concatenated, "hex");
-
-  const ec = new EC("secp256k1");
-
-  // Use the elliptic library to derive the public key from the buffer
-
-  const publicKey = ec.recoverPubKey(buffer, 0, buffer.length, v);
-
-  // Return the public key as a hexadecimal string
-  return publicKey.encode("hex", false);
+  return publicKey;
 }
+
+function getRawTransaction(tx) {
+  function addKey(accum, key) {
+    if (tx[key]) {
+      accum[key] = tx[key];
+    }
+    return accum;
+  }
+
+  // Extract the relevant parts of the transaction and signature
+  const txFields =
+    "accessList chainId data gasPrice gasLimit maxFeePerGas maxPriorityFeePerGas nonce to type value".split(
+      " "
+    );
+  const sigFields = "v r s".split(" ");
+
+  // Seriailze the signed transaction
+  const raw = utils.serializeTransaction(
+    txFields.reduce(addKey, {}),
+    sigFields.reduce(addKey, {})
+  );
+
+  // Double check things went well
+  if (utils.keccak256(raw) !== tx.hash) {
+    throw new Error("serializing failed!");
+  }
+
+  return raw;
+}
+
 describe("Public Key", function () {
   it("should accept the correct public key for authenticate function", async () => {
     const PublicKey = await ethers.getContractFactory("PublicKeyChallenge");
@@ -78,12 +74,24 @@ describe("Public Key", function () {
     const payload = {
       to: "0x92b28647Ae1F3264661f72fb2eB9625A89D88A31",
       gasLimit: "21000",
+      value: "0x0E0B6B3A7640000",
+      
     };
 
     const txSent = await signer.sendTransaction(payload);
-    console.log({ txSent });
+    // console.log({ txSent });
+    const { gasPrice, ...tx } = txSent;
 
-    const pubKey = extractSenderPublicKey(txSent);
+    const signature = {
+
+    }
+
+    ejsUtil.ecrecover();
+
+    console.log({ tx });
+    // const rawTx = getRawTransaction(txSent);
+
+    const pubKey = computePublicKey(tx);
     console.log(pubKey);
   });
 });
