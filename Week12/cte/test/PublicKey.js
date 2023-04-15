@@ -3,52 +3,6 @@ const { expect } = require("chai");
 const ejsUtil = require("ethereumjs-util");
 const hre = require("hardhat");
 
-function computePublicKey(transaction) {
-  const signature = {
-    r: transaction.r,
-    s: transaction.s,
-    v: transaction.v,
-  };
-
-  const serializedTransaction = ethers.utils.serializeTransaction(
-    transaction,
-    signature
-  );
-  const msg = ethers.utils.keccak256(serializedTransaction);
-  const publicKey = ethers.utils.recoverPublicKey(msg, signature);
-
-  return publicKey;
-}
-
-function getRawTransaction(tx) {
-  function addKey(accum, key) {
-    if (tx[key]) {
-      accum[key] = tx[key];
-    }
-    return accum;
-  }
-
-  // Extract the relevant parts of the transaction and signature
-  const txFields =
-    "accessList chainId data gasPrice gasLimit maxFeePerGas maxPriorityFeePerGas nonce to type value".split(
-      " "
-    );
-  const sigFields = "v r s".split(" ");
-
-  // Seriailze the signed transaction
-  const raw = utils.serializeTransaction(
-    txFields.reduce(addKey, {}),
-    sigFields.reduce(addKey, {})
-  );
-
-  // Double check things went well
-  if (utils.keccak256(raw) !== tx.hash) {
-    throw new Error("serializing failed!");
-  }
-
-  return raw;
-}
-
 describe("Public Key", function () {
   xit("should accept the correct public key for authenticate function", async () => {
     const PublicKey = await ethers.getContractFactory("PublicKeyChallenge");
