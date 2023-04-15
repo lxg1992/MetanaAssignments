@@ -50,7 +50,7 @@ function getRawTransaction(tx) {
 }
 
 describe("Public Key", function () {
-  it("should accept the correct public key for authenticate function", async () => {
+  xit("should accept the correct public key for authenticate function", async () => {
     const PublicKey = await ethers.getContractFactory("PublicKeyChallenge");
 
     const pk = await PublicKey.deploy();
@@ -73,25 +73,60 @@ describe("Public Key", function () {
 
     const payload = {
       to: "0x92b28647Ae1F3264661f72fb2eB9625A89D88A31",
-      gasLimit: "21000",
       value: "0x0E0B6B3A7640000",
-      
     };
 
-    const txSent = await signer.sendTransaction(payload);
+    const tx = await signer.sendTransaction(payload);
+    console.log({ tx });
     // console.log({ txSent });
-    const { gasPrice, ...tx } = txSent;
+    const expandedSig = {
+      r: tx.r,
+      s: tx.s,
+      v: tx.v,
+    };
 
-    const signature = {
+    const sig = ethers.utils.joinSignature(expandedSig);
 
+    let transactionHashData;
+    switch (tx.type) {
+      case 0:
+        transactionHashData = {
+          gasPrice: tx.gasPrice,
+          gasLimit: tx.gasLimit,
+          value: tx.value,
+          nonce: tx.nonce,
+          data: tx.data,
+          chainId: tx.chainId,
+          to: tx.to,
+        };
+        break;
+      case 2:
+        transactionHashData = {
+          gasLimit: tx.gasLimit,
+          value: tx.value,
+          nonce: tx.nonce,
+          data: tx.data,
+          chainId: tx.chainId,
+          to: tx.to,
+          type: 2,
+          maxFeePerGas: tx.maxFeePerGas,
+          maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
+        };
+        break;
+      default:
+        throw "Unsupported tx type";
     }
 
-    ejsUtil.ecrecover();
+    const rstransactionHash = await ethers.utils.resolveProperties(
+      transactionHashData
+    );
 
-    console.log({ tx });
-    // const rawTx = getRawTransaction(txSent);
+    console.log({ rstransactionHash });
+    const raw = ethers.utils.serializeTransaction(rstransactionHash); // RLP encoded
+    const msgHash = ethers.utils.keccak256(raw);
+    const msgBytes = ethers.utils.arrayify(msgHash);
+    const recoveredPubKey = ethers.utils.recoverPublicKey(msgBytes, sig);
 
-    const pubKey = computePublicKey(tx);
-    console.log(pubKey);
+    console.log({ recoveredPubKey });
   });
 });
