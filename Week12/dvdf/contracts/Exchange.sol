@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./TrustfulOracle.sol";
-import "../DamnValuableNFT.sol";
+import "./DamnValuableNFT.sol";
 
 /**
  * @title Exchange
@@ -13,7 +13,7 @@ import "../DamnValuableNFT.sol";
 contract Exchange is ReentrancyGuard {
     using Address for address payable;
 
-    DamnValuableNFT public immutable token;
+    DamnValuableNFT public token;
     TrustfulOracle public immutable oracle;
 
     error InvalidPayment();
