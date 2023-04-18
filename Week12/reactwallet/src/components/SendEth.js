@@ -58,20 +58,21 @@ const EthTransaction = ({ nonce }) => {
 
   return (
     <>
-      <Card.Header>
+      <Card.Header>Send Tx</Card.Header>
+      <Card.Content>
         To:
         <Input type="text" value={to} onChange={handleToChange} />
-      </Card.Header>
+      </Card.Content>
       <br />
-      <Card.Header>
+      <Card.Content>
         Value (ETH):
         <Input type="text" value={value} onChange={handleValueChange} />
-      </Card.Header>
+      </Card.Content>
       <br />
-      <Card.Header>
+      <Card.Content>
         Data:
         <Input value={data} onChange={handleDataChange} />
-      </Card.Header>
+      </Card.Content>
       <br />
       <Button onClick={handleSubmit}>Submit</Button>
     </>
