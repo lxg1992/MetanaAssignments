@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Card, Input, Button } from "semantic-ui-react";
+import { Card, Input, Button, Icon } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
@@ -73,6 +73,11 @@ const ERC20Item = ({
   return (
     <Card fluid>
       <Card.Content>
+        <Button
+          floated="right"
+          icon="close"
+          onClick={(e) => removeToken(name)}
+        />
         <Card.Header>Name: {name}</Card.Header>
         <Card.Description>Address: {address}</Card.Description>
         <Card.Description>Balance: {balance}</Card.Description>
@@ -91,13 +96,6 @@ const ERC20Item = ({
           onChange={(e) => setAmount(e.target.value)}
         ></Input>
         <Button onClick={sendTransfer}>Send</Button>
-        {/* <Button
-          onClick={(e) => {
-            removeToken(name);
-          }}
-        > MAKE SURE THIS WORKS BEFORE COMMIT
-          Remove Token
-        </Button> */}
       </Card.Content>
     </Card>
   );

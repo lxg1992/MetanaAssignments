@@ -11,7 +11,7 @@ import {
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
-import { goerliScanTx, infuraNode } from "../helpers/constants";
+import { chainScan, infuraNode } from "../helpers/constants";
 import { f4l4 } from "../helpers/utils";
 import { signMessage } from "../scripts/ethUtils.mjs";
 import EthTransaction from "./SendEth";
@@ -111,7 +111,9 @@ const Known = () => {
               <Card fluid>
                 <Card.Content>
                   {account.lastTx ? (
-                    <Card.Description href={`${goerliScanTx}${account.lastTx}`}>
+                    <Card.Description
+                      href={`${chainScan}/tx/${account.lastTx}`}
+                    >
                       Last Tx: {f4l4(account.lastTx)}{" "}
                     </Card.Description>
                   ) : (

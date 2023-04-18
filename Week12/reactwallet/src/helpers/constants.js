@@ -3,4 +3,4 @@ export const infuraNode =
 
 export const network = "goerli";
 
-export const goerliScanTx = "https://goerli.etherscan.io/tx/";
+export const chainScan = "https://goerli.etherscan.io";
