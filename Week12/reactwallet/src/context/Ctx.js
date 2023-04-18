@@ -5,7 +5,6 @@ const MyContext = createContext();
 const INITIAL = {
   isSet: false,
   privateKey: "",
-  privateKeyBuffer: "",
   publicKey: "",
   address: "",
   lastTx: "",

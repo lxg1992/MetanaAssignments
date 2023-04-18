@@ -21,15 +21,13 @@ const Anonymous = () => {
       <Button
         primary
         onClick={() => {
-          const { publicKey, privateKey, ethAddress, privateKeyBuffer } =
-            generateCredentials();
+          const { publicKey, privateKey, ethAddress } = generateCredentials();
           setAccount((prev) => ({
             ...prev,
             isSet: true,
             privateKey: privateKey,
             publicKey: publicKey,
             address: ethAddress,
-            privateKeyBuffer,
           }));
         }}
       >
@@ -81,7 +79,7 @@ const Anonymous = () => {
                   return;
                 }
                 // const { publicKey, privateKey, ethAddress } =
-                const { publicKey, privateKey, ethAddress, privateKeyBuffer } =
+                const { publicKey, privateKey, ethAddress } =
                   importWithPrivateKey(inputPKey);
                 if (!(publicKey && privateKey && ethAddress)) {
                   setError("Something went wrong. Please Try Again");
@@ -95,7 +93,6 @@ const Anonymous = () => {
                   privateKey: privateKey,
                   publicKey: publicKey,
                   address: ethAddress,
-                  privateKeyBuffer,
                 }));
 
                 setError("");

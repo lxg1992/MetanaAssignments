@@ -20,7 +20,6 @@ const ec = new EC("secp256k1");
 export const generateCredentials = () => {
   try {
     const keyPair = ec.genKeyPair();
-    const privateKeyBuffer = keyPair.getPrivate();
     const privateKey = keyPair.getPrivate("hex");
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
@@ -31,7 +30,6 @@ export const generateCredentials = () => {
       publicKey: pubHex,
       privateKey,
       ethAddress,
-      privateKeyBuffer,
     };
   } catch (e) {
     console.log(e);
@@ -41,7 +39,6 @@ export const generateCredentials = () => {
 export const importWithPrivateKey = (pkInput) => {
   try {
     const keyPair = ec.keyFromPrivate(pkInput);
-    const privateKeyBuffer = keyPair.getPrivate();
     const privateKey = keyPair.getPrivate("hex");
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
@@ -52,7 +49,6 @@ export const importWithPrivateKey = (pkInput) => {
       publicKey: pubHex,
       privateKey,
       ethAddress,
-      privateKeyBuffer,
     };
   } catch (e) {
     console.log(e);

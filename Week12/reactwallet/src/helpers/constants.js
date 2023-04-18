@@ -4,3 +4,7 @@ export const infuraNode =
 export const network = "goerli";
 
 export const chainScan = "https://goerli.etherscan.io";
+
+//0x5BD00AB64cA841f01BEDee69d431be70169Cf744
+
+//a69c0d784fda6fec0f449f12602068ff4f11a999f82da8bc81bf53d0a76d8844
