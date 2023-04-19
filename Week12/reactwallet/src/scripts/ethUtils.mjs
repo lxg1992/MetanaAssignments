@@ -1,11 +1,11 @@
 import elliptic from "elliptic";
 import jssha3 from "js-sha3";
 import { Buffer } from "buffer";
-import { ecsign, toBuffer } from "ethereumjs-util";
 import { Transaction } from "@ethereumjs/tx";
 import { network } from "../helpers/constants.js";
 import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
+import CryptoJS from "crypto-js";
 
 const common = new Common({ chain: network });
 
@@ -17,10 +17,11 @@ const { ec: EC } = elliptic;
 
 const ec = new EC("secp256k1");
 
-export const generateCredentials = () => {
+export const generateCredentials = (salt = "salt") => {
   try {
     const keyPair = ec.genKeyPair();
     const privateKey = keyPair.getPrivate("hex");
+    const encPK = encryptPK(privateKey, salt);
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
     const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
@@ -30,16 +31,24 @@ export const generateCredentials = () => {
       publicKey: pubHex,
       privateKey,
       ethAddress,
+      encPK,
     };
   } catch (e) {
     console.log(e);
   }
 };
 
-export const importWithPrivateKey = (pkInput) => {
+export const encryptPK = (pk, salt) =>
+  CryptoJS.AES.encrypt(pk, salt).toString();
+
+export const decryptPK = (encPK, salt) =>
+  CryptoJS.AES.decrypt(encPK, salt).toString(CryptoJS.enc.Utf8);
+
+export const importWithPrivateKey = (pkInput, salt = "salt") => {
   try {
     const keyPair = ec.keyFromPrivate(pkInput);
     const privateKey = keyPair.getPrivate("hex");
+    const encPK = encryptPK(privateKey, salt);
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
     const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
@@ -49,6 +58,7 @@ export const importWithPrivateKey = (pkInput) => {
       publicKey: pubHex,
       privateKey,
       ethAddress,
+      encPK,
     };
   } catch (e) {
     console.log(e);
