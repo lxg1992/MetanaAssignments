@@ -2,7 +2,7 @@ import elliptic from "elliptic";
 import jssha3 from "js-sha3";
 import { Buffer } from "buffer";
 import { Transaction } from "@ethereumjs/tx";
-import { network } from "../helpers/constants.js";
+import { network } from "./constants.js";
 import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 import CryptoJS from "crypto-js";
@@ -11,9 +11,6 @@ const common = new Common({ chain: network });
 
 const { keccak256 } = jssha3;
 const { ec: EC } = elliptic;
-
-// const PRIVATE_KEY =
-//   "a69c0d784fda6fec0f449f12602068ff4f11a999f82da8bc81bf53d0a76d8844";
 
 const ec = new EC("secp256k1");
 
@@ -112,7 +109,7 @@ export function generateSendRawTxPayload(txParams, privateKey) {
   return serializedTx.toString("hex");
 }
 
-export function createTransferPayload(recipient, amount, decimals) {
+export function createTransferPayloadData(recipient, amount, decimals) {
   // ERC20 transfer function signature
   const transferSignature = "0xa9059cbb";
 

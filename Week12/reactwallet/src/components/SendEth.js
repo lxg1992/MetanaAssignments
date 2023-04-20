@@ -1,12 +1,11 @@
 import React, { useContext, useState } from "react";
-import { Transaction } from "@ethereumjs/tx";
 
-import { Chain, Common, Hardfork } from "@ethereumjs/common";
 import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
   generateSendRawTxPayload,
-} from "../scripts/ethUtils.mjs";
+  decryptPK,
+} from "../helpers/ethUtils.mjs";
 import { infuraNode, network } from "../helpers/constants";
 import { Button, Card, Input } from "semantic-ui-react";
 // local
@@ -31,8 +30,8 @@ const EthTransaction = ({ nonce }) => {
 
   const handleSubmit = async () => {
     const txData = generateTxData(nonce, to, value, data);
-    console.log({ txData });
-    const signedPayload = generateSendRawTxPayload(txData, account.privateKey);
+    const pk = decryptPK(account.encPK, account.salt);
+    const signedPayload = generateSendRawTxPayload(txData, pk);
     const response = await fetch(infuraNode, {
       method: "POST",
       headers: {

@@ -3,9 +3,10 @@ import { Card, Input, Button, Icon } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
-  createTransferPayload,
+  createTransferPayloadData,
   generateSendRawTxPayload,
-} from "../scripts/ethUtils.mjs";
+  decryptPK,
+} from "../helpers/ethUtils.mjs";
 import { infuraNode } from "../helpers/constants";
 
 const ERC20Item = ({
@@ -21,9 +22,12 @@ const ERC20Item = ({
   const [amount, setAmount] = useState(0);
   const [decimals, setDecimals] = useState(0);
 
-  const sendTransfer = async () => {
-    const dataFieldValue = createTransferPayload(recipient, amount, decimals);
-    console.log({ decimals });
+  const sendERC20Transfer = async () => {
+    const dataFieldValue = createTransferPayloadData(
+      recipient,
+      amount,
+      decimals
+    );
 
     const txData = generateTxData(
       nonce,
@@ -34,7 +38,9 @@ const ERC20Item = ({
       100000
     );
 
-    const signedPayload = generateSendRawTxPayload(txData, account.privateKey);
+    const pk = decryptPK(account.encPK, account.salt);
+
+    const signedPayload = generateSendRawTxPayload(txData, pk);
 
     const response = await fetch(infuraNode, {
       method: "POST",
@@ -95,7 +101,7 @@ const ERC20Item = ({
           placeholder={"10000"}
           onChange={(e) => setAmount(e.target.value)}
         ></Input>
-        <Button onClick={sendTransfer}>Send</Button>
+        <Button onClick={sendERC20Transfer}>Send</Button>
       </Card.Content>
     </Card>
   );

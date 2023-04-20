@@ -43,13 +43,6 @@ const ERC20Container = ({ nonce }) => {
     return balance.toFixed(18);
   }
 
-  // function addToken() {
-  //   setAccount((prev) => {
-  //     prev.ERC20Contracts[newTokenName] = newTokenAddr;
-  //     return { ...prev };
-  //   });
-  // }
-
   async function getERC20Decimals(contractAddress) {
     const decimalsMethodId = "0x313ce567";
 
@@ -80,7 +73,7 @@ const ERC20Container = ({ nonce }) => {
   }
 
   return (
-    <Card fluid>
+    <>
       <Card.Content>
         <Card.Header>Tokens</Card.Header>
         {Object.entries(account.ERC20Contracts).map((entry, idx) => (
@@ -110,7 +103,7 @@ const ERC20Container = ({ nonce }) => {
           Add
         </Button>
       </Card.Content>
-    </Card>
+    </>
   );
 };
 

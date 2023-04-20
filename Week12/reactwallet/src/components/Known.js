@@ -13,7 +13,7 @@ import {
 import { MyContext } from "../context/Ctx";
 import { chainScan, infuraNode } from "../helpers/constants";
 import { f4l4 } from "../helpers/utils";
-import { signMessage } from "../scripts/ethUtils.mjs";
+import { signMessage } from "../helpers/ethUtils.mjs";
 import EthTransaction from "./SendEth";
 import ERC20Container from "./ERC20Container";
 
@@ -43,7 +43,6 @@ const Known = () => {
       setBalance(balanceInEth.toFixed(4));
     }
     getBalance();
-    // console.log(account);
   }, [account]);
 
   useEffect(() => {
@@ -70,9 +69,15 @@ const Known = () => {
   }, [account]);
 
   return (
-    <Container textAlign="center">
+    <Container textAlign="center" style={{ padding: "2rem" }}>
       <Card fluid>
-        <Grid container columns={2} verticalAlign="center">
+        <Grid
+          container
+          columns={2}
+          textAlign="center"
+          verticalAlign="top"
+          celled="internally"
+        >
           <Grid.Row>
             <Grid.Column>
               <Button onClick={resetAccount}>Reset</Button>
@@ -82,8 +87,21 @@ const Known = () => {
             <Grid.Column>
               <Card fluid>
                 <Card.Content>
+                  <Card.Header>Ethereum balance</Card.Header>
+                  <Card.Description>{balance}</Card.Description>
+                </Card.Content>
+              </Card>
+              <Card fluid>
+                <Card.Content>
                   <Card.Description>
                     Address: {account.address}
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+              <Card fluid>
+                <Card.Content>
+                  <Card.Description>
+                    Public Key: {f4l4(account.publicKey)}
                   </Card.Description>
                 </Card.Content>
               </Card>
@@ -91,21 +109,6 @@ const Known = () => {
               <Card fluid>
                 <Card.Content>
                   <Card.Description>Nonce: {nonce}</Card.Description>
-                </Card.Content>
-              </Card>
-              <Card fluid>
-                <Card.Content>
-                  <Card.Header>Ethereum balance</Card.Header>
-                  <Card.Description>{balance}</Card.Description>
-                </Card.Content>
-              </Card>
-            </Grid.Column>
-            <GridColumn>
-              <Card fluid>
-                <Card.Content>
-                  <Card.Description>
-                    Public Key: {f4l4(account.publicKey)}
-                  </Card.Description>
                 </Card.Content>
               </Card>
               <Card fluid>
@@ -121,6 +124,8 @@ const Known = () => {
                   )}
                 </Card.Content>
               </Card>
+            </Grid.Column>
+            <GridColumn>
               <Card fluid>
                 <Card.Content>
                   <EthTransaction nonce={nonce} />
@@ -130,7 +135,9 @@ const Known = () => {
           </Grid.Row>
         </Grid>
       </Card>
-      <ERC20Container nonce={nonce} />
+      <Card fluid>
+        <ERC20Container nonce={nonce} />
+      </Card>
     </Container>
   );
 };
