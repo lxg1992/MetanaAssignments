@@ -4,7 +4,7 @@ const MyContext = createContext();
 
 const INITIAL = {
   isSet: false,
-  privateKey: "",
+  // privateKey: "",
   publicKey: "",
   address: "",
   lastTx: "",

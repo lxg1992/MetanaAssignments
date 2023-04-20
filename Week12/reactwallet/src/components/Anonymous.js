@@ -61,7 +61,7 @@ const Anonymous = () => {
                   setAccount((prev) => ({
                     ...prev,
                     isSet: true,
-                    privateKey: privateKey,
+                    // privateKey: privateKey,
                     publicKey: publicKey,
                     address: ethAddress,
                     encPK,
@@ -133,7 +133,7 @@ const Anonymous = () => {
                     // const { publicKey, privateKey, ethAddress } =
                     const { publicKey, privateKey, ethAddress, encPK } =
                       importWithPrivateKey(inputPKey, salt);
-                    if (!(publicKey && privateKey && ethAddress)) {
+                    if (!(publicKey && ethAddress)) {
                       setError("Something went wrong. Please Try Again");
                       return;
                     }
@@ -142,7 +142,7 @@ const Anonymous = () => {
                     setAccount((prev) => ({
                       ...prev,
                       isSet: true,
-                      privateKey: privateKey,
+                      // privateKey: privateKey,
                       publicKey: publicKey,
                       address: ethAddress,
                       encPK,
