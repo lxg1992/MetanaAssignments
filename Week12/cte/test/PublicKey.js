@@ -4,7 +4,35 @@ const ejsUtil = require("ethereumjs-util");
 const hre = require("hardhat");
 
 describe("Public Key", function () {
-  xit("should accept the correct public key for authenticate function", async () => {
+  function getRawTransaction(tx) {
+    function addKey(accum, key) {
+      if (tx[key]) {
+        accum[key] = tx[key];
+      }
+      return accum;
+    }
+
+    // Extract the relevant parts of the transaction and signature
+    const txFields =
+      "accessList chainId data gasPrice gasLimit maxFeePerGas maxPriorityFeePerGas nonce to type value".split(
+        " "
+      );
+    const sigFields = "v r s".split(" ");
+
+    // Seriailze the signed transaction
+    const raw = ethers.utils.serializeTransaction(
+      txFields.reduce(addKey, {}),
+      sigFields.reduce(addKey, {})
+    );
+
+    // Double check things went well
+    if (ethers.utils.keccak256(raw) !== tx.hash) {
+      throw new Error("serializing failed!");
+    }
+
+    return raw;
+  }
+  it("should accept the correct public key for authenticate function", async () => {
     const PublicKey = await ethers.getContractFactory("PublicKeyChallenge");
 
     const pk = await PublicKey.deploy();
@@ -71,9 +99,13 @@ describe("Public Key", function () {
         throw "Unsupported tx type";
     }
 
+    console.log({ transactionHashData });
+
     const rstransactionHash = await ethers.utils.resolveProperties(
       transactionHashData
     );
+
+    getRawTransaction({ ...tx });
 
     console.log({ rstransactionHash });
     const raw = ethers.utils.serializeTransaction(rstransactionHash); // RLP encoded

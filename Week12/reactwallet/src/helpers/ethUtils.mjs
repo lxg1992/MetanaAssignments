@@ -62,28 +62,6 @@ export const importWithPrivateKey = (pkInput, salt = "salt") => {
   }
 };
 
-//Returns 0x1234 as the block number
-// export const getLatestBlockNum = async () => {
-//   const latestBlockNumberRequest = {
-//     jsonrpc: "2.0",
-//     id: 1,
-//     method: "eth_blockNumber",
-//     params: [],
-//   };
-
-//   const response = await fetch(infuraNode, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(latestBlockNumberRequest),
-//   });
-
-//   const data = await response.json();
-
-//   return data.result; //0x1234
-// };
-
 export const getBlockByNumber = async (hexNum = "latest") => {
   const blockDataRequest = {
     jsonrpc: "2.0",

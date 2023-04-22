@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useTransition,
+} from "react";
 import {
   Button,
   Card,
@@ -8,6 +14,7 @@ import {
   GridColumn,
   Input,
   Label,
+  Modal,
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
@@ -26,7 +33,11 @@ const Known = () => {
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
+  const [open, setOpen] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [saltInput, setSaltInput] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
+  const [error, setError] = useState("");
   const intervalRef = useRef();
 
   const fetchGasInfo = async () => {
@@ -41,6 +52,12 @@ const Known = () => {
     intervalRef.current = setInterval(() => {
       setSecondsElapsed((s) => s + 1);
     }, 1000);
+  };
+
+  const getPrivateKey = (salt) => {
+    if ((account.salt !== saltInput)) {
+      setError('Invalid Password');
+    }
   };
 
   const WalletContent = (
@@ -85,7 +102,7 @@ const Known = () => {
                     as={Button}
                     href={`${chainScan}/tx/${account.lastTx}`}
                   >
-                    Last Tx: {f4l4(account.lastTx)}{" "}
+                    Last Tx: {f4l4(account.lastTx)}
                   </Card.Description>
                 ) : (
                   <Card.Description>LastTx: none detected</Card.Description>
@@ -125,6 +142,23 @@ const Known = () => {
                 <Button color="red" onClick={resetAccount}>
                   Log Out
                 </Button>
+                <Modal
+                  onClose={() => setOpen(false)}
+                  onOpen={() => setOpen(true)}
+                  open={open}
+                  size="small"
+                  trigger={<Button>Reveal Private Key</Button>}
+                >
+                  <Modal.Content>
+                    <Label basic>Please Enter Your Salt</Label>
+                    <Input
+                      value={saltInput}
+                      onChange={(e) => setSaltInput(e.target.value)}
+                    />
+                    <Button onClick={getPrivateKey}>Reveal</Button>
+                    {error ? error : privateKey}
+                  </Modal.Content>
+                </Modal>
               </Card.Content>
             </Card>
           </GridColumn>

@@ -76,6 +76,7 @@ describe("Compromised challenge", function () {
       const b64 = Buffer.from(stream.split(" ").join(""), "hex").toString(
         "utf8"
       );
+
       const hex = Buffer.from(b64, "base64").toString("utf8");
       return hex;
     });
