@@ -5,8 +5,9 @@ import {
   generateTxData,
   generateSendRawTxPayload,
   decryptPK,
+  calculateGasFee,
 } from "../helpers/ethUtils.mjs";
-import { infuraNode, network } from "../helpers/constants";
+import { infuraNode, network } from "../helpers/constants.mjs";
 import { Button, Card, Input } from "semantic-ui-react";
 // local
 
@@ -29,7 +30,8 @@ const EthTransaction = ({ nonce }) => {
   };
 
   const handleSubmit = async () => {
-    const txData = generateTxData(nonce, to, value, data);
+    const gasPrice = await calculateGasFee();
+    const txData = await generateTxData(nonce, to, value, data, gasPrice);
     const pk = decryptPK(account.encPK, account.salt);
     const signedPayload = generateSendRawTxPayload(txData, pk);
     const response = await fetch(infuraNode, {
@@ -58,21 +60,28 @@ const EthTransaction = ({ nonce }) => {
   return (
     <>
       <Card.Header>Send Tx</Card.Header>
+      <Card.Meta> To:</Card.Meta>
       <Card.Content>
-        To:
-        <Input type="text" value={to} onChange={handleToChange} />
+        <Input
+          type="text"
+          value={to}
+          onChange={handleToChange}
+          placeholder={"0x123456...abcdef"}
+        />
       </Card.Content>
-      <br />
+      <Card.Meta>Value (ETH):</Card.Meta>
       <Card.Content>
-        Value (ETH):
-        <Input type="text" value={value} onChange={handleValueChange} />
+        <Input
+          type="text"
+          value={value}
+          onChange={handleValueChange}
+          placeholder={"0.1234"}
+        />
       </Card.Content>
-      <br />
+      <Card.Meta>Data:</Card.Meta>
       <Card.Content>
-        Data:
-        <Input value={data} onChange={handleDataChange} />
+        <Input value={data} onChange={handleDataChange} placeholder={"0x"} />
       </Card.Content>
-      <br />
       <Button onClick={handleSubmit}>Submit</Button>
     </>
   );

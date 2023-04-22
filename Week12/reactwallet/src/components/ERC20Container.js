@@ -3,7 +3,7 @@ import { Card, Input, Button } from "semantic-ui-react";
 import BigNumber from "bignumber.js";
 import { MyContext } from "../context/Ctx";
 import ERC20Item from "./ERC20Item";
-import { infuraNode } from "../helpers/constants";
+import { infuraNode } from "../helpers/constants.mjs";
 
 const ERC20Container = ({ nonce }) => {
   const { account, setAccount, addToken } = useContext(MyContext);
@@ -75,7 +75,6 @@ const ERC20Container = ({ nonce }) => {
   return (
     <>
       <Card.Content>
-        <Card.Header>Tokens</Card.Header>
         {Object.entries(account.ERC20Contracts).map((entry, idx) => (
           <ERC20Item
             key={idx}

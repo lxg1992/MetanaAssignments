@@ -2,7 +2,7 @@ import elliptic from "elliptic";
 import jssha3 from "js-sha3";
 import { Buffer } from "buffer";
 import { Transaction } from "@ethereumjs/tx";
-import { network } from "./constants.js";
+import { infuraNode, network } from "./constants.mjs";
 import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 import CryptoJS from "crypto-js";
@@ -62,12 +62,63 @@ export const importWithPrivateKey = (pkInput, salt = "salt") => {
   }
 };
 
-//NEED TO SET UP ENCRYPTION FOR PRIVATE KEY
+//Returns 0x1234 as the block number
+// export const getLatestBlockNum = async () => {
+//   const latestBlockNumberRequest = {
+//     jsonrpc: "2.0",
+//     id: 1,
+//     method: "eth_blockNumber",
+//     params: [],
+//   };
 
-export const signMessage = (msg, privateKey) => {
-  const msgHash = keccak256(msg);
-  const signature = ec.sign(msgHash, privateKey, { canonical: true });
-  return signature;
+//   const response = await fetch(infuraNode, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(latestBlockNumberRequest),
+//   });
+
+//   const data = await response.json();
+
+//   return data.result; //0x1234
+// };
+
+export const getBlockByNumber = async (hexNum = "latest") => {
+  const blockDataRequest = {
+    jsonrpc: "2.0",
+    id: 2,
+    method: "eth_getBlockByNumber",
+    params: [hexNum, false],
+  };
+
+  const response = await fetch(infuraNode, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(blockDataRequest),
+  });
+
+  const data = await response.json();
+
+  return data.result;
+};
+
+//Returns 0xab etc
+export const calculateGasFee = async (returnType = "int") => {
+  //https://www.blocknative.com/blog/eip-1559-fees
+  const block = await getBlockByNumber();
+  console.log(block);
+  const { baseFeePerGas } = block;
+  const parsed = parseInt(baseFeePerGas, 16);
+  const maxFee = (parsed / 1e9) * 1.125;
+  if (returnType === "int") {
+    return maxFee;
+  } else {
+    const hexMaxFee = maxFee.toString(16);
+    return "0x" + hexMaxFee;
+  }
 };
 
 export const encodeStr = (str) =>
@@ -82,13 +133,13 @@ export const gweiToHex = (gwei) => (gwei ? encodeNum(gwei * 1e9) : "0x0");
 export const ethToHex = (eth) =>
   eth ? encodeNum(parseFloat(eth) * 1e18) : "0x0";
 
-export const generateTxData = (
+export const generateTxData = async (
   nonce,
   to, // 0xaddresshere
   valueInEth,
   data = "0x",
-  gasPriceInGwei = 100,
-  gasLimit = 50000
+  gasPriceInGwei = 5,
+  gasLimit = 100000
 ) => {
   const txData = {
     to: to || "0x",
@@ -109,7 +160,7 @@ export function generateSendRawTxPayload(txParams, privateKey) {
   return serializedTx.toString("hex");
 }
 
-export function createTransferPayloadData(recipient, amount, decimals) {
+export function createTransferDataPayload(recipient, amount, decimals) {
   // ERC20 transfer function signature
   const transferSignature = "0xa9059cbb";
 

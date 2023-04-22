@@ -3,11 +3,12 @@ import { Card, Input, Button, Icon } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
-  createTransferPayloadData,
+  createTransferDataPayload,
   generateSendRawTxPayload,
   decryptPK,
+  calculateGasFee,
 } from "../helpers/ethUtils.mjs";
-import { infuraNode } from "../helpers/constants";
+import { infuraNode } from "../helpers/constants.mjs";
 
 const ERC20Item = ({
   name,
@@ -23,19 +24,24 @@ const ERC20Item = ({
   const [decimals, setDecimals] = useState(0);
 
   const sendERC20Transfer = async () => {
-    const dataFieldValue = createTransferPayloadData(
+    const dataFieldValue = createTransferDataPayload(
       recipient,
       amount,
       decimals
     );
 
-    const txData = generateTxData(
+    const gasPrice = await calculateGasFee();
+
+    //estimate gas
+
+    const txData = await generateTxData(
       nonce,
       address,
       0,
       dataFieldValue,
-      100,
+      gasPrice,
       100000
+      // 100,
     );
 
     const pk = decryptPK(account.encPK, account.salt);

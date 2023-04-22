@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Button,
   Card,
@@ -6,23 +6,155 @@ import {
   Accordion,
   Grid,
   GridColumn,
+  Input,
+  Label,
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
-import { chainScan, infuraNode } from "../helpers/constants";
+import { chainScan, infuraNode } from "../helpers/constants.mjs";
 import { f4l4 } from "../helpers/utils";
-import { signMessage } from "../helpers/ethUtils.mjs";
 import EthTransaction from "./SendEth";
 import ERC20Container from "./ERC20Container";
+import {
+  calculateGasFee,
+  getBlockByNumber,
+  getLatestBlockNum,
+} from "../helpers/ethUtils.mjs";
 
 const Known = () => {
   const { account, resetAccount, setAccount } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
+  const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const intervalRef = useRef();
+
+  const fetchGasInfo = async () => {
+    const gasFeeInfo = await calculateGasFee();
+    setGasPriceEstimate(gasFeeInfo);
+    beginTimer();
+  };
+
+  const beginTimer = () => {
+    clearInterval(intervalRef.current);
+    setSecondsElapsed(0);
+    intervalRef.current = setInterval(() => {
+      setSecondsElapsed((s) => s + 1);
+    }, 1000);
+  };
+
+  const WalletContent = (
+    <Card fluid>
+      <Grid
+        container
+        columns={2}
+        textAlign="center"
+        verticalAlign="top"
+        padded="vertically"
+      >
+        <Grid.Row>
+          <Grid.Column>
+            <Card fluid>
+              <Card.Content>
+                <Card.Header>Ethereum balance</Card.Header>
+                <Card.Description>{balance}</Card.Description>
+              </Card.Content>
+            </Card>
+            <Card fluid>
+              <Card.Content>
+                <Card.Description>Address: {account.address}</Card.Description>
+              </Card.Content>
+            </Card>
+            <Card fluid>
+              <Card.Content>
+                <Card.Description>
+                  Public Key: {f4l4(account.publicKey)}
+                </Card.Description>
+              </Card.Content>
+            </Card>
+
+            <Card fluid>
+              <Card.Content>
+                <Card.Description>Nonce: {nonce}</Card.Description>
+              </Card.Content>
+            </Card>
+            <Card fluid>
+              <Card.Content>
+                {account.lastTx ? (
+                  <Card.Description
+                    as={Button}
+                    href={`${chainScan}/tx/${account.lastTx}`}
+                  >
+                    Last Tx: {f4l4(account.lastTx)}{" "}
+                  </Card.Description>
+                ) : (
+                  <Card.Description>LastTx: none detected</Card.Description>
+                )}
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+          <GridColumn>
+            <Card fluid>
+              <Card.Content>
+                <EthTransaction nonce={nonce} />
+              </Card.Content>
+            </Card>
+          </GridColumn>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            <Card fluid>
+              <Card.Content>
+                <Button color="green" onClick={fetchGasInfo}>
+                  Calculate Gas
+                </Button>
+                <Input
+                  value={gasPriceEstimate}
+                  label={"gwei"}
+                  labelPosition="right"
+                />
+                {gasPriceEstimate > 0 && (
+                  <Label>updated {secondsElapsed}s ago</Label>
+                )}
+              </Card.Content>
+            </Card>
+          </Grid.Column>
+          <GridColumn width={16}>
+            <Card fluid>
+              <Card.Content>
+                <Button color="red" onClick={resetAccount}>
+                  Log Out
+                </Button>
+              </Card.Content>
+            </Card>
+          </GridColumn>
+        </Grid.Row>
+      </Grid>
+    </Card>
+  );
+
+  const TokenContent = (
+    <Card fluid>
+      <ERC20Container nonce={nonce} />
+    </Card>
+  );
 
   const panels = [
-    
-  ]
+    {
+      title: "Wallet",
+      key: "wallet",
+      content: {
+        content: WalletContent,
+      },
+    },
+    {
+      title: "Tokens",
+      key: "tokens",
+      content: {
+        content: TokenContent,
+      },
+    },
+  ];
 
   useEffect(() => {
     async function getBalance() {
@@ -72,82 +204,13 @@ const Known = () => {
 
   return (
     <Container textAlign="center" style={{ padding: "2rem" }}>
-      <Accordion exclusive={false}>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header>Wallet</Card.Header>
-          </Card.Content>
-          <Grid
-            container
-            columns={2}
-            textAlign="center"
-            verticalAlign="top"
-            padded="vertically"
-          >
-            <Grid.Row>
-              <Grid.Column>
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Header>Ethereum balance</Card.Header>
-                    <Card.Description>{balance}</Card.Description>
-                  </Card.Content>
-                </Card>
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Description>
-                      Address: {account.address}
-                    </Card.Description>
-                  </Card.Content>
-                </Card>
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Description>
-                      Public Key: {f4l4(account.publicKey)}
-                    </Card.Description>
-                  </Card.Content>
-                </Card>
-
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Description>Nonce: {nonce}</Card.Description>
-                  </Card.Content>
-                </Card>
-                <Card fluid>
-                  <Card.Content>
-                    {account.lastTx ? (
-                      <Card.Description
-                        as={Button}
-                        href={`${chainScan}/tx/${account.lastTx}`}
-                      >
-                        Last Tx: {f4l4(account.lastTx)}{" "}
-                      </Card.Description>
-                    ) : (
-                      <Card.Description>LastTx: none detected</Card.Description>
-                    )}
-                  </Card.Content>
-                </Card>
-              </Grid.Column>
-              <GridColumn>
-                <Card fluid>
-                  <Card.Content>
-                    <EthTransaction nonce={nonce} />
-                  </Card.Content>
-                </Card>
-                <Card fluid>
-                  <Card.Content>
-                    <Button color="red" onClick={resetAccount}>
-                      Log Out
-                    </Button>
-                  </Card.Content>
-                </Card>
-              </GridColumn>
-            </Grid.Row>
-          </Grid>
-        </Card>
-        <Card fluid>
-          <ERC20Container nonce={nonce} />
-        </Card>
-      </Accordion>
+      <Accordion
+        styled
+        fluid
+        // exclusive={false}
+        panels={panels}
+        defaultActiveIndex={0}
+      />
     </Container>
   );
 };
