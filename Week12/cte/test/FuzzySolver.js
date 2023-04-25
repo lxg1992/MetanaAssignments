@@ -3,8 +3,7 @@ const { expect } = require("chai");
 const {
   bytecode,
 } = require("../artifacts/contracts/FuzzyIdentity.sol/FuzzySolver.json");
-
-xdescribe("FuzzyIdentity", function () {
+describe("FuzzyIdentity", function () {
   it("should return the correct hash", async () => {
     const Deployer = await ethers.getContractFactory("Deployer");
 
