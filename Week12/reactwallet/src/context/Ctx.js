@@ -18,21 +18,37 @@ const INITIAL = {
 
 function MyContextProvider({ children }) {
   const [account, setAccount] = useState(INITIAL);
+  const [accountDict, setAccountDict] = useState({});
 
   // Local Storage: setting & getting data
   useEffect(() => {
-    const accountData = JSON.parse(localStorage.getItem("wallet_account"));
+    const accountData = JSON.parse(localStorage.getItem("rw_account_active"));
+    const accountDictData = JSON.parse(localStorage.getItem("rw_account_dict"));
 
     if (accountData && accountData.isSet) {
       setAccount(accountData);
+      setAccountDict((state) => ({
+        ...state,
+        [accountData.address]: accountData,
+      }));
+    }
+
+    if (Object.keys(accountDictData).length) {
+      setAccountDict(accountDictData);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("wallet_account", JSON.stringify(account));
-  }, [account]);
+    localStorage.setItem("rw_account_active", JSON.stringify(account));
+    localStorage.setItem("rw_account_dict", JSON.stringify(accountDict));
+  }, [account, accountDict]);
+
+  //Whenever account changes, it will change the active account, and the account list
 
   const resetAccount = () => {
+    //Should be clear accounts
+    let addressToFilter;
+    //
     setAccount(INITIAL);
   };
 

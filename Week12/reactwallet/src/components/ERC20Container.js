@@ -6,7 +6,7 @@ import ERC20Item from "./ERC20Item";
 import { infuraNode } from "../helpers/constants.mjs";
 
 const ERC20Container = ({ nonce }) => {
-  const { account, setAccount, addToken } = useContext(MyContext);
+  const { account, addToken } = useContext(MyContext);
   const [newTokenName, setNewTokenName] = useState("");
   const [newTokenAddr, setNewTokenAddr] = useState("");
 

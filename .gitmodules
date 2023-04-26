@@ -1,6 +1,0 @@
-[submodule "Week8/Week8/evm-puzzles"]
-	path = Week8/Week8/evm-puzzles
-	url = https://github.com/lxg1992/evm-puzzles
-[submodule "Week8/--force"]
-	path = Week8/--force
-	url = https://github.com/lxg1992/evm-puzzles

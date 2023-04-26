@@ -8,8 +8,8 @@ import GasChart from "./components/GasChart";
 function App() {
   return (
     <div className="App">
-      {/* <ERC20Chart /> */}
-      {/* <BaseFeeChart /> */}
+      <ERC20Chart />
+      <BaseFeeChart />
       <GasChart />
     </div>
   );
