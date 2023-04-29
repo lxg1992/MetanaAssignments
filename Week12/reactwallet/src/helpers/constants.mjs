@@ -1,10 +1,10 @@
-export const infuraNode =
+export let infuraNode =
   process.env.NODE_URL ||
   "https://goerli.infura.io/v3/3f603564d9e44bcd91f5d08319d99942";
 
-export const network = process.env.NETWORK || "goerli";
+export let network = process.env.NETWORK || "goerli";
 
-export const chainScan = process.env.EXPLORER || "https://goerli.etherscan.io";
+export let chainScan = process.env.EXPLORER || "https://goerli.etherscan.io";
 
 // export const defaultSalt = process.env.SALT;
 

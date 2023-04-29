@@ -39,7 +39,7 @@ const Anonymous = () => {
               setOpenCreate(true);
             }}
             open={openCreate}
-            trigger={<Button>Create</Button>}
+            trigger={<Button>Create Single</Button>}
           >
             <Modal.Header>Enter your password</Modal.Header>
             <Modal.Content>

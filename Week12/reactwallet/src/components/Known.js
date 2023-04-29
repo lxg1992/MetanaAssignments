@@ -15,6 +15,7 @@ import {
   Input,
   Label,
   Modal,
+  Popup,
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
@@ -29,7 +30,7 @@ import {
 } from "../helpers/ethUtils.mjs";
 
 const Known = () => {
-  const { account, resetAccount, setAccount } = useContext(MyContext);
+  const { account, fullResetAccount, setAccount } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
@@ -38,6 +39,7 @@ const Known = () => {
   const [saltInput, setSaltInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const [error, setError] = useState("");
+  const [network, setNetwork] = useState("");
   const intervalRef = useRef();
 
   const fetchGasInfo = async () => {
@@ -55,38 +57,58 @@ const Known = () => {
   };
 
   const getPrivateKey = (salt) => {
-    if ((account.salt !== saltInput)) {
-      setError('Invalid Password');
+    if (account.salt !== saltInput) {
+      setError("Invalid Password");
     }
+    // Get the export private key function
   };
 
   const WalletContent = (
     <Card fluid>
       <Grid
         container
-        columns={2}
+        columns={3}
         textAlign="center"
         verticalAlign="top"
         padded="vertically"
+        doubling
+        stackable
       >
         <Grid.Row>
           <Grid.Column>
             <Card fluid>
               <Card.Content>
-                <Card.Header>Ethereum balance</Card.Header>
-                <Card.Description>{balance}</Card.Description>
+                <Card.Description>Ethereum Balance: {balance}</Card.Description>
               </Card.Content>
             </Card>
             <Card fluid>
               <Card.Content>
-                <Card.Description>Address: {account.address}</Card.Description>
+                <Popup
+                  trigger={
+                    <Card.Description>
+                      Address: {f4l4(account.address)}
+                    </Card.Description>
+                  }
+                  hoverable
+                  basic
+                >
+                  <Popup.Content>{account.address}</Popup.Content>
+                </Popup>
               </Card.Content>
             </Card>
             <Card fluid>
               <Card.Content>
-                <Card.Description>
-                  Public Key: {f4l4(account.publicKey)}
-                </Card.Description>
+                <Popup
+                  trigger={
+                    <Card.Description>
+                      Public Key: {f4l4(account.publicKey)}
+                    </Card.Description>
+                  }
+                  hoverable
+                  basic
+                >
+                  <Popup.Content>{account.publicKey}</Popup.Content>
+                </Popup>
               </Card.Content>
             </Card>
 
@@ -110,6 +132,18 @@ const Known = () => {
               </Card.Content>
             </Card>
           </Grid.Column>
+          <Grid.Column>
+            <Card fluid>
+              <Card.Content>
+                <Card.Header>Network</Card.Header>
+              </Card.Content>
+            </Card>
+            <Card fluid>
+              <Card.Content>
+                <Card.Header>Account</Card.Header>
+              </Card.Content>
+            </Card>
+          </Grid.Column>
           <GridColumn>
             <Card fluid>
               <Card.Content>
@@ -118,6 +152,7 @@ const Known = () => {
             </Card>
           </GridColumn>
         </Grid.Row>
+
         <Grid.Row>
           <Grid.Column width={16}>
             <Card fluid>
@@ -139,8 +174,8 @@ const Known = () => {
           <GridColumn width={16}>
             <Card fluid>
               <Card.Content>
-                <Button color="red" onClick={resetAccount}>
-                  Log Out
+                <Button color="red" onClick={fullResetAccount}>
+                  Clear Accounts
                 </Button>
                 <Modal
                   onClose={() => setOpen(false)}

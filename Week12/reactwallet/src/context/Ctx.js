@@ -9,8 +9,10 @@ const INITIAL = {
   address: "",
   lastTx: "",
   ERC20Contracts: {
-    USDC: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    CHAINLINK: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
+    goerli: {
+      USDC: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F", //goerli
+      CHAINLINK: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", //goerli
+    },
   },
   encPK: "",
   salt: "",
@@ -23,7 +25,8 @@ function MyContextProvider({ children }) {
   // Local Storage: setting & getting data
   useEffect(() => {
     const accountData = JSON.parse(localStorage.getItem("rw_account_active"));
-    const accountDictData = JSON.parse(localStorage.getItem("rw_account_dict"));
+    const accountDictData =
+      JSON.parse(localStorage.getItem("rw_account_dict")) || {};
 
     if (accountData && accountData.isSet) {
       setAccount(accountData);
@@ -45,23 +48,23 @@ function MyContextProvider({ children }) {
 
   //Whenever account changes, it will change the active account, and the account list
 
-  const resetAccount = () => {
+  const fullResetAccount = () => {
     //Should be clear accounts
     let addressToFilter;
     //
     setAccount(INITIAL);
   };
 
-  const addToken = (newTokenName, newTokenAddr) => {
+  const addToken = (newTokenName, newTokenAddr, network = "goerli") => {
     setAccount((state) => {
-      state.ERC20Contracts[newTokenName] = newTokenAddr;
+      state.ERC20Contracts[network][newTokenName] = newTokenAddr;
       return { ...state };
     });
   };
 
-  const removeToken = (tokenNameToRemove) => {
+  const removeToken = (tokenNameToRemove, network = "goerli") => {
     setAccount((state) => {
-      delete state.ERC20Contracts[tokenNameToRemove];
+      delete state.ERC20Contracts[network][tokenNameToRemove];
       return { ...state };
     });
   };
@@ -71,7 +74,7 @@ function MyContextProvider({ children }) {
       value={{
         account,
         setAccount,
-        resetAccount,
+        fullResetAccount,
         addToken,
         removeToken,
       }}
