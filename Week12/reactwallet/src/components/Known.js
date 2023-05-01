@@ -16,11 +16,12 @@ import {
   Label,
   Modal,
   Popup,
+  Dropdown,
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
 import { chainScan, infuraNode } from "../helpers/constants.mjs";
-import { f4l4 } from "../helpers/utils";
+import { f4l4, firstCap } from "../helpers/utils";
 import EthTransaction from "./SendEth";
 import ERC20Container from "./ERC20Container";
 import {
@@ -28,6 +29,7 @@ import {
   getBlockByNumber,
   getLatestBlockNum,
 } from "../helpers/ethUtils.mjs";
+import { networks } from "../helpers/lists";
 
 const Known = () => {
   const { account, fullResetAccount, setAccount } = useContext(MyContext);
@@ -41,6 +43,12 @@ const Known = () => {
   const [error, setError] = useState("");
   const [network, setNetwork] = useState("");
   const intervalRef = useRef();
+
+  const ddlOptions = networks.map((networkVal, i) => ({
+    key: i,
+    text: firstCap(networkVal),
+    value: networkVal,
+  }));
 
   const fetchGasInfo = async () => {
     const gasFeeInfo = await calculateGasFee();
@@ -137,6 +145,9 @@ const Known = () => {
               <Card.Content>
                 <Card.Header>Network</Card.Header>
               </Card.Content>
+              <Card.Content>
+                <Dropdown options={ddlOptions}></Dropdown>
+              </Card.Content>
             </Card>
             <Card fluid>
               <Card.Content>
@@ -202,11 +213,7 @@ const Known = () => {
     </Card>
   );
 
-  const TokenContent = (
-    <Card fluid>
-      <ERC20Container nonce={nonce} />
-    </Card>
-  );
+  const TokenContent = <ERC20Container nonce={nonce} />;
 
   const panels = [
     {

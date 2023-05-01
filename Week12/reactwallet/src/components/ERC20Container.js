@@ -74,7 +74,7 @@ const ERC20Container = ({ nonce }) => {
   }
 
   return (
-    <>
+    <Card fluid>
       <Card.Content>
         {Object.entries(account.ERC20Contracts[network] || {}).map(
           (entry, idx) => (
@@ -105,7 +105,7 @@ const ERC20Container = ({ nonce }) => {
           Add
         </Button>
       </Card.Content>
-    </>
+    </Card>
   );
 };
 
