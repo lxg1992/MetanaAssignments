@@ -1,6 +1,6 @@
+export const apiKey = process.env.API_KEY || "3f603564d9e44bcd91f5d08319d99942";
 export let infuraNode =
-  process.env.NODE_URL ||
-  "https://goerli.infura.io/v3/3f603564d9e44bcd91f5d08319d99942";
+  process.env.NODE_URL || `https://goerli.infura.io/v3/${apiKey}`;
 
 export let network = process.env.NETWORK || "goerli";
 

@@ -7,12 +7,12 @@ import {
   decryptPK,
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
-import { infuraNode, network } from "../helpers/constants.mjs";
+import { infuraNode } from "../helpers/constants.mjs";
 import { Button, Card, Input } from "semantic-ui-react";
 // local
 
 const EthTransaction = ({ nonce }) => {
-  const { account, setAccount } = useContext(MyContext);
+  const { account, setAccount, network } = useContext(MyContext);
   const [to, setTo] = useState("");
   const [value, setValue] = useState("");
   const [data, setData] = useState("");
@@ -30,11 +30,11 @@ const EthTransaction = ({ nonce }) => {
   };
 
   const handleSubmit = async () => {
-    const gasPrice = await calculateGasFee();
+    const gasPrice = await calculateGasFee({ network });
     const txData = await generateTxData(nonce, to, value, data, gasPrice);
     const pk = decryptPK(account.encPK, account.salt);
-    const signedPayload = generateSendRawTxPayload(txData, pk);
-    const response = await fetch(infuraNode, {
+    const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
+    const response = await fetch(network.node, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

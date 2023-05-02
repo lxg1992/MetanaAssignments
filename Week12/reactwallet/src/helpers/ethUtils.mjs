@@ -2,12 +2,10 @@ import elliptic from "elliptic";
 import jssha3 from "js-sha3";
 import { Buffer } from "buffer";
 import { Transaction } from "@ethereumjs/tx";
-import { infuraNode, network } from "./constants.mjs";
+// import { infuraNode, network } from "./constants.mjs";
 import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 import CryptoJS from "crypto-js";
-
-const common = new Common({ chain: network });
 
 const { keccak256 } = jssha3;
 const { ec: EC } = elliptic;
@@ -62,7 +60,7 @@ export const importWithPrivateKey = (pkInput, salt = "salt") => {
   }
 };
 
-export const getBlockByNumber = async (hexNum = "latest") => {
+export const getBlockByNumber = async ({ hexNum = "latest", network }) => {
   const blockDataRequest = {
     jsonrpc: "2.0",
     id: 2,
@@ -70,7 +68,7 @@ export const getBlockByNumber = async (hexNum = "latest") => {
     params: [hexNum, false],
   };
 
-  const response = await fetch(infuraNode, {
+  const response = await fetch(network.node, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -84,9 +82,9 @@ export const getBlockByNumber = async (hexNum = "latest") => {
 };
 
 //Returns 0xab etc
-export const calculateGasFee = async (returnType = "int") => {
+export const calculateGasFee = async ({ network, returnType = "int" }) => {
   //https://www.blocknative.com/blog/eip-1559-fees
-  const block = await getBlockByNumber();
+  const block = await getBlockByNumber({ hexNum: "latest", network });
   console.log(block);
   const { baseFeePerGas } = block;
   const parsed = parseInt(baseFeePerGas, 16);
@@ -130,7 +128,8 @@ export const generateTxData = async (
   return txData;
 };
 
-export function generateSendRawTxPayload(txParams, privateKey) {
+export function generateSendRawTxPayload(txParams, privateKey, chain) {
+  const common = new Common({ chain });
   const tx = Transaction.fromTxData(txParams, { common });
   const pkBuffer = Buffer.from(privateKey, "hex");
   const signedTx = tx.sign(pkBuffer);

@@ -8,7 +8,6 @@ import {
   decryptPK,
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
-import { infuraNode } from "../helpers/constants.mjs";
 
 const ERC20Item = ({
   name,
@@ -17,7 +16,7 @@ const ERC20Item = ({
   getERC20Decimals,
   nonce,
 }) => {
-  const { account, setAccount, removeToken } = useContext(MyContext);
+  const { account, setAccount, removeToken, network } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState(0);
@@ -30,7 +29,7 @@ const ERC20Item = ({
       decimals
     );
 
-    const gasPrice = await calculateGasFee();
+    const gasPrice = await calculateGasFee({ network });
 
     //estimate gas
 
@@ -46,9 +45,9 @@ const ERC20Item = ({
 
     const pk = decryptPK(account.encPK, account.salt);
 
-    const signedPayload = generateSendRawTxPayload(txData, pk);
+    const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
 
-    const response = await fetch(infuraNode, {
+    const response = await fetch(network.node, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +79,7 @@ const ERC20Item = ({
     }
 
     asyncAction();
-  }, [account]);
+  }, [account, network]);
 
   return (
     <Card fluid>

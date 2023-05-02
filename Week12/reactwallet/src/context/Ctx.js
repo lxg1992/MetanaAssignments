@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext } from "react";
+import { networkDict } from "../helpers/lists";
 
 const MyContext = createContext();
 
@@ -21,12 +22,15 @@ const INITIAL = {
 function MyContextProvider({ children }) {
   const [account, setAccount] = useState(INITIAL);
   const [accountDict, setAccountDict] = useState({});
+  const [network, setNetwork] = useState({}); // Object
 
   // Local Storage: setting & getting data
   useEffect(() => {
-    const accountData = JSON.parse(localStorage.getItem("rw_account_active"));
+    const accountData =
+      JSON.parse(localStorage.getItem("rw_account_active")) || "";
     const accountDictData =
       JSON.parse(localStorage.getItem("rw_account_dict")) || {};
+    const networkData = JSON.parse(localStorage.getItem("rw_network")) || {};
 
     if (accountData && accountData.isSet) {
       setAccount(accountData);
@@ -39,12 +43,29 @@ function MyContextProvider({ children }) {
     if (Object.keys(accountDictData).length) {
       setAccountDict(accountDictData);
     }
+
+    if (Object.keys(networkData).length) {
+      setNetwork(networkData);
+    }
   }, []);
+
+  // useEffect(() => {
+  //   localStorage.setItem("rw_account_active", JSON.stringify(account));
+  //   localStorage.setItem("rw_account_dict", JSON.stringify(accountDict));
+  //   localStorage.setItem("rw_network", JSON.stringify(network));
+  // }, [account, accountDict, network]);
 
   useEffect(() => {
     localStorage.setItem("rw_account_active", JSON.stringify(account));
+  }, [account]);
+
+  useEffect(() => {
     localStorage.setItem("rw_account_dict", JSON.stringify(accountDict));
-  }, [account, accountDict]);
+  }, [accountDict]);
+
+  useEffect(() => {
+    localStorage.setItem("rw_network", JSON.stringify(network));
+  }, [network]);
 
   //Whenever account changes, it will change the active account, and the account list
 
@@ -53,6 +74,11 @@ function MyContextProvider({ children }) {
     let addressToFilter;
     //
     setAccount(INITIAL);
+  };
+
+  const setNetworkTo = (networkValue = "goerli") => {
+    console.log({ networkSet: network });
+    setNetwork(networkDict[networkValue]);
   };
 
   const addToken = (newTokenName, newTokenAddr, network = "goerli") => {
@@ -77,6 +103,9 @@ function MyContextProvider({ children }) {
         fullResetAccount,
         addToken,
         removeToken,
+        network,
+        setNetworkTo,
+        accountDict,
       }}
     >
       {children}

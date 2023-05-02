@@ -20,7 +20,6 @@ import {
 } from "semantic-ui-react";
 
 import { MyContext } from "../context/Ctx";
-import { chainScan, infuraNode } from "../helpers/constants.mjs";
 import { f4l4, firstCap } from "../helpers/utils";
 import EthTransaction from "./SendEth";
 import ERC20Container from "./ERC20Container";
@@ -29,10 +28,11 @@ import {
   getBlockByNumber,
   getLatestBlockNum,
 } from "../helpers/ethUtils.mjs";
-import { networks } from "../helpers/lists";
+import { networkDict } from "../helpers/lists";
 
 const Known = () => {
-  const { account, fullResetAccount, setAccount } = useContext(MyContext);
+  const { account, fullResetAccount, network, setNetworkTo } =
+    useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
@@ -41,17 +41,19 @@ const Known = () => {
   const [saltInput, setSaltInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const [error, setError] = useState("");
-  const [network, setNetwork] = useState("");
   const intervalRef = useRef();
 
-  const ddlOptions = networks.map((networkVal, i) => ({
+  const networkOptions = Object.entries(networkDict).map((n, i) => ({
     key: i,
-    text: firstCap(networkVal),
-    value: networkVal,
+    text: n[1].title,
+    value: n[0],
+    label: {
+      color: n[1].color,
+    },
   }));
 
   const fetchGasInfo = async () => {
-    const gasFeeInfo = await calculateGasFee();
+    const gasFeeInfo = await calculateGasFee({ network });
     setGasPriceEstimate(gasFeeInfo);
     beginTimer();
   };
@@ -130,7 +132,7 @@ const Known = () => {
                 {account.lastTx ? (
                   <Card.Description
                     as={Button}
-                    href={`${chainScan}/tx/${account.lastTx}`}
+                    href={`${network.chainScan}/tx/${account.lastTx}`}
                   >
                     Last Tx: {f4l4(account.lastTx)}
                   </Card.Description>
@@ -146,7 +148,14 @@ const Known = () => {
                 <Card.Header>Network</Card.Header>
               </Card.Content>
               <Card.Content>
-                <Dropdown options={ddlOptions}></Dropdown>
+                <Dropdown
+                  simple
+                  options={networkOptions}
+                  value={network.name}
+                  onChange={(e, d) => {
+                    setNetworkTo(d.value);
+                  }}
+                ></Dropdown>
               </Card.Content>
             </Card>
             <Card fluid>
@@ -234,7 +243,7 @@ const Known = () => {
 
   useEffect(() => {
     async function getBalance() {
-      const response = await fetch(infuraNode, {
+      const response = await fetch(network.node, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -253,11 +262,11 @@ const Known = () => {
       setBalance(balanceInEth.toFixed(4));
     }
     getBalance();
-  }, [account]);
+  }, [account, network]);
 
   useEffect(() => {
     async function getNonce() {
-      const response = await fetch(infuraNode, {
+      const response = await fetch(network.node, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -276,7 +285,7 @@ const Known = () => {
     }
 
     getNonce();
-  }, [account]);
+  }, [account, network]);
 
   return (
     <Container textAlign="center" style={{ padding: "2rem" }}>

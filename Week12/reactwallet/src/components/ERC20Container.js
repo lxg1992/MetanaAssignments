@@ -3,10 +3,9 @@ import { Card, Input, Button } from "semantic-ui-react";
 import BigNumber from "bignumber.js";
 import { MyContext } from "../context/Ctx";
 import ERC20Item from "./ERC20Item";
-import { infuraNode, network } from "../helpers/constants.mjs";
 
 const ERC20Container = ({ nonce }) => {
-  const { account, addToken } = useContext(MyContext);
+  const { account, addToken, network } = useContext(MyContext);
   // console.log(account);
   const [newTokenName, setNewTokenName] = useState("");
   const [newTokenAddr, setNewTokenAddr] = useState("");
@@ -16,7 +15,7 @@ const ERC20Container = ({ nonce }) => {
     const paddedAddress = account.address.replace(/^0x/, "").padStart(64, "0");
     const data = balanceOfMethodId + paddedAddress;
 
-    const response = await fetch(infuraNode, {
+    const response = await fetch(network.node, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +46,7 @@ const ERC20Container = ({ nonce }) => {
   async function getERC20Decimals(contractAddress) {
     const decimalsMethodId = "0x313ce567";
 
-    const response = await fetch(infuraNode, {
+    const response = await fetch(network.node, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +75,8 @@ const ERC20Container = ({ nonce }) => {
   return (
     <Card fluid>
       <Card.Content>
-        {Object.entries(account.ERC20Contracts[network] || {}).map(
+        {console.log(account.ERC20Contracts)}
+        {Object.entries(account.ERC20Contracts[network.name] || {}).map(
           (entry, idx) => (
             <ERC20Item
               key={idx}
