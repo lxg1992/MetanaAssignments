@@ -45,11 +45,8 @@ const Known = () => {
 
   const networkOptions = Object.entries(networkDict).map((n, i) => ({
     key: i,
-    text: n[1].title,
+    text: `${n[1].label} ${n[1].title}`,
     value: n[0],
-    label: {
-      color: n[1].color,
-    },
   }));
 
   const fetchGasInfo = async () => {
@@ -132,7 +129,7 @@ const Known = () => {
                 {account.lastTx ? (
                   <Card.Description
                     as={Button}
-                    href={`${network.chainScan}/tx/${account.lastTx}`}
+                    href={`${network.chainScan}/tx/${account.lastTx}`} //Need to make it so account[network].lastTx
                   >
                     Last Tx: {f4l4(account.lastTx)}
                   </Card.Description>
@@ -149,7 +146,7 @@ const Known = () => {
               </Card.Content>
               <Card.Content>
                 <Dropdown
-                  simple
+                  selection
                   options={networkOptions}
                   value={network.name}
                   onChange={(e, d) => {

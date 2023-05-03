@@ -10,18 +10,23 @@ import {
 import { MyContext } from "../context/Ctx";
 
 import {
-  generateCredentials,
-  importWithPrivateKey,
+  generateCredentialsSingle,
+  importWithPrivateKeySingle,
 } from "../helpers/ethUtils.mjs";
 
 const pKeyRegex = /[0-9a-f]{64}/i;
 
 const Anonymous = () => {
-  const { setAccount } = useContext(MyContext);
+  const { setAccount, setAccountDict } = useContext(MyContext);
 
-  const [openImport, setOpenImport] = useState(false);
-  const [openCreate, setOpenCreate] = useState(false);
+  const [openImportSingle, setOpenImportSingle] = useState(false);
+  const [openCreateSingle, setOpenCreateSingle] = useState(false);
+
+  const [openImportMulti, setOpenImportMulti] = useState(false);
+  const [openCreateMulti, setOpenCreateMulti] = useState(false);
+
   const [inputPKey, setInputPKey] = useState("");
+  const [mnemonic, setMnemonic] = useState("");
   const [error, setError] = useState("");
   const [salt, setSalt] = useState("");
 
@@ -32,13 +37,13 @@ const Anonymous = () => {
           <Modal
             onClose={() => {
               setError("");
-              setOpenCreate(false);
+              setOpenCreateSingle(false);
             }}
             onOpen={() => {
               setError("");
-              setOpenCreate(true);
+              setOpenCreateSingle(true);
             }}
-            open={openCreate}
+            open={openCreateSingle}
             trigger={<Button>Create Single</Button>}
           >
             <Modal.Header>Enter your password</Modal.Header>
@@ -57,7 +62,7 @@ const Anonymous = () => {
                     setError("Please input the password");
                   }
                   const { publicKey, privateKey, ethAddress, encPK } =
-                    generateCredentials(salt);
+                    generateCredentialsSingle(salt);
                   setAccount((prev) => ({
                     ...prev,
                     isSet: true,
@@ -67,7 +72,7 @@ const Anonymous = () => {
                     encPK,
                     salt,
                   }));
-                  setOpenCreate(false);
+                  setOpenCreateSingle(false);
                   setError("");
                 }}
               >
@@ -78,14 +83,14 @@ const Anonymous = () => {
           <Modal
             onClose={() => {
               setError("");
-              setOpenImport(false);
+              setOpenImportSingle(false);
             }}
             onOpen={() => {
               setError("");
-              setOpenImport(true);
+              setOpenImportSingle(true);
             }}
-            open={openImport}
-            trigger={<Button secondary>Import</Button>}
+            open={openImportSingle}
+            trigger={<Button secondary>Import Single</Button>}
           >
             <Modal.Header>Enter your Private Key and Password</Modal.Header>
             <Modal.Content>
@@ -111,7 +116,7 @@ const Anonymous = () => {
                 onClick={() => {
                   setInputPKey("");
                   setSalt("");
-                  setOpenImport(false);
+                  setOpenImportSingle(false);
                 }}
               >
                 Cancel
@@ -132,7 +137,7 @@ const Anonymous = () => {
                     }
                     // const { publicKey, privateKey, ethAddress } =
                     const { publicKey, privateKey, ethAddress, encPK } =
-                      importWithPrivateKey(inputPKey, salt);
+                      importWithPrivateKeySingle(inputPKey, salt);
                     if (!(publicKey && ethAddress)) {
                       setError("Something went wrong. Please Try Again");
                       return;
@@ -152,7 +157,7 @@ const Anonymous = () => {
                       //if salt is provided, then ask for it, if not then default hash
                     }));
 
-                    setOpenImport(false);
+                    setOpenImportSingle(false);
                     setError("");
                   } catch (e) {
                     console.log(e);

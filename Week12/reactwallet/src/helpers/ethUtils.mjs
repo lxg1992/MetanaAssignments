@@ -12,7 +12,7 @@ const { ec: EC } = elliptic;
 
 const ec = new EC("secp256k1");
 
-export const generateCredentials = (salt = "salt") => {
+export const generateCredentialsSingle = (salt = "salt") => {
   try {
     const keyPair = ec.genKeyPair();
     const privateKey = keyPair.getPrivate("hex");
@@ -39,7 +39,7 @@ export const encryptPK = (pk, salt) =>
 export const decryptPK = (encPK, salt) =>
   CryptoJS.AES.decrypt(encPK, salt).toString(CryptoJS.enc.Utf8);
 
-export const importWithPrivateKey = (pkInput, salt = "salt") => {
+export const importWithPrivateKeySingle = (pkInput, salt = "salt") => {
   try {
     const keyPair = ec.keyFromPrivate(pkInput);
     const privateKey = keyPair.getPrivate("hex");
@@ -85,7 +85,6 @@ export const getBlockByNumber = async ({ hexNum = "latest", network }) => {
 export const calculateGasFee = async ({ network, returnType = "int" }) => {
   //https://www.blocknative.com/blog/eip-1559-fees
   const block = await getBlockByNumber({ hexNum: "latest", network });
-  console.log(block);
   const { baseFeePerGas } = block;
   const parsed = parseInt(baseFeePerGas, 16);
   const maxFee = (parsed / 1e9) * 1.125;
