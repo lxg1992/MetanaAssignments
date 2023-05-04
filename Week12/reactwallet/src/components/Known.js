@@ -28,7 +28,7 @@ import {
   getBlockByNumber,
   getLatestBlockNum,
 } from "../helpers/ethUtils.mjs";
-import { networkDict } from "../helpers/lists";
+import { networkDict } from "../context/Ctx";
 
 const Known = () => {
   const { account, fullResetAccount, network, setNetworkTo } =
@@ -158,6 +158,9 @@ const Known = () => {
             <Card fluid>
               <Card.Content>
                 <Card.Header>Account</Card.Header>
+              </Card.Content>
+              <Card.Content>
+                <Dropdown></Dropdown>
               </Card.Content>
             </Card>
           </Grid.Column>
