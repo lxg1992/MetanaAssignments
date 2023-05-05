@@ -31,12 +31,22 @@ import {
 import { networkDict } from "../context/Ctx";
 
 const Known = () => {
-  const { account, fullResetAccount, network, setNetworkTo } =
-    useContext(MyContext);
+  const {
+    // States
+    account,
+    network,
+    accountDict,
+    // Actions
+    setAccount,
+    fullResetAccount,
+    setNetworkTo,
+    setAccountInDict,
+  } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
-  const [open, setOpen] = useState(false);
+  const [revealOpen, setRevealOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [saltInput, setSaltInput] = useState("");
   const [privateKey, setPrivateKey] = useState("");
@@ -48,6 +58,19 @@ const Known = () => {
     text: `${n[1].label} ${n[1].title}`,
     value: n[0],
   }));
+
+  const accountOptions = Object.entries(accountDict).map((n, i) => ({
+    key: i,
+    text: `[${i}] ${f4l4(n[0])}`, // change to i + 1 at the end
+    value: n[0],
+  }));
+
+  const resetHiddenValues = () => {
+    setPrivateKey("");
+    setSaltInput("");
+  };
+
+  console.log(accountOptions);
 
   const fetchGasInfo = async () => {
     const gasFeeInfo = await calculateGasFee({ network });
@@ -160,7 +183,14 @@ const Known = () => {
                 <Card.Header>Account</Card.Header>
               </Card.Content>
               <Card.Content>
-                <Dropdown></Dropdown>
+                <Dropdown
+                  selection
+                  options={accountOptions}
+                  value={account.address}
+                  onChange={(e, d) => {
+                    setAccount(accountDict[d.value]);
+                  }}
+                ></Dropdown>
               </Card.Content>
             </Card>
           </Grid.Column>
@@ -198,9 +228,15 @@ const Known = () => {
                   Clear Accounts
                 </Button>
                 <Modal
-                  onClose={() => setOpen(false)}
-                  onOpen={() => setOpen(true)}
-                  open={open}
+                  onClose={() => {
+                    resetHiddenValues();
+                    setRevealOpen(false);
+                  }}
+                  onOpen={() => {
+                    resetHiddenValues();
+                    setRevealOpen(true);
+                  }}
+                  open={revealOpen}
                   size="small"
                   trigger={<Button>Reveal Private Key</Button>}
                 >
@@ -212,6 +248,31 @@ const Known = () => {
                     />
                     <Button onClick={getPrivateKey}>Reveal</Button>
                     {error ? error : privateKey}
+                  </Modal.Content>
+                </Modal>
+              </Card.Content>
+              <Card.Content>
+                <Modal
+                  onClose={() => {
+                    resetHiddenValues();
+                    setImportOpen(false);
+                  }}
+                  onOpen={() => {
+                    resetHiddenValues();
+                    setImportOpen(true);
+                  }}
+                  open={importOpen}
+                  size="large"
+                  trigger={<Button>Import Address With Private Key</Button>}
+                >
+                  <Modal.Content>
+                    <Label basic>Please Enter Your Private Key</Label>
+                    <Input
+                      fluid
+                      value={privateKey}
+                      onChange={({ target }) => setPrivateKey(target.value)}
+                    />
+                    <Button onClick={() => setImportOpen(false)}>Import</Button>
                   </Modal.Content>
                 </Modal>
               </Card.Content>

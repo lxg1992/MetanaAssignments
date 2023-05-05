@@ -1,5 +1,5 @@
-import React, { useState, useEffect, createContext } from "react";
-import { apiKey } from "./constants.mjs";
+import React, { useState, useEffect, createContext, useMemo } from "react";
+import { apiKey } from "../helpers/constants.mjs";
 
 export const networkDict = {
   mainnet: {
@@ -47,9 +47,9 @@ const INITIAL = {
 };
 
 function MyContextProvider({ children }) {
-  const [account, setAccount] = useState(INITIAL);
+  const [account, setAccount] = useState(INITIAL); // {}
   const [accountDict, setAccountDict] = useState({});
-  const [network, setNetwork] = useState({}); // Object
+  const [network, setNetwork] = useState({});
 
   // Local Storage: setting & getting data
   useEffect(() => {
@@ -57,8 +57,10 @@ function MyContextProvider({ children }) {
       JSON.parse(localStorage.getItem("rw_account_active")) || "";
     const accountDictData =
       JSON.parse(localStorage.getItem("rw_account_dict")) || {};
-    const networkData = JSON.parse(localStorage.getItem("rw_network")) || {};
+    const networkData =
+      /* */ JSON.parse(localStorage.getItem("rw_network")) || {};
 
+    //If local storage variables exist, set them in the context
     if (accountData && accountData.isSet) {
       setAccount(accountData);
       setAccountDict((state) => ({
@@ -74,6 +76,7 @@ function MyContextProvider({ children }) {
     if (Object.keys(networkData).length) {
       setNetwork(networkData);
     }
+    // ON INITIAL LOAD
   }, []);
 
   useEffect(() => {
@@ -95,6 +98,7 @@ function MyContextProvider({ children }) {
     let addressToFilter;
     //
     setAccount(INITIAL);
+    setAccountDict({});
   };
 
   const setNetworkTo = (networkValue = "goerli") => {
@@ -116,32 +120,50 @@ function MyContextProvider({ children }) {
     });
   };
 
-  const setAccountInDict = (address, payloadObj) => {
+  const setAccountInDict = (address, patchObj) => {
     setAccountDict((state) => ({
-      ...state,
+      ...state, //rest of accounts
       [address]: {
-        ...state[address],
-        ...payloadObj,
+        ...state[address], //Spread the rest of the object
+        ...patchObj, //Edit new details
       },
     }));
   };
 
-  return (
-    <MyContext.Provider
-      value={{
-        account,
-        network,
-        accountDict,
-        setAccount,
-        fullResetAccount,
-        addToken,
-        removeToken,
-        setNetworkTo,
-      }}
-    >
-      {children}
-    </MyContext.Provider>
+  const removeAccountFromDict = (address) => {
+    setAccountDict((state) => {
+      delete state[address];
+      return {
+        ...state,
+      };
+    });
+  };
+
+  const findAvailableAccount = () => {
+    const availableAccounts = Object.keys(accountDict);
+    let availableAccount;
+    if (availableAccounts.length) {
+      availableAccount = availableAccounts[0];
+    }
+    return availableAccount;
+  }
+
+  const ctxVals = useMemo(
+    () => ({
+      account,
+      network,
+      accountDict,
+      setAccount,
+      fullResetAccount,
+      addToken,
+      removeToken,
+      setNetworkTo,
+      setAccountInDict,
+    }),
+    [account, network, accountDict]
   );
+
+  return <MyContext.Provider value={ctxVals}>{children}</MyContext.Provider>;
 }
 
 export { MyContextProvider, MyContext };
