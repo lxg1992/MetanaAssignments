@@ -8,16 +8,15 @@ import {
   Card,
 } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
+import { pKeyRegex } from "../helpers/constants.mjs";
 
 import {
   generateCredentialsSingle,
   importWithPrivateKeySingle,
 } from "../helpers/ethUtils.mjs";
 
-const pKeyRegex = /[0-9a-f]{64}/i;
-
 const Anonymous = () => {
-  const { setAccount, setAccountDict } = useContext(MyContext);
+  const { account, setAccount, setAccountInDict } = useContext(MyContext);
 
   const [openImportSingle, setOpenImportSingle] = useState(false);
   const [openCreateSingle, setOpenCreateSingle] = useState(false);
@@ -61,16 +60,21 @@ const Anonymous = () => {
                   if (!salt) {
                     setError("Please input the password");
                   }
-                  const { publicKey, privateKey, ethAddress, encPK } =
+                  const { publicKey, ethAddress, encPK } =
                     generateCredentialsSingle(salt);
-                  setAccount((prev) => ({
-                    ...prev,
+
+                  const accountObj = {
                     isSet: true,
-                    // privateKey: privateKey,
-                    publicKey: publicKey,
-                    address: ethAddress,
+                    publicKey,
                     encPK,
                     salt,
+                    address: ethAddress,
+                  };
+                  setAccountInDict(ethAddress, accountObj);
+
+                  setAccount((prev) => ({
+                    ...prev,
+                    ...accountObj,
                   }));
                   setOpenCreateSingle(false);
                   setError("");
@@ -136,25 +140,32 @@ const Anonymous = () => {
                       setError("No password");
                     }
                     // const { publicKey, privateKey, ethAddress } =
-                    const { publicKey, privateKey, ethAddress, encPK } =
+                    const { publicKey, ethAddress, encPK } =
                       importWithPrivateKeySingle(inputPKey, salt);
                     if (!(publicKey && ethAddress)) {
                       setError("Something went wrong. Please Try Again");
                       return;
                     }
 
+                    const accountObj = {
+                      isSet: true,
+                      publicKey,
+                      encPK,
+                      salt,
+                      address: ethAddress,
+                      lastTx: "",
+                      ERC20Contracts: {
+                        mainnet: {},
+                        sepolia: {},
+                        goerli: {},
+                      },
+                    };
+
+                    setAccountInDict(ethAddress, accountObj);
                     // At this point we can see that import is fine
                     setAccount((prev) => ({
                       ...prev,
-                      isSet: true,
-                      // privateKey: privateKey,
-                      publicKey: publicKey,
-                      address: ethAddress,
-                      encPK,
-                      salt,
-
-                      //account should have a salted-hash
-                      //if salt is provided, then ask for it, if not then default hash
+                      ...accountObj,
                     }));
 
                     setOpenImportSingle(false);

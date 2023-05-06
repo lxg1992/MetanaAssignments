@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  useTransition,
-} from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Button,
   Card,
@@ -19,16 +13,15 @@ import {
   Dropdown,
 } from "semantic-ui-react";
 
-import { MyContext } from "../context/Ctx";
-import { f4l4, firstCap } from "../helpers/utils";
-import EthTransaction from "./SendEth";
+import { MyContext, networkDict } from "../context/Ctx";
+import { f4l4 } from "../helpers/utils";
+import EthTransaction from "./EthTransaction";
 import ERC20Container from "./ERC20Container";
 import {
   calculateGasFee,
-  getBlockByNumber,
-  getLatestBlockNum,
+  importWithPrivateKeySingle,
 } from "../helpers/ethUtils.mjs";
-import { networkDict } from "../context/Ctx";
+import { pKeyRegex } from "../helpers/constants.mjs";
 
 const Known = () => {
   const {
@@ -49,7 +42,7 @@ const Known = () => {
   const [importOpen, setImportOpen] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [saltInput, setSaltInput] = useState("");
-  const [privateKey, setPrivateKey] = useState("");
+  const [inputPrivateKey, setInputPrivateKey] = useState("");
   const [error, setError] = useState("");
   const intervalRef = useRef();
 
@@ -65,12 +58,15 @@ const Known = () => {
     value: n[0],
   }));
 
-  const resetHiddenValues = () => {
-    setPrivateKey("");
-    setSaltInput("");
-  };
+  // useEffect(() => {
+  //   fetchGasInfo();
+  // }, [network]);
 
-  console.log(accountOptions);
+  const resetHiddenValues = () => {
+    setInputPrivateKey("");
+    setSaltInput("");
+    setError("");
+  };
 
   const fetchGasInfo = async () => {
     const gasFeeInfo = await calculateGasFee({ network });
@@ -86,11 +82,45 @@ const Known = () => {
     }, 1000);
   };
 
-  const getPrivateKey = (salt) => {
+  const handleGetPK = () => {
     if (account.salt !== saltInput) {
       setError("Invalid Password");
     }
     // Get the export private key function
+  };
+
+  // Generate the key
+  const handleImport = () => {
+    if (!pKeyRegex.test(inputPrivateKey)) {
+      setError("Invalid Private Key");
+      return;
+    }
+    const { publicKey, ethAddress, encPK } = importWithPrivateKeySingle(
+      inputPrivateKey,
+      account.salt
+    );
+    if (!publicKey || !ethAddress || !encPK) {
+      setError("Error generating account data");
+      return;
+    }
+
+    const accountObj = {
+      isSet: true,
+      publicKey,
+      address: ethAddress,
+      encPK,
+      salt: account.salt,
+      lastTx: "",
+      ERC20Contracts: {
+        goerli: {},
+        mainnet: {},
+        sepolia: {},
+      },
+    };
+
+    setAccountInDict(ethAddress, accountObj);
+    setAccount(accountObj);
+    resetHiddenValues();
   };
 
   const WalletContent = (
@@ -195,11 +225,7 @@ const Known = () => {
             </Card>
           </Grid.Column>
           <GridColumn>
-            <Card fluid>
-              <Card.Content>
-                <EthTransaction nonce={nonce} />
-              </Card.Content>
-            </Card>
+            <EthTransaction nonce={nonce} />
           </GridColumn>
         </Grid.Row>
 
@@ -246,8 +272,8 @@ const Known = () => {
                       value={saltInput}
                       onChange={(e) => setSaltInput(e.target.value)}
                     />
-                    <Button onClick={getPrivateKey}>Reveal</Button>
-                    {error ? error : privateKey}
+                    <Button onClick={handleGetPK}>Reveal</Button>
+                    {error ? <Label>{error}</Label> : inputPrivateKey}
                   </Modal.Content>
                 </Modal>
               </Card.Content>
@@ -269,10 +295,13 @@ const Known = () => {
                     <Label basic>Please Enter Your Private Key</Label>
                     <Input
                       fluid
-                      value={privateKey}
-                      onChange={({ target }) => setPrivateKey(target.value)}
+                      value={inputPrivateKey}
+                      onChange={({ target }) =>
+                        setInputPrivateKey(target.value)
+                      }
                     />
-                    <Button onClick={() => setImportOpen(false)}>Import</Button>
+                    <Button onClick={handleImport}>Import</Button>
+                    {error ? <Label basic>{error}</Label> : inputPrivateKey}
                   </Modal.Content>
                 </Modal>
               </Card.Content>

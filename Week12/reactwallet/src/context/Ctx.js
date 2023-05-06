@@ -41,6 +41,8 @@ const INITIAL = {
       USDC: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F", //goerli
       CHAINLINK: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", //goerli
     },
+    mainnet: {},
+    sepolia: {},
   },
   encPK: "",
   salt: "",
@@ -49,7 +51,7 @@ const INITIAL = {
 function MyContextProvider({ children }) {
   const [account, setAccount] = useState(INITIAL); // {}
   const [accountDict, setAccountDict] = useState({});
-  const [network, setNetwork] = useState({});
+  const [network, setNetwork] = useState(networkDict.goerli);
 
   // Local Storage: setting & getting data
   useEffect(() => {
@@ -146,7 +148,7 @@ function MyContextProvider({ children }) {
       availableAccount = availableAccounts[0];
     }
     return availableAccount;
-  }
+  };
 
   const ctxVals = useMemo(
     () => ({

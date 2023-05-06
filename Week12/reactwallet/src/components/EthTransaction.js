@@ -58,32 +58,34 @@ const EthTransaction = ({ nonce }) => {
   };
 
   return (
-    <>
-      <Card.Header>Send Tx</Card.Header>
-      <Card.Meta> To:</Card.Meta>
+    <Card fluid>
       <Card.Content>
-        <Input
-          type="text"
-          value={to}
-          onChange={handleToChange}
-          placeholder={"0x123456...abcdef"}
-        />
+        <Card.Header>Send Tx</Card.Header>
+        <Card.Meta> To:</Card.Meta>
+        <Card.Content>
+          <Input
+            type="text"
+            value={to}
+            onChange={handleToChange}
+            placeholder={"0x123456...abcdef"}
+          />
+        </Card.Content>
+        <Card.Meta>Value (ETH):</Card.Meta>
+        <Card.Content>
+          <Input
+            type="text"
+            value={value}
+            onChange={handleValueChange}
+            placeholder={"0.1234"}
+          />
+        </Card.Content>
+        <Card.Meta>Data:</Card.Meta>
+        <Card.Content>
+          <Input value={data} onChange={handleDataChange} placeholder={"0x"} />
+        </Card.Content>
+        <Button onClick={handleSubmit}>Submit</Button>
       </Card.Content>
-      <Card.Meta>Value (ETH):</Card.Meta>
-      <Card.Content>
-        <Input
-          type="text"
-          value={value}
-          onChange={handleValueChange}
-          placeholder={"0.1234"}
-        />
-      </Card.Content>
-      <Card.Meta>Data:</Card.Meta>
-      <Card.Content>
-        <Input value={data} onChange={handleDataChange} placeholder={"0x"} />
-      </Card.Content>
-      <Button onClick={handleSubmit}>Submit</Button>
-    </>
+    </Card>
   );
 };
 
