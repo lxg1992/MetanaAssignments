@@ -60,7 +60,7 @@ function MyContextProvider({ children }) {
     const accountDictData =
       JSON.parse(localStorage.getItem("rw_account_dict")) || {};
     const networkData =
-      /* */ JSON.parse(localStorage.getItem("rw_network")) || {};
+      /*Added for*/ JSON.parse(localStorage.getItem("rw_network")) || {};
 
     //If local storage variables exist, set them in the context
     if (accountData && accountData.isSet) {
