@@ -111,6 +111,7 @@ function MyContextProvider({ children }) {
   const addToken = (newTokenName, newTokenAddr, networkStr = "goerli") => {
     setAccount((state) => {
       state.ERC20Contracts[networkStr][newTokenName] = newTokenAddr;
+      console.log({ state });
       return { ...state };
     });
   };

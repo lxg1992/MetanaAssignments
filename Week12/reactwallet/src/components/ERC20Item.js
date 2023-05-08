@@ -87,7 +87,7 @@ const ERC20Item = ({
         <Button
           floated="right"
           icon="close"
-          onClick={(e) => removeToken(name)}
+          onClick={(e) => removeToken(name, network.name)}
         />
         <Card.Header>Name: {name}</Card.Header>
         <Card.Description>Address: {address}</Card.Description>

@@ -71,14 +71,6 @@ const Anonymous = () => {
                     isSet: true,
                   });
 
-                  // const accountObj = {
-                  //   isSet: true,
-                  //   publicKey,
-                  //   encPK,
-                  //   salt,
-                  //   address: ethAddress,
-                  //   lastTx: ""
-                  // };
                   setAccountInDict(ethAddress, accountObj);
 
                   setAccount((prev) => ({

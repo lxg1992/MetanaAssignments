@@ -103,7 +103,9 @@ const ERC20Container = ({ nonce }) => {
           onChange={(e) => setNewTokenAddr(e.target.value)}
           placeholder={"Token Address"}
         />
-        <Button onClick={() => addToken(newTokenName, newTokenAddr)}>
+        <Button
+          onClick={() => addToken(newTokenName, newTokenAddr, network.name)}
+        >
           Add
         </Button>
       </Card.Content>
