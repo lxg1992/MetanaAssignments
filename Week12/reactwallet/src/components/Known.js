@@ -104,20 +104,6 @@ const Known = () => {
       return;
     }
 
-    // const accountObj = {
-    //   isSet: true,
-    //   publicKey,
-    //   address: ethAddress,
-    //   encPK,
-    //   salt: account.salt,
-    //   lastTx: "",
-    //   ERC20Contracts: {
-    //     goerli: {},
-    //     mainnet: {},
-    //     sepolia: {},
-    //   },
-    // };
-
     const accountObj = defaultSetAccount({
       publicKey,
       encPK,
