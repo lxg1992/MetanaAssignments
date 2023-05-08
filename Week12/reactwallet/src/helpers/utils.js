@@ -8,3 +8,13 @@ export const f4l4 = (str) => {
 export const firstCap = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+export const defaultAccount = {
+  isSet: false,
+  publicKey: "",
+  encPK: "",
+  salt: "",
+  address: "",
+  lastTx: "",
+};
+  

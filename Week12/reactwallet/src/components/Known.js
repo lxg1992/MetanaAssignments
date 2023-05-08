@@ -21,7 +21,7 @@ import {
   calculateGasFee,
   importWithPrivateKeySingle,
 } from "../helpers/ethUtils.mjs";
-import { pKeyRegex } from "../helpers/constants.mjs";
+import { defaultSetAccount, pKeyRegex } from "../helpers/constants.mjs";
 
 const Known = () => {
   const {
@@ -104,19 +104,27 @@ const Known = () => {
       return;
     }
 
-    const accountObj = {
-      isSet: true,
+    // const accountObj = {
+    //   isSet: true,
+    //   publicKey,
+    //   address: ethAddress,
+    //   encPK,
+    //   salt: account.salt,
+    //   lastTx: "",
+    //   ERC20Contracts: {
+    //     goerli: {},
+    //     mainnet: {},
+    //     sepolia: {},
+    //   },
+    // };
+
+    const accountObj = defaultSetAccount({
       publicKey,
-      address: ethAddress,
       encPK,
       salt: account.salt,
-      lastTx: "",
-      ERC20Contracts: {
-        goerli: {},
-        mainnet: {},
-        sepolia: {},
-      },
-    };
+      ethAddress,
+      isSet: true,
+    });
 
     setAccountInDict(ethAddress, accountObj);
     setAccount(accountObj);
@@ -301,7 +309,7 @@ const Known = () => {
                       }
                     />
                     <Button onClick={handleImport}>Import</Button>
-                    {error ? <Label basic>{error}</Label> : inputPrivateKey}
+                    {error && <Label basic>{error}</Label>}
                   </Modal.Content>
                 </Modal>
               </Card.Content>

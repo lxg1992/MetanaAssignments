@@ -8,7 +8,7 @@ import {
   Card,
 } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
-import { pKeyRegex } from "../helpers/constants.mjs";
+import { defaultSetAccount, pKeyRegex } from "../helpers/constants.mjs";
 
 import {
   generateCredentialsSingle,
@@ -63,13 +63,22 @@ const Anonymous = () => {
                   const { publicKey, ethAddress, encPK } =
                     generateCredentialsSingle(salt);
 
-                  const accountObj = {
-                    isSet: true,
+                  const accountObj = defaultSetAccount({
                     publicKey,
                     encPK,
                     salt,
-                    address: ethAddress,
-                  };
+                    ethAddress,
+                    isSet: true,
+                  });
+
+                  // const accountObj = {
+                  //   isSet: true,
+                  //   publicKey,
+                  //   encPK,
+                  //   salt,
+                  //   address: ethAddress,
+                  //   lastTx: ""
+                  // };
                   setAccountInDict(ethAddress, accountObj);
 
                   setAccount((prev) => ({
@@ -138,6 +147,7 @@ const Anonymous = () => {
                     }
                     if (!salt) {
                       setError("No password");
+                      return;
                     }
                     // const { publicKey, privateKey, ethAddress } =
                     const { publicKey, ethAddress, encPK } =
@@ -146,21 +156,13 @@ const Anonymous = () => {
                       setError("Something went wrong. Please Try Again");
                       return;
                     }
-
-                    const accountObj = {
-                      isSet: true,
+                    const accountObj = defaultSetAccount({
                       publicKey,
                       encPK,
                       salt,
-                      address: ethAddress,
-                      lastTx: "",
-                      ERC20Contracts: {
-                        mainnet: {},
-                        sepolia: {},
-                        goerli: {},
-                      },
-                    };
-
+                      ethAddress,
+                      isSet: true,
+                    });
                     setAccountInDict(ethAddress, accountObj);
                     // At this point we can see that import is fine
                     setAccount((prev) => ({
