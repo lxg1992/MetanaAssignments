@@ -75,7 +75,6 @@ const ERC20Container = ({ nonce }) => {
   return (
     <Card fluid>
       <Card.Content>
-        {console.log(account)}
         {Object.entries(account.ERC20Contracts[network.name] || {}).map(
           (entry, idx) => {
             return (

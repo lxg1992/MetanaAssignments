@@ -103,12 +103,12 @@ function MyContextProvider({ children }) {
     setAccountDict({});
   };
 
-  const setNetworkTo = (networkValue = "goerli") => {
+  const setNetworkTo = (networkValue) => {
     setNetwork(networkDict[networkValue]);
     console.log({ networkSet: network });
   };
 
-  const addToken = (newTokenName, newTokenAddr, networkStr = "goerli") => {
+  const addToken = (newTokenName, newTokenAddr, networkStr) => {
     setAccount((state) => {
       state.ERC20Contracts[networkStr][newTokenName] = newTokenAddr;
       console.log({ state });
@@ -116,7 +116,7 @@ function MyContextProvider({ children }) {
     });
   };
 
-  const removeToken = (tokenNameToRemove, networkStr = "goerli") => {
+  const removeToken = (tokenNameToRemove, networkStr) => {
     setAccount((state) => {
       delete state.ERC20Contracts[networkStr][tokenNameToRemove];
       return { ...state };
@@ -146,9 +146,9 @@ function MyContextProvider({ children }) {
     const availableAccounts = Object.keys(accountDict);
     let availableAccount;
     if (availableAccounts.length) {
-      availableAccount = availableAccounts[0];
+      return { availableAddr: availableAccounts[0] };
     }
-    return availableAccount;
+    return { availableAddr: null };
   };
 
   const ctxVals = useMemo(
@@ -162,6 +162,8 @@ function MyContextProvider({ children }) {
       removeToken,
       setNetworkTo,
       setAccountInDict,
+      removeAccountFromDict,
+      findAvailableAccount,
     }),
     [account, network, accountDict]
   );
