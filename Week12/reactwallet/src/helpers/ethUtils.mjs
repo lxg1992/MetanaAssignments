@@ -2,15 +2,52 @@ import elliptic from "elliptic";
 import jssha3 from "js-sha3";
 import { Buffer } from "buffer";
 import { Transaction } from "@ethereumjs/tx";
-// import { infuraNode, network } from "./constants.mjs";
 import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 import CryptoJS from "crypto-js";
+import bip39 from "bip39";
+import Wallet, { hdkey } from "ethereumjs-wallet";
 
 const { keccak256 } = jssha3;
 const { ec: EC } = elliptic;
 
 const ec = new EC("secp256k1");
+
+export const encryptPK = (pk, salt) =>
+  CryptoJS.AES.encrypt(pk, salt).toString();
+
+export const decryptPK = (encPK, salt) =>
+  CryptoJS.AES.decrypt(encPK, salt).toString(CryptoJS.enc.Utf8);
+
+export const generateCredentialsMulti = (mnemonic, salt = "salt") => {
+  try {
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    const root = hdkey.fromMasterSeed(seed);
+    const accounts = [];
+    for (let i = 0; i < 1; i++) {
+      const hdWallet = root.derivePath(`m/44'/60'/${i}'/0/0`);
+      const privateKey = hdWallet.getWallet().getPrivateKeyString().slice(2);
+      // console.log({ pkMulti: privateKey });
+      const encPK = encryptPK(privateKey, salt);
+      const publicKey = hdWallet.getWallet().getPublicKeyString();
+      const pubHex = publicKey.substring(2);
+      const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
+      const ethAddressBuffer = Buffer.from(hashOfPublicKey, "hex");
+      const ethAddress = `0x${ethAddressBuffer.slice(-20).toString("hex")}`;
+      // console.log({ unEncMulti: decryptPK(encPK, salt) });
+
+      accounts.push({
+        publicKey: pubHex,
+        privateKey,
+        ethAddress,
+        encPK,
+      });
+    }
+    return accounts;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export const generateCredentialsSingle = (salt = "salt") => {
   try {
@@ -33,22 +70,22 @@ export const generateCredentialsSingle = (salt = "salt") => {
   }
 };
 
-export const encryptPK = (pk, salt) =>
-  CryptoJS.AES.encrypt(pk, salt).toString();
-
-export const decryptPK = (encPK, salt) =>
-  CryptoJS.AES.decrypt(encPK, salt).toString(CryptoJS.enc.Utf8);
+export const generateMnemonic = () => {
+  return bip39.generateMnemonic(128);
+};
 
 export const importWithPrivateKeySingle = (pkInput, salt = "salt") => {
   try {
     const keyPair = ec.keyFromPrivate(pkInput);
     const privateKey = keyPair.getPrivate("hex");
+    // console.log({ pkSingle: privateKey });
     const encPK = encryptPK(privateKey, salt);
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
     const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
     const ethAddressBuffer = Buffer.from(hashOfPublicKey, "hex");
     const ethAddress = `0x${ethAddressBuffer.slice(-20).toString("hex")}`;
+    // console.log({ unEncSingle: decryptPK(encPK, salt) });
     return {
       publicKey: pubHex,
       privateKey,
@@ -83,7 +120,6 @@ export const getBlockByNumber = async ({ hexNum = "latest", network }) => {
 
 //Returns 0xab etc
 export const calculateGasFee = async ({ network, returnType = "int" }) => {
-  //https://www.blocknative.com/blog/eip-1559-fees
   const block = await getBlockByNumber({ hexNum: "latest", network });
   const { baseFeePerGas } = block;
   const parsed = parseInt(baseFeePerGas, 16);

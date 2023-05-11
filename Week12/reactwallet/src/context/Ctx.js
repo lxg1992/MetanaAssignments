@@ -133,6 +133,13 @@ function MyContextProvider({ children }) {
     }));
   };
 
+  const patchAccount = (patchObj) => {
+    setAccount((state) => ({
+      ...state, //rest of accounts
+      ...patchObj, //Edit new details
+    }));
+  }
+
   const removeAccountFromDict = (address) => {
     setAccountDict((state) => {
       delete state[address];
@@ -144,7 +151,6 @@ function MyContextProvider({ children }) {
 
   const findAvailableAccount = () => {
     const availableAccounts = Object.keys(accountDict);
-    let availableAccount;
     if (availableAccounts.length) {
       return { availableAddr: availableAccounts[0] };
     }
@@ -157,6 +163,7 @@ function MyContextProvider({ children }) {
       network,
       accountDict,
       setAccount,
+      patchAccount,
       fullResetAccount,
       addToken,
       removeToken,

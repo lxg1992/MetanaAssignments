@@ -75,7 +75,6 @@ const Known = () => {
   const handleRemoveAccount = (address) => {
     removeAccountFromDict(address);
     const { availableAddr } = findAvailableAccount();
-    console.log({ availableAddr });
     if (!availableAddr) {
       fullResetAccount();
       return;
@@ -198,7 +197,7 @@ const Known = () => {
             </Card>
             <Card fluid>
               <Card.Content>
-                {account.lastTx ? (
+                {account.lastTx ? ( //This needs to be fixed so that it shows the last tx per account, not for network
                   <Card.Description
                     as={Button}
                     href={`${network.chainScan}/tx/${account.lastTx}`} //Need to make it so account[network].lastTx
