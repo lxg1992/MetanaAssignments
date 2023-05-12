@@ -9,7 +9,7 @@ import {
   Label,
 } from "semantic-ui-react";
 import { MyContext } from "../context/Ctx";
-import { defaultSetAccount, pKeyRegex } from "../helpers/constants.mjs";
+import { generateDefaultAccount, pKeyRegex } from "../helpers/constants.mjs";
 
 import {
   generateCredentialsMulti,
@@ -19,13 +19,7 @@ import {
 import { generateMnemonic } from "../helpers/ethUtils.mjs";
 
 const Anonymous = () => {
-  const {
-    account,
-    setAccount,
-    setAccountInDict,
-    patchAccount,
-    setAccountDict,
-  } = useContext(MyContext);
+  const { setAccount, setAccountInDict, patchAccount } = useContext(MyContext);
 
   const [openImportSingle, setOpenImportSingle] = useState(false);
   const [openCreateSingle, setOpenCreateSingle] = useState(false);
@@ -59,7 +53,7 @@ const Anonymous = () => {
               setOpenCreateSingle(true);
             }}
             open={openCreateSingle}
-            trigger={<Button>Create Single</Button>}
+            trigger={<Button>Create Single Account</Button>}
           >
             <Modal.Header>Enter your password</Modal.Header>
             <Modal.Content>
@@ -80,7 +74,7 @@ const Anonymous = () => {
                   const { publicKey, ethAddress, encPK } =
                     generateCredentialsSingle(salt);
 
-                  const accountObj = defaultSetAccount({
+                  const accountObj = generateDefaultAccount({
                     publicKey,
                     encPK,
                     salt,
@@ -112,7 +106,7 @@ const Anonymous = () => {
               setOpenImportSingle(true);
             }}
             open={openImportSingle}
-            trigger={<Button secondary>Import Single</Button>}
+            trigger={<Button secondary>Import with Private Key</Button>}
           >
             <Modal.Header>Enter your Private Key and Password</Modal.Header>
             <Modal.Content>
@@ -121,6 +115,8 @@ const Anonymous = () => {
                 fluid
                 placeholder="1234abcd.......abcd01234"
               />
+            </Modal.Content>
+            <Modal.Content>
               <Input
                 onChange={(e) => setSalt(e.target.value)}
                 fluid
@@ -133,15 +129,6 @@ const Anonymous = () => {
               </Modal.Content>
             )}
             <Modal.Actions>
-              <Button
-                color="black"
-                onClick={() => {
-                  clearFields();
-                  setOpenImportSingle(false);
-                }}
-              >
-                Cancel
-              </Button>
               <Button
                 content="Submit"
                 labelPosition="right"
@@ -163,7 +150,7 @@ const Anonymous = () => {
                       setError("Something went wrong. Please Try Again");
                       return;
                     }
-                    const accountObj = defaultSetAccount({
+                    const accountObj = generateDefaultAccount({
                       publicKey,
                       encPK,
                       salt,
@@ -197,10 +184,10 @@ const Anonymous = () => {
               setMnemonic(generateMnemonic());
             }}
             open={openCreateMulti}
-            trigger={<Button>Create Multi</Button>}
+            trigger={<Button>Create with Mnemonic</Button>}
           >
             <Modal.Header>
-              Please Save The Mnemonic Phrase and Add A Password
+              Please save the Mnemonic Phrase and add a Password
             </Modal.Header>
             <Modal.Content>
               <Label>{mnemonic}</Label>
@@ -220,28 +207,108 @@ const Anonymous = () => {
                     setError("Please input the password");
                     return;
                   }
-                  let firstAcc;
                   const accounts = generateCredentialsMulti(mnemonic, salt);
                   accounts.forEach((acc, i) => {
-                    const { publicKey, ethAddress, encPK } = acc;
-                    const accountObj = defaultSetAccount({
+                    const {
+                      publicKey,
+                      ethAddress,
+                      encPK,
+                      fromMnemonic,
+                      encMnemonic,
+                    } = acc;
+                    const accountObj = generateDefaultAccount({
                       publicKey,
                       encPK,
                       salt,
                       ethAddress,
                       isSet: true,
+                      fromMnemonic,
+                      encMnemonic,
                     });
                     if (i === 0) {
+                      // Set the first new account as the current account
                       setAccount(accountObj);
                     }
                     setAccountInDict(ethAddress, accountObj);
                   });
-
-                  //TODO: Add to context
-                  //TODO: Set to the last set account
+                  setOpenCreateMulti(false);
+                  clearFields();
                 }}
               >
                 Create Accounts
+              </Button>
+            </Modal.Actions>
+          </Modal>
+          <Modal
+            onClose={() => {
+              clearFields();
+              setOpenImportMulti(false);
+            }}
+            onOpen={() => {
+              clearFields();
+              setOpenImportMulti(true);
+            }}
+            open={openImportMulti}
+            trigger={<Button secondary>Import from Mnemonic</Button>}
+          >
+            <Modal.Header>
+              Please enter your Mnemonic Phrase and Password
+            </Modal.Header>
+            <Modal.Content>
+              <Input
+                fluid
+                placeholder="firstword secondword thirdword..."
+                onChange={(e) => setMnemonic(e.target.value)}
+              />
+            </Modal.Content>
+            <Modal.Content>
+              <Input
+                fluid
+                placeholder="p4ssc0d3"
+                onChange={(e) => setSalt(e.target.value)}
+              />
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                primary
+                onClick={() => {
+                  if (!salt) {
+                    setError("Please input the password");
+                    return;
+                  }
+                  if (!mnemonic) {
+                    setError("Please input the mnemonic");
+                    return;
+                  }
+                  const accounts = generateCredentialsMulti(mnemonic, salt);
+                  accounts.forEach((acc, i) => {
+                    const {
+                      publicKey,
+                      ethAddress,
+                      encPK,
+                      fromMnemonic,
+                      encMnemonic,
+                    } = acc;
+                    const accountObj = generateDefaultAccount({
+                      publicKey,
+                      encPK,
+                      salt,
+                      ethAddress,
+                      isSet: true,
+                      fromMnemonic,
+                      encMnemonic,
+                    });
+                    if (i === 0) {
+                      // Set the first new account as the current account
+                      setAccount(accountObj);
+                    }
+                    setAccountInDict(ethAddress, accountObj);
+                  });
+                  setOpenImportMulti(false);
+                  clearFields();
+                }}
+              >
+                Import Accounts
               </Button>
             </Modal.Actions>
           </Modal>

@@ -5,7 +5,7 @@ import {
   generateTxData,
   createTransferDataPayload,
   generateSendRawTxPayload,
-  decryptPK,
+  decryptItem,
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
 
@@ -43,7 +43,7 @@ const ERC20Item = ({
       // 100,
     );
 
-    const pk = decryptPK(account.encPK, account.salt);
+    const pk = decryptItem(account.encPK, account.salt);
 
     const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
 

@@ -4,7 +4,7 @@ import { MyContext } from "../context/Ctx";
 import {
   generateTxData,
   generateSendRawTxPayload,
-  decryptPK,
+  decryptItem,
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
 import { infuraNode } from "../helpers/constants.mjs";
@@ -32,7 +32,7 @@ const EthTransaction = ({ nonce }) => {
   const handleSubmit = async () => {
     const gasPrice = await calculateGasFee({ network });
     const txData = await generateTxData(nonce, to, value, data, gasPrice);
-    const pk = decryptPK(account.encPK, account.salt);
+    const pk = decryptItem(account.encPK, account.salt);
     const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
     const response = await fetch(network.node, {
       method: "POST",

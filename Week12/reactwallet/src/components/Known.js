@@ -20,9 +20,10 @@ import EthTransaction from "./EthTransaction";
 import ERC20Container from "./ERC20Container";
 import {
   calculateGasFee,
+  decryptItem,
   importWithPrivateKeySingle,
 } from "../helpers/ethUtils.mjs";
-import { defaultSetAccount, pKeyRegex } from "../helpers/constants.mjs";
+import { generateDefaultAccount, pKeyRegex } from "../helpers/constants.mjs";
 
 const Known = () => {
   const {
@@ -41,11 +42,13 @@ const Known = () => {
   const [balance, setBalance] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
-  const [revealOpen, setRevealOpen] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
+  const [revealModalOpen, setRevealModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [saltInput, setSaltInput] = useState("");
   const [inputPrivateKey, setInputPrivateKey] = useState("");
+  const [revealPrivateKey, setRevealPrivateKey] = useState("");
   const [error, setError] = useState("");
   const intervalRef = useRef();
 
@@ -62,14 +65,22 @@ const Known = () => {
       key: i,
       text: (
         <>
-          <Icon
-            name="close"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRemoveAccount(n[0]);
-            }}
+          <Popup
+            content="Remove"
+            trigger={
+              <Icon
+                name="close"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRemoveAccount(n[0]);
+                }}
+              />
+            }
           />
-          {`[${i}] ${f4l4(n[0])}`}
+          <Popup
+            content={n[0]}
+            trigger={<Label>{`[${i}] ${f4l4(n[0])}`}</Label>}
+          />
         </>
       ), // change to i + 1 at the end
       value: n[0],
@@ -91,6 +102,7 @@ const Known = () => {
   // }, [network]);
 
   const resetHiddenValues = () => {
+    setRevealPrivateKey("");
     setInputPrivateKey("");
     setSaltInput("");
     setError("");
@@ -113,12 +125,15 @@ const Known = () => {
   const handleGetPK = () => {
     if (account.salt !== saltInput) {
       setError("Invalid Password");
+      return;
     }
+    resetHiddenValues();
+    setRevealPrivateKey(decryptItem(account.encPK, account.salt));
     // Get the export private key function
   };
 
   // Generate the key
-  const handleImport = () => {
+  const handleSingleImport = () => {
     if (!pKeyRegex.test(inputPrivateKey)) {
       setError("Invalid Private Key");
       return;
@@ -132,7 +147,7 @@ const Known = () => {
       return;
     }
 
-    const accountObj = defaultSetAccount({
+    const accountObj = generateDefaultAccount({
       publicKey,
       encPK,
       salt: account.salt,
@@ -143,6 +158,7 @@ const Known = () => {
     setAccountInDict(ethAddress, accountObj);
     setAccount(accountObj);
     resetHiddenValues();
+    setImportModalOpen(false);
   };
 
   const WalletContent = (
@@ -278,38 +294,40 @@ const Known = () => {
                 <Modal
                   onClose={() => {
                     resetHiddenValues();
-                    setRevealOpen(false);
+                    setRevealModalOpen(false);
                   }}
                   onOpen={() => {
                     resetHiddenValues();
-                    setRevealOpen(true);
+                    setRevealModalOpen(true);
                   }}
-                  open={revealOpen}
+                  open={revealModalOpen}
                   size="small"
                   trigger={<Button>Reveal Private Key</Button>}
                 >
                   <Modal.Content>
-                    <Label basic>Please Enter Your Salt</Label>
+                    <Label basic>Please Enter Your Password</Label>
                     <Input
                       value={saltInput}
                       onChange={(e) => setSaltInput(e.target.value)}
                     />
                     <Button onClick={handleGetPK}>Reveal</Button>
-                    {error ? <Label>{error}</Label> : inputPrivateKey}
+                    {error && <Label>{error}</Label>}
+                    {revealPrivateKey && <Label>{revealPrivateKey}</Label>}
                   </Modal.Content>
                 </Modal>
+                {account.fromMnemonic && <Modal></Modal>}
               </Card.Content>
               <Card.Content>
                 <Modal
                   onClose={() => {
                     resetHiddenValues();
-                    setImportOpen(false);
+                    setImportModalOpen(false);
                   }}
                   onOpen={() => {
                     resetHiddenValues();
-                    setImportOpen(true);
+                    setImportModalOpen(true);
                   }}
-                  open={importOpen}
+                  open={importModalOpen}
                   size="large"
                   trigger={<Button>Import Address With Private Key</Button>}
                 >
@@ -322,7 +340,7 @@ const Known = () => {
                         setInputPrivateKey(target.value)
                       }
                     />
-                    <Button onClick={handleImport}>Import</Button>
+                    <Button onClick={handleSingleImport}>Import</Button>
                     {error && <Label basic>{error}</Label>}
                   </Modal.Content>
                 </Modal>

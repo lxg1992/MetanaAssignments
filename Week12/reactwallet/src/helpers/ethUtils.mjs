@@ -6,41 +6,44 @@ import BigNumber from "bignumber.js";
 import { Common } from "@ethereumjs/common";
 import CryptoJS from "crypto-js";
 import bip39 from "bip39";
-import Wallet, { hdkey } from "ethereumjs-wallet";
+import { hdkey } from "ethereumjs-wallet";
 
 const { keccak256 } = jssha3;
 const { ec: EC } = elliptic;
 
 const ec = new EC("secp256k1");
 
-export const encryptPK = (pk, salt) =>
+export const encryptItem = (pk, salt) =>
   CryptoJS.AES.encrypt(pk, salt).toString();
 
-export const decryptPK = (encPK, salt) =>
+export const decryptItem = (encPK, salt) =>
   CryptoJS.AES.decrypt(encPK, salt).toString(CryptoJS.enc.Utf8);
 
 export const generateCredentialsMulti = (mnemonic, salt = "salt") => {
   try {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     const root = hdkey.fromMasterSeed(seed);
+    const encMnemonic = encryptItem(mnemonic, salt);
     const accounts = [];
     for (let i = 0; i < 10; i++) {
       const hdWallet = root.derivePath(`m/44'/60'/${i}'/0/0`);
       const privateKey = hdWallet.getWallet().getPrivateKeyString().slice(2);
       // console.log({ pkMulti: privateKey });
-      const encPK = encryptPK(privateKey, salt);
+      const encPK = encryptItem(privateKey, salt);
       const publicKey = hdWallet.getWallet().getPublicKeyString();
       const pubHex = publicKey.substring(2);
       const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
       const ethAddressBuffer = Buffer.from(hashOfPublicKey, "hex");
       const ethAddress = `0x${ethAddressBuffer.slice(-20).toString("hex")}`;
-      // console.log({ unEncMulti: decryptPK(encPK, salt) });
+      // console.log({ unEncMulti: decryptItem(encPK, salt) });
 
       accounts.push({
         publicKey: pubHex,
         privateKey,
         ethAddress,
         encPK,
+        fromMnemonic: true,
+        encMnemonic,
       });
     }
     return accounts;
@@ -53,7 +56,7 @@ export const generateCredentialsSingle = (salt = "salt") => {
   try {
     const keyPair = ec.genKeyPair();
     const privateKey = keyPair.getPrivate("hex");
-    const encPK = encryptPK(privateKey, salt);
+    const encPK = encryptItem(privateKey, salt);
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
     const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
@@ -79,13 +82,13 @@ export const importWithPrivateKeySingle = (pkInput, salt = "salt") => {
     const keyPair = ec.keyFromPrivate(pkInput);
     const privateKey = keyPair.getPrivate("hex");
     // console.log({ pkSingle: privateKey });
-    const encPK = encryptPK(privateKey, salt);
+    const encPK = encryptItem(privateKey, salt);
     const publicKey = keyPair.getPublic();
     const pubHex = publicKey.encode("hex").substring(2);
     const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
     const ethAddressBuffer = Buffer.from(hashOfPublicKey, "hex");
     const ethAddress = `0x${ethAddressBuffer.slice(-20).toString("hex")}`;
-    // console.log({ unEncSingle: decryptPK(encPK, salt) });
+    // console.log({ unEncSingle: decryptItem(encPK, salt) });
     return {
       publicKey: pubHex,
       privateKey,
