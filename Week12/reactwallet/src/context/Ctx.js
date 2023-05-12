@@ -163,6 +163,7 @@ function MyContextProvider({ children }) {
       network,
       accountDict,
       setAccount,
+      setAccountDict,
       patchAccount,
       fullResetAccount,
       addToken,

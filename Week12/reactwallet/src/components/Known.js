@@ -55,22 +55,26 @@ const Known = () => {
     value: n[0],
   }));
 
-  const accountOptions = Object.entries(accountDict).map((n, i) => ({
-    key: i,
-    text: (
-      <>
-        <Icon
-          name="close"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRemoveAccount(n[0]);
-          }}
-        />
-        {`[${i}] ${f4l4(n[0])}`}
-      </>
-    ), // change to i + 1 at the end
-    value: n[0],
-  }));
+  const accountOptions = Object.entries(accountDict).map((n, i) => {
+    console.log(n[0]);
+    console.log(n[1]);
+    return {
+      key: i,
+      text: (
+        <>
+          <Icon
+            name="close"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemoveAccount(n[0]);
+            }}
+          />
+          {`[${i}] ${f4l4(n[0])}`}
+        </>
+      ), // change to i + 1 at the end
+      value: n[0],
+    };
+  });
 
   const handleRemoveAccount = (address) => {
     removeAccountFromDict(address);

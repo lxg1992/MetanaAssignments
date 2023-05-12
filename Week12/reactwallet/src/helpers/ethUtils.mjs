@@ -24,7 +24,7 @@ export const generateCredentialsMulti = (mnemonic, salt = "salt") => {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     const root = hdkey.fromMasterSeed(seed);
     const accounts = [];
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 10; i++) {
       const hdWallet = root.derivePath(`m/44'/60'/${i}'/0/0`);
       const privateKey = hdWallet.getWallet().getPrivateKeyString().slice(2);
       // console.log({ pkMulti: privateKey });

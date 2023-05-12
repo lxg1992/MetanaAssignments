@@ -19,8 +19,13 @@ import {
 import { generateMnemonic } from "../helpers/ethUtils.mjs";
 
 const Anonymous = () => {
-  const { account, setAccount, setAccountInDict, patchAccount } =
-    useContext(MyContext);
+  const {
+    account,
+    setAccount,
+    setAccountInDict,
+    patchAccount,
+    setAccountDict,
+  } = useContext(MyContext);
 
   const [openImportSingle, setOpenImportSingle] = useState(false);
   const [openCreateSingle, setOpenCreateSingle] = useState(false);
@@ -215,7 +220,23 @@ const Anonymous = () => {
                     setError("Please input the password");
                     return;
                   }
+                  let firstAcc;
                   const accounts = generateCredentialsMulti(mnemonic, salt);
+                  accounts.forEach((acc, i) => {
+                    const { publicKey, ethAddress, encPK } = acc;
+                    const accountObj = defaultSetAccount({
+                      publicKey,
+                      encPK,
+                      salt,
+                      ethAddress,
+                      isSet: true,
+                    });
+                    if (i === 0) {
+                      setAccount(accountObj);
+                    }
+                    setAccountInDict(ethAddress, accountObj);
+                  });
+
                   //TODO: Add to context
                   //TODO: Set to the last set account
                 }}
