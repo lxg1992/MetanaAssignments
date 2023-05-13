@@ -40,16 +40,21 @@ const Known = () => {
     findAvailableAccount,
   } = useContext(MyContext);
   const [balance, setBalance] = useState(0);
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [nonce, setNonce] = useState(0);
   const [gasPriceEstimate, setGasPriceEstimate] = useState(0);
+  const [error, setError] = useState("");
+  //Modals
   const [revealModalOpen, setRevealModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [mnemonicModalOpen, setMnemonicModalOpen] = useState(false);
 
-  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  //Inputs
   const [saltInput, setSaltInput] = useState("");
   const [inputPrivateKey, setInputPrivateKey] = useState("");
+  //Derived
   const [revealPrivateKey, setRevealPrivateKey] = useState("");
-  const [error, setError] = useState("");
+  const [revealMnemonic, setRevealMnemonic] = useState("");
   const intervalRef = useRef();
 
   const networkOptions = Object.entries(networkDict).map((n, i) => ({
@@ -102,8 +107,9 @@ const Known = () => {
   // }, [network]);
 
   const resetHiddenValues = () => {
-    setRevealPrivateKey("");
     setInputPrivateKey("");
+    setRevealPrivateKey("");
+    setRevealMnemonic("");
     setSaltInput("");
     setError("");
   };
@@ -130,6 +136,16 @@ const Known = () => {
     resetHiddenValues();
     setRevealPrivateKey(decryptItem(account.encPK, account.salt));
     // Get the export private key function
+  };
+
+  const handleGetMnemonic = () => {
+    if (account.salt !== saltInput) {
+      setError("Invalid Password");
+      return;
+    }
+    resetHiddenValues();
+    setRevealMnemonic(decryptItem(account.encMnemonic, account.salt));
+    // Get the export
   };
 
   // Generate the key
@@ -315,7 +331,32 @@ const Known = () => {
                     {revealPrivateKey && <Label>{revealPrivateKey}</Label>}
                   </Modal.Content>
                 </Modal>
-                {account.fromMnemonic && <Modal></Modal>}
+                {account.fromMnemonic && (
+                  <Modal
+                    onClose={() => {
+                      resetHiddenValues();
+                      setMnemonicModalOpen(false);
+                    }}
+                    onOpen={() => {
+                      resetHiddenValues();
+                      setMnemonicModalOpen(true);
+                    }}
+                    open={mnemonicModalOpen}
+                    size="large"
+                    trigger={<Button>Reveal Mnemonic</Button>}
+                  >
+                    <Modal.Content>
+                      <Label basic>Please Enter Your Password</Label>
+                      <Input
+                        value={saltInput}
+                        onChange={(e) => setSaltInput(e.target.value)}
+                      />
+                      <Button onClick={handleGetMnemonic}>Reveal</Button>
+                      {error && <Label>{error}</Label>}
+                      {revealMnemonic && <Label>{revealMnemonic}</Label>}
+                    </Modal.Content>
+                  </Modal>
+                )}
               </Card.Content>
               <Card.Content>
                 <Modal
