@@ -85,6 +85,7 @@ const Known = () => {
           <Popup
             content={n[0]}
             trigger={<Label>{`[${i}] ${f4l4(n[0])}`}</Label>}
+            hoverable
           />
         </>
       ), // change to i + 1 at the end

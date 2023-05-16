@@ -1,5 +1,6 @@
 // const fetch = require("node-fetch");
 
+const { utils } = require("ethers");
 // // Infura endpoint for Ethereum mainnet
 // const endpoint = "https://goerli.infura.io/v3/3f603564d9e44bcd91f5d08319d99942";
 
@@ -20,6 +21,8 @@
 //     params: [blockNumber, false],
 //   };
 // }
+
+const transferSignature = "0xa9059cbb";
 
 // // Convert hex string to decimal
 // function hexToDecimal(hexString) {

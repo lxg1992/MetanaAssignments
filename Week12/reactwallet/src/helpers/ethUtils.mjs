@@ -28,14 +28,12 @@ export const generateCredentialsMulti = (mnemonic, salt = "salt") => {
     for (let i = 0; i < 10; i++) {
       const hdWallet = root.derivePath(`m/44'/60'/${i}'/0/0`);
       const privateKey = hdWallet.getWallet().getPrivateKeyString().slice(2);
-      // console.log({ pkMulti: privateKey });
       const encPK = encryptItem(privateKey, salt);
       const publicKey = hdWallet.getWallet().getPublicKeyString();
       const pubHex = publicKey.substring(2);
       const hashOfPublicKey = keccak256(Buffer.from(pubHex, "hex"));
       const ethAddressBuffer = Buffer.from(hashOfPublicKey, "hex");
       const ethAddress = `0x${ethAddressBuffer.slice(-20).toString("hex")}`;
-      // console.log({ unEncMulti: decryptItem(encPK, salt) });
 
       accounts.push({
         publicKey: pubHex,
@@ -193,3 +191,6 @@ export function createTransferDataPayload(recipient, amount, decimals) {
 
   return payload;
 }
+
+//0x18160ddd total supply
+//Add GasLimit estimation and work to the Component

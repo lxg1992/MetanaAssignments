@@ -16,17 +16,49 @@ const EthTransaction = ({ nonce }) => {
   const [to, setTo] = useState("");
   const [value, setValue] = useState("");
   const [data, setData] = useState("");
+  const [isEstimated, setIsEstimated] = useState(false);
 
   const handleToChange = (event) => {
+    setIsEstimated(false);
     setTo(event.target.value);
   };
 
   const handleValueChange = (event) => {
+    setIsEstimated(false);
     setValue(event.target.value);
   };
 
   const handleDataChange = (event) => {
+    setIsEstimated(false);
     setData(event.target.value);
+  };
+
+  const handleEstimate = async () => {
+    const gasPrice = await calculateGasFee({ network });
+    const txData = await generateTxData(nonce, to, value, data, gasPrice);
+    // const pk = decryptItem(account.encPK, account.salt);
+    // const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
+    const response = await fetch(network.node, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_estimateGas",
+        params: [txData],
+        id: 1,
+      }),
+    });
+
+    const returnData = await response.json();
+    if (returnData.error) {
+      console.error(returnData.error);
+      throw new Error(returnData.error.message);
+    }
+    console.log(returnData.result);
+    setIsEstimated(true);
+    return returnData.result;
   };
 
   const handleSubmit = async () => {
@@ -83,7 +115,13 @@ const EthTransaction = ({ nonce }) => {
         <Card.Content>
           <Input value={data} onChange={handleDataChange} placeholder={"0x"} />
         </Card.Content>
-        <Button onClick={handleSubmit}>Submit</Button>
+        {isEstimated ? (
+          <Button secondary onClick={handleSubmit}>
+            Submit
+          </Button>
+        ) : (
+          <Button onClick={handleEstimate}>Estimate</Button>
+        )}
       </Card.Content>
     </Card>
   );

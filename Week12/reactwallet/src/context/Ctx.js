@@ -32,20 +32,6 @@ const MyContext = createContext();
 
 const INITIAL = {
   isSet: false,
-  // privateKey: "",
-  publicKey: "",
-  address: "",
-  lastTx: "",
-  ERC20Contracts: {
-    goerli: {
-      USDC: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F", //goerli
-      CHAINLINK: "0x326C977E6efc84E512bB9C30f76E30c160eD06FB", //goerli
-    },
-    mainnet: {},
-    sepolia: {},
-  },
-  encPK: "",
-  salt: "",
 };
 
 function MyContextProvider({ children }) {
@@ -96,9 +82,6 @@ function MyContextProvider({ children }) {
   //Whenever account changes, it will change the active account, and the account list
 
   const fullResetAccount = () => {
-    //Should be clear accounts
-    let addressToFilter;
-    //
     setAccount(INITIAL);
     setAccountDict({});
   };
@@ -138,7 +121,7 @@ function MyContextProvider({ children }) {
       ...state, //rest of accounts
       ...patchObj, //Edit new details
     }));
-  }
+  };
 
   const removeAccountFromDict = (address) => {
     setAccountDict((state) => {
