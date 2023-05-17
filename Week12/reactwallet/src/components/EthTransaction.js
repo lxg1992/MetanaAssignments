@@ -7,7 +7,7 @@ import {
   decryptItem,
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
-import { infuraNode } from "../helpers/constants.mjs";
+import { ethAddressRegex, hexaDecimalRegex } from "../helpers/constants.mjs";
 import { Button, Card, Input } from "semantic-ui-react";
 // local
 
@@ -16,7 +16,10 @@ const EthTransaction = ({ nonce }) => {
   const [to, setTo] = useState("");
   const [value, setValue] = useState("");
   const [data, setData] = useState("");
+  const [overriddenGasLimit, setOverriddenGasLimit] = useState("");
+  const [estimatedGasLimit, setEstimatedGasLimit] = useState("");
   const [isEstimated, setIsEstimated] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
   const handleToChange = (event) => {
     setIsEstimated(false);
@@ -26,6 +29,7 @@ const EthTransaction = ({ nonce }) => {
   const handleValueChange = (event) => {
     setIsEstimated(false);
     setValue(event.target.value);
+    console.log({ value });
   };
 
   const handleDataChange = (event) => {
@@ -33,11 +37,45 @@ const EthTransaction = ({ nonce }) => {
     setData(event.target.value);
   };
 
+  const handleOverriddenGasLimitChange = (event) => {
+    // setIsEstimated(false);
+    setOverriddenGasLimit(event.target.value);
+  };
+
+  const checkValidity = () => {
+    if (checkToValidity() && checkValueValidity() && checkDataValidity()) {
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+    }
+  };
+
+  const checkToValidity = () => {
+    return ethAddressRegex.test(to);
+  };
+
+  const checkValueValidity = () => {
+    return !isNaN(value) || value === "";
+  };
+
+  //regex for 0x hex string for evm function signature
+
+  const checkDataValidity = () => {
+    return (
+      data === "" ||
+      (hexaDecimalRegex.test(data) &&
+        data.length % 2 === 0 &&
+        data.length >= 10)
+    );
+  };
+
+  const checkOverriddenGasLimitValidity = () => {
+    return !isNaN(overriddenGasLimit) || overriddenGasLimit === "";
+  };
+
   const handleEstimate = async () => {
     const gasPrice = await calculateGasFee({ network });
     const txData = await generateTxData(nonce, to, value, data, gasPrice);
-    // const pk = decryptItem(account.encPK, account.salt);
-    // const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
     const response = await fetch(network.node, {
       method: "POST",
       headers: {
@@ -57,13 +95,25 @@ const EthTransaction = ({ nonce }) => {
       throw new Error(returnData.error.message);
     }
     console.log(returnData.result);
+    const intGasLimit = parseInt(returnData.result, 16);
     setIsEstimated(true);
-    return returnData.result;
+    setEstimatedGasLimit(intGasLimit);
+    return intGasLimit;
   };
 
   const handleSubmit = async () => {
     const gasPrice = await calculateGasFee({ network });
-    const txData = await generateTxData(nonce, to, value, data, gasPrice);
+    const gasLimit = overriddenGasLimit
+      ? overriddenGasLimit
+      : estimatedGasLimit;
+    const txData = await generateTxData(
+      nonce,
+      to,
+      value,
+      data,
+      gasPrice,
+      gasLimit
+    );
     const pk = decryptItem(account.encPK, account.salt);
     const signedPayload = generateSendRawTxPayload(txData, pk, network.name);
     const response = await fetch(network.node, {
@@ -113,9 +163,25 @@ const EthTransaction = ({ nonce }) => {
         </Card.Content>
         <Card.Meta>Data:</Card.Meta>
         <Card.Content>
-          <Input value={data} onChange={handleDataChange} placeholder={"0x"} />
+          <Input value={data} onChange={handleDataChange} placeholder="0x" />
         </Card.Content>
-        {isEstimated ? (
+        {isEstimated && isValid && (
+          <>
+            <Card.Content>
+              <Card.Meta>Estimated Gas Limit:</Card.Meta>
+              <Card.Description>{estimatedGasLimit}</Card.Description>
+            </Card.Content>
+            <Card.Meta>Overridde Gas Limit:</Card.Meta>
+            <Card.Content>
+              <Input
+                value={overriddenGasLimit}
+                onChange={handleOverriddenGasLimitChange}
+                placeholder="21000"
+              />
+            </Card.Content>
+          </>
+        )}
+        {isEstimated && isValid ? (
           <Button secondary onClick={handleSubmit}>
             Submit
           </Button>
