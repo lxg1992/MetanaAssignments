@@ -39,7 +39,7 @@ const ERC20Item = ({
       0,
       dataFieldValue,
       gasPrice,
-      100000
+      200000
       // 100,
     );
 

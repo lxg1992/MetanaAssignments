@@ -8,7 +8,7 @@ import {
   calculateGasFee,
 } from "../helpers/ethUtils.mjs";
 import { ethAddressRegex, hexaDecimalRegex } from "../helpers/constants.mjs";
-import { Button, Card, Input } from "semantic-ui-react";
+import { Button, Card, Input, Icon } from "semantic-ui-react";
 // local
 
 const EthTransaction = ({ nonce }) => {
@@ -17,6 +17,7 @@ const EthTransaction = ({ nonce }) => {
   const [value, setValue] = useState("");
   const [data, setData] = useState("");
   const [overriddenGasLimit, setOverriddenGasLimit] = useState("");
+  // const [overriddenGasPrice, setOverriddenGasPrice] = useState("");
   const [estimatedGasLimit, setEstimatedGasLimit] = useState("");
   const [isEstimated, setIsEstimated] = useState(false);
   const [isValid, setIsValid] = useState(false);
@@ -24,17 +25,19 @@ const EthTransaction = ({ nonce }) => {
   const handleToChange = (event) => {
     setIsEstimated(false);
     setTo(event.target.value);
+    checkValidity();
   };
 
   const handleValueChange = (event) => {
     setIsEstimated(false);
     setValue(event.target.value);
-    console.log({ value });
+    checkValidity();
   };
 
   const handleDataChange = (event) => {
     setIsEstimated(false);
     setData(event.target.value);
+    checkValidity();
   };
 
   const handleOverriddenGasLimitChange = (event) => {
@@ -42,12 +45,27 @@ const EthTransaction = ({ nonce }) => {
     setOverriddenGasLimit(event.target.value);
   };
 
+  // const handleOverriddenGasPriceChange = (event) => {
+  //   // setIsEstimated(false);
+  //   setOverriddenGasPrice(event.target.value);
+  // };
+
   const checkValidity = () => {
-    if (checkToValidity() && checkValueValidity() && checkDataValidity()) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
-    }
+    setIsValid(false);
+    let toRef;
+    clearTimeout(toRef);
+    toRef = setTimeout(() => {
+      if (
+        checkToValidity() &&
+        checkValueValidity() &&
+        checkDataValidity() &&
+        checkOverriddenGasLimitValidity()
+      ) {
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
+    }, 2000);
   };
 
   const checkToValidity = () => {
@@ -70,35 +88,39 @@ const EthTransaction = ({ nonce }) => {
   };
 
   const checkOverriddenGasLimitValidity = () => {
-    return !isNaN(overriddenGasLimit) || overriddenGasLimit === "";
+    return overriddenGasLimit === "" || !isNaN(overriddenGasLimit);
   };
 
   const handleEstimate = async () => {
-    const gasPrice = await calculateGasFee({ network });
-    const txData = await generateTxData(nonce, to, value, data, gasPrice);
-    const response = await fetch(network.node, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "eth_estimateGas",
-        params: [txData],
-        id: 1,
-      }),
-    });
+    try {
+      const gasPrice = await calculateGasFee({ network });
+      const txData = await generateTxData(nonce, to, value, data, gasPrice);
+      const response = await fetch(network.node, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_estimateGas",
+          params: [txData],
+          id: 1,
+        }),
+      });
 
-    const returnData = await response.json();
-    if (returnData.error) {
-      console.error(returnData.error);
-      throw new Error(returnData.error.message);
+      const returnData = await response.json();
+      if (returnData.error) {
+        console.error(returnData.error);
+        throw new Error(returnData.error.message);
+      }
+      const intGasLimit = parseInt(returnData.result, 16);
+      setIsEstimated(true);
+      setEstimatedGasLimit(intGasLimit);
+      return intGasLimit;
+    } catch (e) {
+      console.error(e);
+      throw new Error(e);
     }
-    console.log(returnData.result);
-    const intGasLimit = parseInt(returnData.result, 16);
-    setIsEstimated(true);
-    setEstimatedGasLimit(intGasLimit);
-    return intGasLimit;
   };
 
   const handleSubmit = async () => {
@@ -140,9 +162,13 @@ const EthTransaction = ({ nonce }) => {
   };
 
   return (
-    <Card fluid>
+    <Card fluid color={isValid ? "green" : "red"}>
       <Card.Content>
-        <Card.Header>Send Tx</Card.Header>
+        <Card.Header>Send Tx </Card.Header>
+        <Card.Description>
+          Transaction Valid?{" "}
+          {isValid ? <Icon name="checkmark" /> : <Icon name="close" />}
+        </Card.Description>
         <Card.Meta> To:</Card.Meta>
         <Card.Content>
           <Input
@@ -186,7 +212,9 @@ const EthTransaction = ({ nonce }) => {
             Submit
           </Button>
         ) : (
-          <Button onClick={handleEstimate}>Estimate</Button>
+          <Button disabled={!isValid} onClick={handleEstimate}>
+            Estimate
+          </Button>
         )}
       </Card.Content>
     </Card>

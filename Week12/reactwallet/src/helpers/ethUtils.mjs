@@ -120,11 +120,16 @@ export const getBlockByNumber = async ({ hexNum = "latest", network }) => {
 };
 
 //Returns 0xab etc
-export const calculateGasFee = async ({ network, returnType = "int" }) => {
+export const calculateGasFee = async ({
+  network,
+  returnType = "int",
+  multiplier = 1.125, // 12.5% increase in gas fee to ensure tx goes through
+  exactGwei = 0,
+}) => {
   const block = await getBlockByNumber({ hexNum: "latest", network });
   const { baseFeePerGas } = block;
   const parsed = parseInt(baseFeePerGas, 16);
-  const maxFee = (parsed / 1e9) * 1.125;
+  const maxFee = exactGwei > 0 ? exactGwei : (parsed / 1e9) * multiplier;
   if (returnType === "int") {
     return maxFee;
   } else {

@@ -116,7 +116,7 @@ const Known = () => {
   };
 
   const fetchGasInfo = async () => {
-    const gasFeeInfo = await calculateGasFee({ network });
+    const gasFeeInfo = await calculateGasFee({ network, multiplier: 1 });
     setGasPriceEstimate(gasFeeInfo);
     beginTimer();
   };
