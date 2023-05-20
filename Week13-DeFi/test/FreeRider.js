@@ -42,7 +42,7 @@ describe("[Challenge] Free Rider", function () {
     );
 
     // Deploy WETH
-    weth = await (await ethers.getContractFactory("WETH", deployer)).deploy();
+    weth = await (await ethers.getContractFactory("WETH9", deployer)).deploy();
 
     // Deploy token to be traded against WETH in Uniswap v2
     token = await (

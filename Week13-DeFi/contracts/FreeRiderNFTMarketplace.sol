@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "../DamnValuableNFT.sol";
+import "./DamnValuableNFT.sol";
 
 contract FreeRiderNFTMarketplace is ReentrancyGuard {
     using Address for address payable;
