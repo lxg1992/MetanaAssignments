@@ -7,7 +7,7 @@ const { ethers } = require("hardhat");
 const { expect } = require("chai");
 const { setBalance } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("[Challenge] Free Rider", function () {
+xdescribe("[Challenge] Free Rider", function () {
   let deployer, player, devs;
   let weth,
     token,

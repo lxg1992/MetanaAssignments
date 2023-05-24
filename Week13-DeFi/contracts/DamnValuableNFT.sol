@@ -4,13 +4,19 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "solady/src/auth/OwnableRoles.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 /**
  * @title DamnValuableNFT
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
  * @notice Implementation of a mintable and burnable NFT with role-based access controls
  */
-contract DamnValuableNFT is ERC721, ERC721Burnable, OwnableRoles {
+contract DamnValuableNFT is
+    ERC721,
+    ERC721Burnable,
+    OwnableRoles,
+    IERC721Receiver
+{
     uint256 public constant MINTER_ROLE = _ROLE_0;
     uint256 public tokenIdCounter;
 
@@ -32,7 +38,7 @@ contract DamnValuableNFT is ERC721, ERC721Burnable, OwnableRoles {
         address,
         uint256,
         bytes memory
-    ) external view returns (bytes4) {
+    ) external view override returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
 }

@@ -13,7 +13,7 @@ interface IWETH {
     function withdraw(uint256) external;
 }
 
-contract FreeRiderHack {
+contract FreeRiderHack is IERC721Receiver {
     // Interfaces
     IERC721 private immutable NFT;
     IWETH private immutable WETH;
@@ -100,8 +100,8 @@ contract FreeRiderHack {
         address,
         uint256,
         bytes memory
-    ) external view returns (bytes4) {
+    ) external view override returns (bytes4) {
         require(msg.sender == address(NFT) && tx.origin == attacker);
-        return IERC721Receiver.onERC721Received.selector;
+        return 0x150b7a02;
     }
 }
