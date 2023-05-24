@@ -19,9 +19,20 @@ contract DamnValuableNFT is ERC721, ERC721Burnable, OwnableRoles {
         _grantRoles(msg.sender, MINTER_ROLE);
     }
 
-    function safeMint(address to) public onlyRoles(MINTER_ROLE) returns (uint256 tokenId) {
+    function safeMint(
+        address to
+    ) public onlyRoles(MINTER_ROLE) returns (uint256 tokenId) {
         tokenId = tokenIdCounter;
         _safeMint(to, tokenId);
         ++tokenIdCounter;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) external view returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
