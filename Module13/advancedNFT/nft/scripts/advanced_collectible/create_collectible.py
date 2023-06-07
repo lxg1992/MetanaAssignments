@@ -8,7 +8,7 @@ def main():
     dev = accounts.add(config["wallets"]["from_key"])
     advanced_collectible = AdvancedCollectible[len(AdvancedCollectible) - 1]
     fund_with_link(advanced_collectible.address)
-    transaction = advanced_collectible.createCollectible("None", {"from": dev})
+    transaction = advanced_collectible.createCollectible("None", {"from": dev, "gas_limit": 100000000, "allow_revert": True})
     print("Waiting on second transaction...")
     # wait for the 2nd transaction
     transaction.wait(1)
