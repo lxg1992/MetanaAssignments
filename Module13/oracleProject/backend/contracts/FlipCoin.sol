@@ -62,8 +62,8 @@ contract CoinFlip is VRF2WrapperConsumerBase {
         override
     {
         require(
-            statuses[requestId].player != address(0),
-            "requestId not found"
+            statuses[requestId].fees > 0,
+            "Request not found"
         );
         require(
             statuses[requestId].fulfilled == false,
@@ -76,16 +76,20 @@ contract CoinFlip is VRF2WrapperConsumerBase {
             : statuses[requestId].choice == CoinSide.Tails;
         statuses[requestId].fulfilled = true;
 
-        if (statuses[requestId].didWin) {
-            payable(statuses[requestId].player).transfer(
-                statuses[requestId].fees * 2
-            );
-        }
+        // if (statuses[requestId].didWin) {
+        //     payable(statuses[requestId].player).transfer(
+        //         statuses[requestId].fees * 2
+        //     );
+        // }
 
         emit CoinFlipResponse(
             requestId,
             statuses[requestId].choice,
             statuses[requestId].didWin
         );
+    }
+
+    function getStatus(uint256 requestId) external view returns (CoinFlipStatus memory) {
+        return statuses[requestId];
     }
 }
