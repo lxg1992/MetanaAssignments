@@ -7,16 +7,14 @@
 const hre = require("hardhat");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  const FlipCoin = await hre.ethers.getContractFactory("FlipCoin");
 
-  const lock = await hre.ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
+  const flipCoin = await FlipCoin.deploy();
 
-  await lock.waitForDeployment();
+  await flipCoin.deployed();
+
+  console.log("FlipCoin deployed to:", flipCoin.address);
 
   console.log(
     `Lock with ${ethers.formatEther(

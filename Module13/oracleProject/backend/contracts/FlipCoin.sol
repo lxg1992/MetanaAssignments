@@ -9,8 +9,9 @@ contract CoinFlip is VRF2WrapperConsumerBase {
     event CoinFlipRequest(uint256 requestId, CoinSide side);
     event CoinFlipResponse(uint256 requestId, CoinSide side, bool isWon);
 
-    address constant linkAddress = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
-    address constant vrfWrapperAddress =
+    // For Goerli
+    address constant linkAddress = 0x514910771AF9Ca656af840dff83E8264EcF986CA; 
+    address constant vrfWrapperAddress = 
         0x5A861794B927983406fCE1D062e00b9368d97Df6;
 
     mapping(uint256 => CoinFlipStatus) public statuses;
@@ -38,9 +39,8 @@ contract CoinFlip is VRF2WrapperConsumerBase {
 
     function flip(CoinSide choice) external payable returns (uint256) {
         uint256 requestId = requestRandomness(
-            linkAddress,
-            entreeFee,
             callbackGasLimit,
+            requestConfirmations,
             numWords
         );
 
