@@ -5,13 +5,13 @@ import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
 //0x5A861794B927983406fCE1D062e00b9368d97Df6 - wrapper
 //0x514910771AF9Ca656af840dff83E8264EcF986CA - link
 //0x271682DEB8C4E0901D1a1550aD2e64D568E69909 - coordinator
-contract CoinFlip is VRF2WrapperConsumerBase {
+contract FlipCoin is VRFV2WrapperConsumerBase {
     event CoinFlipRequest(uint256 requestId, CoinSide side);
     event CoinFlipResponse(uint256 requestId, CoinSide side, bool isWon);
 
     // For Goerli
-    address constant linkAddress = 0x514910771AF9Ca656af840dff83E8264EcF986CA; 
-    address constant vrfWrapperAddress = 
+    address constant linkAddress = 0x514910771AF9Ca656af840dff83E8264EcF986CA;
+    address constant vrfWrapperAddress =
         0x5A861794B927983406fCE1D062e00b9368d97Df6;
 
     mapping(uint256 => CoinFlipStatus) public statuses;
@@ -21,21 +21,21 @@ contract CoinFlip is VRF2WrapperConsumerBase {
     uint32 constant numWords = 1;
     uint16 constant requestConfirmations = 3;
 
+    enum CoinSide {
+        Heads,
+        Tails
+    }
+
     struct CoinFlipStatus {
         uint256 fees;
         uint256 randomWord;
         address player;
         bool didWin;
         bool fulfilled;
-        CoinFlipSelection choice;
+        CoinSide choice;
     }
 
-    enum CoinSide {
-        Heads,
-        Tails
-    }
-
-    constructor() VRF2WrapperConsumerBase(linkAddress, vrfWrapperAddress) {}
+    constructor() VRFV2WrapperConsumerBase(linkAddress, vrfWrapperAddress) {}
 
     function flip(CoinSide choice) external payable returns (uint256) {
         uint256 requestId = requestRandomness(
@@ -45,7 +45,7 @@ contract CoinFlip is VRF2WrapperConsumerBase {
         );
 
         statuses[requestId] = CoinFlipStatus({
-            fees: VRF2_V2_WRAPPER.calculateRequestPrice(callbackGasLimit),
+            fees: VRF_V2_WRAPPER.calculateRequestPrice(callbackGasLimit),
             randomWord: 0,
             player: msg.sender,
             didWin: false,
@@ -57,14 +57,11 @@ contract CoinFlip is VRF2WrapperConsumerBase {
         return requestId;
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
-        override
-    {
-        require(
-            statuses[requestId].fees > 0,
-            "Request not found"
-        );
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) internal override {
+        require(statuses[requestId].fees > 0, "Request not found");
         require(
             statuses[requestId].fulfilled == false,
             "requestId already fulfilled"
@@ -89,7 +86,12 @@ contract CoinFlip is VRF2WrapperConsumerBase {
         );
     }
 
-    function getStatus(uint256 requestId) external view returns (CoinFlipStatus memory) {
+    function getStatus(
+        uint256 requestId
+    ) external view returns (CoinFlipStatus memory) {
         return statuses[requestId];
     }
 }
+
+//Deploy contract
+//Fund with link

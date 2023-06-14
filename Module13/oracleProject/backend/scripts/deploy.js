@@ -12,15 +12,15 @@ async function main() {
 
   const flipCoin = await FlipCoin.deploy();
 
-  await flipCoin.deployed();
+  await flipCoin.waitForDeployment();
+  
+  await hre.run("verify:verify", {
+    address: flipCoin.target,
+    constructorArguments: [],
+    }
+  )
 
-  console.log("FlipCoin deployed to:", flipCoin.address);
-
-  console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
-  );
+  console.log('Address', flipCoin.target);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
