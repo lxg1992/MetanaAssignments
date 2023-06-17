@@ -9,6 +9,12 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "uint256",
                 "name": "requestId",
                 "type": "uint256"
@@ -28,15 +34,15 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "requestId",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "enum FlipCoin.CoinSide",
-                "name": "side",
-                "type": "uint8"
+                "internalType": "uint256",
+                "name": "requestId",
+                "type": "uint256"
             },
             {
                 "indexed": false,
