@@ -14,11 +14,8 @@ async function main() {
 
   await flipCoin.waitForDeployment();
   
-  await hre.run("verify:verify", {
-    address: flipCoin.target,
-    constructorArguments: [],
-    }
-  )
+  //0x6B3942181998B48F3f436B9434BE91065c2fFbcb latest deployed
+
 
   console.log('Address', flipCoin.target);
 }
