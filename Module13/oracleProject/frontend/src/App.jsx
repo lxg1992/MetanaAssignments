@@ -5,19 +5,21 @@ import {
   useContract,
   useContractRead,
   useContractWrite,
+  useContractEvents,
   Web3Button,
 } from "@thirdweb-dev/react";
-import { BigNumber } from "ethers";
 import "./App.css";
 import FlipCoinABI from "./abi/FlipCoinABI.json";
 
-const flipCoinAddress = "0xb5Fe9D933E248f4C7740D754FE7Aa44Dbcc90EE7";
+const flipCoinAddress = "0x4b81DE9D5285c30ec7c9E769A30A41C0afb6C333";
+
+const callOverride = {
+  gasLimit: 1000000,
+};
 
 function App() {
   const address = useAddress();
   const connectWithMM = useMetamask();
-
-  const [choice, setChoice] = useState(0);
 
   const {
     contract,
@@ -26,21 +28,32 @@ function App() {
   } = useContract(flipCoinAddress, FlipCoinABI);
 
   const {
-    data: linkBalance,
-    isLoading: isLinkBalanceLoading,
-    error: linkBalanceError,
-  } = useContractRead(contract, "getContractERC20Balance");
-
-  console.log(choice);
-
-  const {
     mutateAsync: flipAsync,
     isLoading: isFlipLoading,
     error: flipError,
   } = useContractWrite(contract, "flip");
 
+  const {
+    data: linkBalance,
+    isLoading: isLinkBalanceLoading,
+    error: linkBalanceError,
+  } = useContractRead(contract, "getContractERC20Balance");
+
+  const {
+    data: eventReqData,
+    isLoading: isReqEventLoading,
+    error: reqEventError,
+  } = useContractEvents(contract, "CoinFlipRequest");
+
+  const {
+    data: eventResData,
+    isLoading: isResEventLoading,
+    error: resEventError,
+  } = useContractEvents(contract, "CoinFlipResponse");
+
   if (contractError) {
-    return <p>{contractError.message}</p>;
+    console.log({ contractError });
+    // return <p>ContractError: {contractError.message}</p>;
   }
 
   if (linkBalanceError) {
@@ -49,6 +62,14 @@ function App() {
 
   if (isContractLoading) {
     return <p>Loading...</p>;
+  }
+
+  if (eventReqData) {
+    console.log({ eventReqData });
+  }
+
+  if (eventResData) {
+    console.log({ eventResData });
   }
 
   return (
@@ -65,7 +86,7 @@ function App() {
       <div>
         <p>Link Balance of Contract</p>
         {isLinkBalanceLoading ? (
-          <p>Loading...</p>
+          <p>Loading balance...</p>
         ) : (
           <p>{linkBalance.toString() / 10 ** 18}</p>
         )}
@@ -79,21 +100,26 @@ function App() {
         </select>
       </div> */}
       <div>
-        {isFlipLoading ? <p>Loading...</p> : null}
-        <Web3Button
-          isDisabled={choice === -1}
-          contractAddress={flipCoinAddress}
-          action={() => flipAsync({ args: [0] })}
-        >
-          🎧
-        </Web3Button>
-        <Web3Button
-          isDisabled={choice === -1}
-          contractAddress={flipCoinAddress}
-          action={() => flipAsync({ args: [1] })}
-        >
-          🦎
-        </Web3Button>
+        {isFlipLoading ? <p>Loading flip result...</p> : null}
+        {address && (
+          <>
+            <Web3Button
+              isDisabled={isFlipLoading}
+              contractAddress={flipCoinAddress}
+              action={() => flipAsync([0, { ...callOverride }])}
+            >
+              🎧
+            </Web3Button>
+            -
+            <Web3Button
+              isDisabled={isFlipLoading}
+              contractAddress={flipCoinAddress}
+              action={() => flipAsync([1, { ...callOverride }])}
+            >
+              🦎
+            </Web3Button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -110,3 +136,5 @@ export default App;
  * TODO: SHOW THE RESULT OF THE FLIP
  * TODO: LOCAL HISTORY?
  */
+
+//              action={() => flipAsync([0, { ...callOverride }])}
