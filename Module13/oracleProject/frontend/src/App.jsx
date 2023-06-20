@@ -79,6 +79,7 @@ function App() {
         </select>
       </div> */}
       <div>
+        {isFlipLoading ? <p>Loading...</p> : null}
         <Web3Button
           isDisabled={choice === -1}
           contractAddress={flipCoinAddress}
@@ -102,6 +103,8 @@ export default App;
 
 /**
  * TODO: SUBSCRIBE TO EVENT Request and Response
+ * TODO: SHOW THE REQUEST ID
+ *
  * TODO: ON FLIP REQUEST, SHOW LOADING (prevent further flips)
  * TODO: FILTER EVENTS BASED ON THE REQUEST ID AND ADDRESS
  * TODO: SHOW THE RESULT OF THE FLIP
