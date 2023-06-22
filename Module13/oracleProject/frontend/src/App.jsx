@@ -14,7 +14,7 @@ import FlipCoinABI from "./abi/FlipCoinABI.json";
 const flipCoinAddress = "0x4b81DE9D5285c30ec7c9E769A30A41C0afb6C333";
 
 const callOverride = {
-  gasLimit: 1000000,
+  gasLimit: 500000,
 };
 
 function App() {
@@ -27,11 +27,11 @@ function App() {
     error: contractError,
   } = useContract(flipCoinAddress, FlipCoinABI);
 
-  const {
-    mutateAsync: flipAsync,
-    isLoading: isFlipLoading,
-    error: flipError,
-  } = useContractWrite(contract, "flip");
+  // const {
+  //   mutateAsync: flipAsync,
+  //   isLoading: isFlipLoading,
+  //   error: flipError,
+  // } = useContractWrite(contract, "flip");
 
   const {
     data: linkBalance,
@@ -53,7 +53,6 @@ function App() {
 
   if (contractError) {
     console.log({ contractError });
-    // return <p>ContractError: {contractError.message}</p>;
   }
 
   if (linkBalanceError) {
@@ -61,7 +60,7 @@ function App() {
   }
 
   if (isContractLoading) {
-    return <p>Loading...</p>;
+    return <p>Loading contract...</p>;
   }
 
   if (eventReqData) {
@@ -71,6 +70,15 @@ function App() {
   if (eventResData) {
     console.log({ eventResData });
   }
+
+  const flipAsync = async (choice) => {
+    try {
+      const data = await contract.call("flip", [choice], callOverride);
+      console.log({ data });
+    } catch (error) {
+      console.log({ error });
+    }
+  };
 
   return (
     <div className="App">
@@ -84,6 +92,10 @@ function App() {
         )}
       </div>
       <div>
+        <p>FlipCoin address:</p>
+        <h6>{flipCoinAddress}</h6>
+      </div>
+      <div>
         <p>Link Balance of Contract</p>
         {isLinkBalanceLoading ? (
           <p>Loading balance...</p>
@@ -91,35 +103,56 @@ function App() {
           <p>{linkBalance.toString() / 10 ** 18}</p>
         )}
       </div>
-      {/* <div>
-        <label>Side:</label>
-        <select value={choice} onChange={handleChoiceChange}>
-          <option value={-1}>Select</option>
-          <option value={0}>Heads</option>
-          <option value={1}>Tails</option>
-        </select>
-      </div> */}
       <div>
-        {isFlipLoading ? <p>Loading flip result...</p> : null}
         {address && (
           <>
             <Web3Button
-              isDisabled={isFlipLoading}
+              // isDisabled={isFlipLoading}
               contractAddress={flipCoinAddress}
-              action={() => flipAsync([0, { ...callOverride }])}
+              action={() => flipAsync(0)}
             >
               🎧
             </Web3Button>
             -
             <Web3Button
-              isDisabled={isFlipLoading}
+              // isDisabled={isFlipLoading}
               contractAddress={flipCoinAddress}
-              action={() => flipAsync([1, { ...callOverride }])}
+              action={() => flipAsync(1)}
             >
               🦎
             </Web3Button>
           </>
         )}
+      </div>
+      <div className="container">
+        <div className="column">
+          {isReqEventLoading && <p>Loading...</p>}
+          {eventReqData &&
+            eventReqData.length &&
+            eventReqData
+              .filter((event) => event.data.sender === address)
+              .map((event, i) => {
+                return (
+                  <div key={i}>
+                    <p>Choice: {event.data.side === 0 ? "🎧" : "🦎"}</p>
+                  </div>
+                );
+              })}
+        </div>
+        <div className="column">
+          {isResEventLoading && <p>Loading...</p>}
+          {eventResData &&
+            eventResData.length &&
+            eventResData
+              .filter((event) => event.data.sender === address)
+              .map((event, i) => {
+                return (
+                  <div key={i}>
+                    <p>Won: {event.data.isWon ? "✔" : "❌"}</p>
+                  </div>
+                );
+              })}
+        </div>
       </div>
     </div>
   );
