@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0
+
 pragma solidity ^0.8.9;
 
 import "@chainlink/contracts/src/v0.8/VRFV2WrapperConsumerBase.sol";
@@ -89,7 +91,12 @@ contract FlipCoin is VRFV2WrapperConsumerBase {
     function getContractERC20Balance() external view returns (uint256) {
         return IERC20(linkAddress).balanceOf(address(this));
     }
+
+    function fundContractWithLink(uint256 amount) external {
+        IERC20(linkAddress).transferFrom(msg.sender, address(this), amount);
+    }
+    //make a function to fund the contract with link
 }
 
-//Deploy contract 0xb5Fe9D933E248f4C7740D754FE7Aa44Dbcc90EE7
+//Deploy contract 0x4b81DE9D5285c30ec7c9E769A30A41C0afb6C333
 //Fund with link

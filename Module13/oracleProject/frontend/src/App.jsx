@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useMetamask,
   useAddress,
   useContract,
   useContractRead,
-  useContractWrite,
   useContractEvents,
   Web3Button,
+  useSDK,
 } from "@thirdweb-dev/react";
 import "./App.css";
 import FlipCoinABI from "./abi/FlipCoinABI.json";
@@ -18,20 +18,32 @@ const callOverride = {
 };
 
 function App() {
+  const [block, setBlock] = useState(null);
   const address = useAddress();
   const connectWithMM = useMetamask();
+  const thirdweb = useSDK();
+
+  const fetchLatestBlock = async () => {
+    console.log({ thirdweb });
+    console.log(thirdweb.provider._emitted.block);
+  };
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     fetchLatestBlock().then((block) => {
+  //       const events = await contract.events.getEvents("CoinFlipRequest", {
+  //         fromBlock: block - 300,
+  //       })
+  //     });
+  //   }, 1000);
+  //   return () => clearTimeout(timer);
+  // });
 
   const {
     contract,
     isLoading: isContractLoading,
     error: contractError,
   } = useContract(flipCoinAddress, FlipCoinABI);
-
-  // const {
-  //   mutateAsync: flipAsync,
-  //   isLoading: isFlipLoading,
-  //   error: flipError,
-  // } = useContractWrite(contract, "flip");
 
   const {
     data: linkBalance,
@@ -43,13 +55,25 @@ function App() {
     data: eventReqData,
     isLoading: isReqEventLoading,
     error: reqEventError,
-  } = useContractEvents(contract, "CoinFlipRequest");
+  } = useContractEvents(contract, "CoinFlipRequest", {
+    subscribe: true,
+  });
+
+  if (reqEventError) {
+    console.log({ reqEventError });
+  }
 
   const {
     data: eventResData,
     isLoading: isResEventLoading,
     error: resEventError,
-  } = useContractEvents(contract, "CoinFlipResponse");
+  } = useContractEvents(contract, "CoinFlipResponse", {
+    subscribe: true,
+  });
+
+  if (resEventError) {
+    console.log({ resEventError });
+  }
 
   if (contractError) {
     console.log({ contractError });
@@ -107,7 +131,6 @@ function App() {
         {address && (
           <>
             <Web3Button
-              // isDisabled={isFlipLoading}
               contractAddress={flipCoinAddress}
               action={() => flipAsync(0)}
             >
@@ -115,7 +138,6 @@ function App() {
             </Web3Button>
             -
             <Web3Button
-              // isDisabled={isFlipLoading}
               contractAddress={flipCoinAddress}
               action={() => flipAsync(1)}
             >
@@ -126,7 +148,7 @@ function App() {
       </div>
       <div className="container">
         <div className="column">
-          {isReqEventLoading && <p>Loading...</p>}
+          {isReqEventLoading && <p>Requests loading...</p>}
           {eventReqData &&
             eventReqData.length &&
             eventReqData
@@ -140,7 +162,7 @@ function App() {
               })}
         </div>
         <div className="column">
-          {isResEventLoading && <p>Loading...</p>}
+          {isResEventLoading && <p>Responses loading...</p>}
           {eventResData &&
             eventResData.length &&
             eventResData
@@ -169,5 +191,3 @@ export default App;
  * TODO: SHOW THE RESULT OF THE FLIP
  * TODO: LOCAL HISTORY?
  */
-
-//              action={() => flipAsync([0, { ...callOverride }])}

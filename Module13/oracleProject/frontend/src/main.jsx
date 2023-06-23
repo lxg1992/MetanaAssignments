@@ -5,12 +5,9 @@ import {
   ThirdwebProvider,
   metamaskWallet,
   coinbaseWallet,
-  walletConnectV1,
   walletConnect,
-  safeWallet,
-  paperWallet,
-  magicLink,
 } from "@thirdweb-dev/react";
+
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
