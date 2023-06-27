@@ -18,26 +18,48 @@ const callOverride = {
 };
 
 function App() {
-  const [block, setBlock] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [responses, setResponses] = useState([]);
+  const [times, setTimes] = useState([]);
+  const [intervalTimer, setIntervalTimer] = useState(0);
+  const [reqTx, setReqTxData] = useState({});
+  const [resTx, setResTxData] = useState({});
   const address = useAddress();
   const connectWithMM = useMetamask();
-  const thirdweb = useSDK();
 
-  const fetchLatestBlock = async () => {
-    console.log({ thirdweb });
-    console.log(thirdweb.provider._emitted.block);
+  const isAwaitingResponse = requests.length !== responses.length;
+  console.log({ waiting: isAwaitingResponse });
+
+  const timerRender = () => {
+    switch (intervalTimer) {
+      case 0:
+        return "🕛";
+      case 11:
+        return "🕚";
+      case 10:
+        return "🕙";
+      case 9:
+        return "🕘";
+      case 8:
+        return "🕗";
+      case 7:
+        return "🕖";
+      case 6:
+        return "🕕";
+      case 5:
+        return "🕔";
+      case 4:
+        return "🕓";
+      case 3:
+        return "🕒";
+      case 2:
+        return "🕑";
+      case 1:
+        return "🕐";
+      default:
+        return "🕛";
+    }
   };
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     fetchLatestBlock().then((block) => {
-  //       const events = await contract.events.getEvents("CoinFlipRequest", {
-  //         fromBlock: block - 300,
-  //       })
-  //     });
-  //   }, 1000);
-  //   return () => clearTimeout(timer);
-  // });
 
   const {
     contract,
@@ -45,35 +67,61 @@ function App() {
     error: contractError,
   } = useContract(flipCoinAddress, FlipCoinABI);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIntervalTimer((prev) => {
+        if (prev <= 11) {
+          return prev + 1;
+        }
+        return 0;
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubReq = contract?.events?.addEventListener(
+      "CoinFlipRequest",
+      (event) => {
+        console.log("triggering");
+
+        setReqTxData({});
+        setRequests((prev) => [...prev, event]);
+        setTimes((prev) => [...prev, new Date().toLocaleTimeString("en-US")]);
+        setIntervalTimer(0);
+        // setReqTxData(event.transaction);
+        console.log({ eventReq: event });
+      }
+    );
+    const unsubRes = contract?.events?.addEventListener(
+      "CoinFlipResponse",
+      (event) => {
+        setResTxData({});
+        setResponses((prev) => [...prev, event]);
+        setIntervalTimer(0);
+        // setResTxData(event.transaction);
+        console.log({ eventRes: event });
+      }
+    );
+
+    return () => {
+      if (typeof unsubReq === "function") {
+        unsubReq();
+      }
+      if (typeof unsubRes === "function") {
+        unsubRes();
+      }
+    };
+  }, [contract]);
+
   const {
     data: linkBalance,
     isLoading: isLinkBalanceLoading,
     error: linkBalanceError,
   } = useContractRead(contract, "getContractERC20Balance");
-
-  const {
-    data: eventReqData,
-    isLoading: isReqEventLoading,
-    error: reqEventError,
-  } = useContractEvents(contract, "CoinFlipRequest", {
-    subscribe: true,
-  });
-
-  if (reqEventError) {
-    console.log({ reqEventError });
-  }
-
-  const {
-    data: eventResData,
-    isLoading: isResEventLoading,
-    error: resEventError,
-  } = useContractEvents(contract, "CoinFlipResponse", {
-    subscribe: true,
-  });
-
-  if (resEventError) {
-    console.log({ resEventError });
-  }
 
   if (contractError) {
     console.log({ contractError });
@@ -87,14 +135,6 @@ function App() {
     return <p>Loading contract...</p>;
   }
 
-  if (eventReqData) {
-    console.log({ eventReqData });
-  }
-
-  if (eventResData) {
-    console.log({ eventResData });
-  }
-
   const flipAsync = async (choice) => {
     try {
       const data = await contract.call("flip", [choice], callOverride);
@@ -103,6 +143,8 @@ function App() {
       console.log({ error });
     }
   };
+
+  console.log(intervalTimer);
 
   return (
     <div className="App">
@@ -127,8 +169,8 @@ function App() {
           <p>{linkBalance.toString() / 10 ** 18}</p>
         )}
       </div>
-      <div>
-        {address && (
+      <div className="centered">
+        {address && !isAwaitingResponse ? (
           <>
             <Web3Button
               contractAddress={flipCoinAddress}
@@ -144,14 +186,19 @@ function App() {
               🦎
             </Web3Button>
           </>
+        ) : (
+          <>
+            <Web3Button action={() => alert("Please wait")}>
+              Waiting for response
+            </Web3Button>
+          </>
         )}
       </div>
+      {/* <div className="centered">stuff</div> */}
       <div className="container">
         <div className="column">
-          {isReqEventLoading && <p>Requests loading...</p>}
-          {eventReqData &&
-            eventReqData.length &&
-            eventReqData
+          {requests.length > 0 &&
+            requests
               .filter((event) => event.data.sender === address)
               .map((event, i) => {
                 return (
@@ -162,10 +209,13 @@ function App() {
               })}
         </div>
         <div className="column">
-          {isResEventLoading && <p>Responses loading...</p>}
-          {eventResData &&
-            eventResData.length &&
-            eventResData
+          {times.map((time, i) => (
+            <p key={i}>{time}</p>
+          ))}
+        </div>
+        <div className="column">
+          {responses.length > 0 &&
+            responses
               .filter((event) => event.data.sender === address)
               .map((event, i) => {
                 return (
@@ -174,6 +224,11 @@ function App() {
                   </div>
                 );
               })}
+          {isAwaitingResponse && (
+            <div>
+              <h3>Wait...{timerRender()}</h3>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -183,11 +238,11 @@ function App() {
 export default App;
 
 /**
- * TODO: SUBSCRIBE TO EVENT Request and Response
- * TODO: SHOW THE REQUEST ID
+ * // SUBSCRIBE TO EVENT Request and Response
+ * ? SHOW THE REQUEST ID
  *
- * TODO: ON FLIP REQUEST, SHOW LOADING (prevent further flips)
- * TODO: FILTER EVENTS BASED ON THE REQUEST ID AND ADDRESS
- * TODO: SHOW THE RESULT OF THE FLIP
- * TODO: LOCAL HISTORY?
+ * // ON FLIP REQUEST, SHOW LOADING (prevent further flips)
+ * * FILTER EVENTS BASED ON THE REQUEST ID AND ADDRESS
+ * * SHOW THE RESULT OF THE FLIP
+ * ? LOCAL HISTORY
  */
