@@ -66,7 +66,6 @@ const ERC20Item = ({
       throw new Error(returnData.error.message);
     }
     setAccount((prevState) => ({ ...prevState, lastTx: returnData.result }));
-    console.log(returnData.result);
     return returnData.result;
   };
 

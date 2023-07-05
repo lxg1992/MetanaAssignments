@@ -88,13 +88,11 @@ function MyContextProvider({ children }) {
 
   const setNetworkTo = (networkValue) => {
     setNetwork(networkDict[networkValue]);
-    console.log({ networkSet: network });
   };
 
   const addToken = (newTokenName, newTokenAddr, networkStr) => {
     setAccount((state) => {
       state.ERC20Contracts[networkStr][newTokenName] = newTokenAddr;
-      console.log({ state });
       return { ...state };
     });
   };

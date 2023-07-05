@@ -1,0 +1,29 @@
+type Token @entity {
+  id: ID!
+  tokenID: BigInt!
+  tokenURI: String!
+  externalURL: String!
+  ipfsURI: String!
+  image: String!
+  name: String!
+  description: String!
+  type: String!
+  sun: String!
+  moon: String!
+  rising: String!
+  updatedAtTimestamp: BigInt!
+  owner: User!
+}
+
+typer User @entity {
+  id: ID!
+  tokens: [Token!]! @derivedFrom(field: "owner")
+}
+
+type _Schema_
+  @fulltext(
+    name: "baycSearch"
+    language: en
+    algorithm: rank
+    include: [{ entity: "Token", fields: [{name: "name"}, {name: "description"}, {name: "type"}, {name: "sun"}, {name: "moon"}, {name: "rising"}]}]
+  )

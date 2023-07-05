@@ -6,7 +6,6 @@ import ERC20Item from "./ERC20Item";
 
 const ERC20Container = ({ nonce }) => {
   const { account, addToken, network } = useContext(MyContext);
-  // console.log(account);
   const [newTokenName, setNewTokenName] = useState("");
   const [newTokenAddr, setNewTokenAddr] = useState("");
 

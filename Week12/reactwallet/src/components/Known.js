@@ -64,8 +64,6 @@ const Known = () => {
   }));
 
   const accountOptions = Object.entries(accountDict).map((n, i) => {
-    console.log(n[0]);
-    console.log(n[1]);
     return {
       key: i,
       text: (
