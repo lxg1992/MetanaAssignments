@@ -1,6 +1,6 @@
 specVersion: 0.0.5
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 features:
   - fullTextSearch
   - ipfsOnEthereumContracts
@@ -21,14 +21,8 @@ dataSources:
         - User
       abis:
         - name: BAYC
-          file: ./abis/BAYC.json
+          file: BAYC/abis/BAYC.json
       eventHandlers:
-        # - event: Approval(indexed address,indexed address,indexed uint256)
-        #   handler: handleApproval
-        # - event: ApprovalForAll(indexed address,indexed address,bool)
-        #   handler: handleApprovalForAll
-        # - event: OwnershipTransferred(indexed address,indexed address)
-        #   handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./src/bayc.ts
+      file: BAYC/BAYC.wasm

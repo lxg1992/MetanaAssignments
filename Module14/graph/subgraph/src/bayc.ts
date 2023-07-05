@@ -1,73 +1,48 @@
 import {
-  Approval as ApprovalEvent,
-  ApprovalForAll as ApprovalForAllEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  Transfer as TransferEvent
-} from "../generated/BAYC/BAYC"
-import {
-  Approval,
-  ApprovalForAll,
-  OwnershipTransferred,
-  Transfer
-} from "../generated/schema"
+  Transfer as TransferEvent,
+  BAYC as TokenContract,
+} from "../generated/BAYC/BAYC";
 
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.owner = event.params.owner
-  entity.approved = event.params.approved
-  entity.tokenId = event.params.tokenId
+import { Token, User } from "../generated/schema";
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+import { ipfs, json } from "@graphprotocol/graph-ts";
 
-  entity.save()
-}
-
-export function handleApprovalForAll(event: ApprovalForAllEvent): void {
-  let entity = new ApprovalForAll(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.owner = event.params.owner
-  entity.operator = event.params.operator
-  entity.approved = event.params.approved
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent
-): void {
-  let entity = new OwnershipTransferred(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
+const ipfshash = "QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq";
 
 export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.tokenId = event.params.tokenId
+  let token = Token.load(event.params.tokenId.toString());
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  if (!token) {
+    token = new Token(event.params.tokenId.toString());
+    token.tokenID = event.params.tokenId;
+    token.tokenURI = "/" + event.params.tokenId.toString() + ".json";
 
-  entity.save()
+    let metadata = ipfs.cat(ipfshash + token.tokenURI);
+
+    if (metadata) {
+      const value = json.fromBytes(metadata).toObject();
+      if (value) {
+        const image = value.get("image");
+        const name = value.get("name");
+        // const description = value.get("description");
+        // const externalURL = value.get("external_url");
+        if (name && image) {
+          token.image = image.toString();
+          token.name = name.toString();
+          //   token.externalURL = externalURL.toString();
+          //   token.description = description.toString();
+          token.ipfsURI = "ipfs.io/ipfs/" + ipfshash + token.tokenURI;
+        }
+      }
+    }
+    token.updatedAtTimestamp = event.block.timestamp;
+    token.owner = event.params.to.toHexString();
+    token.save();
+
+    let user = User.load(event.params.to.toHexString());
+    if (!user) {
+      user = new User(event.params.to.toHexString());
+      user.save();
+    }
+  }
 }
