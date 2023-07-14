@@ -8,15 +8,15 @@ function getInstance(name) {
 }
 
 async function main() {
-  const registry = await getInstance("Registry");
-  const events = await registry.queryFilter(registry.filters.Registered());
-  console.log("Registrations");
+  const lottery = await getInstance("AutoLottery");
+  const events = await lottery.queryFilter(lottery.filters.Entered());
+  console.log("Entries");
   console.log("=============");
   console.log(
     events
       .map(
         (e) =>
-          `[${e.blockNumber}] https://goerli.etherscan.io/address/${e.args.who} => ${e.args.name}`
+          `[${e.blockNumber}] https://goerli.etherscan.io/address/${e.args.who} => ${e.args.guess}`
       )
       .join("\n")
   );
