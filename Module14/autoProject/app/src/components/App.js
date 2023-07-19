@@ -1,18 +1,18 @@
-import { EthereumContext } from '../eth/context';
-import { createProvider } from '../eth/provider';
-import { createInstance } from '../eth/registry';
+import { EthereumContext } from "../eth/context";
+import { createProvider } from "../eth/provider";
+import { createInstance } from "../eth/registry";
 
-import './App.css';
-import Registrations from './Registrations';
-import Register from './Register';
+import "./App.css";
+import Registrations from "./Registrations";
+import Register from "./Register";
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const provider = createProvider();
-  const registry = createInstance(provider);
-  const ethereumContext = { provider, registry };
+  const lottery = createInstance(provider);
+  const ethereumContext = { provider, lottery };
 
   return (
     <div className="App">

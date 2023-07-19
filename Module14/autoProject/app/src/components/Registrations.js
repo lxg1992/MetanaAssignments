@@ -5,16 +5,18 @@ import './Registrations.css';
 const mapEvent = (event) => ({
   blockNumber: event.blockNumber,
   who: event.args.who,
-  name: event.args.name,
+  guess: event.args.guess,
+  isPaid: event.args.isPaid,
+  // name: event.args.name,
   id: `${event.blockHash}/${event.transactionIndex}/${event.logIndex}`,
 })
 
 function Registrations() {
-  const { registry } = useContext(EthereumContext);
+  const { lottery } = useContext(EthereumContext);
   const [registrations, setRegistrations] = useState(undefined);
 
   useEffect(() => {
-    const filter = registry.filters.Registered();
+    const filter = lottery.filters.Entered();
 
     const listener = (...args) => {
       const event = args[args.length-1];
@@ -22,14 +24,14 @@ function Registrations() {
     };
     
     const subscribe = async() => {  
-      const past = await registry.queryFilter(filter);
+      const past = await lottery.queryFilter(filter);
       setRegistrations((past.reverse() || []).map(mapEvent));
-      registry.on(filter, listener);  
+      lottery.on(filter, listener);
     }
     
     subscribe();
-    return () => registry.off(filter, listener);
-  }, [registry]);
+    return () => lottery.off(filter, listener);
+  }, [lottery]);
 
   return <div className="Registrations">
     <h3>Last registrations 📝</h3>
@@ -39,7 +41,7 @@ function Registrations() {
     {registrations && (
       <ul>
         {registrations.map(r => (
-          <li key={r.id}><span className="address">{r.who}</span> {r.name}</li>
+          <li key={r.id}><span className="address">{r.who}</span> {r.guess}</li>
         ))}
       </ul>
     )}
