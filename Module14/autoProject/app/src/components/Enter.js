@@ -2,12 +2,18 @@ import { useRef, useState, useContext } from "react";
 import { registerName } from "../eth/register";
 import { EthereumContext } from "../eth/context";
 import { toast } from "react-toastify";
-import "./Register.css";
+import "./Enter.css";
 
-function Register() {
+function Enter() {
   const guessInput = useRef(null);
+  const [relayTx, setRelayTx] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
   const { lottery, provider } = useContext(EthereumContext);
+
+  const handleRelayCheckboxChange = (event) => {
+    setRelayTx(event.target.checked);
+  };
 
   const sendTx = async (event) => {
     event.preventDefault();
@@ -15,7 +21,7 @@ function Register() {
     setSubmitting(true);
 
     try {
-      const response = await registerName(lottery, provider, guess);
+      const response = await registerName(lottery, provider, guess, relayTx);
       const hash = response.hash;
       const onClick = hash
         ? () => window.open(`https://goerli.etherscan.io/tx/${hash}`)
@@ -34,15 +40,24 @@ function Register() {
       <form onSubmit={sendTx}>
         <input
           required={true}
-          placeholder="Register your guess here"
+          placeholder="Enter your guess here"
           ref={guessInput}
         ></input>
         <button type="submit" disabled={submitting}>
-          {submitting ? "Registering..." : "Register"}
+          {submitting ? "Registering..." : "Enter"}
         </button>
       </form>
+      <label className="form-switch">
+        <input
+          type="checkbox"
+          checked={relayTx}
+          onChange={handleRelayCheckboxChange}
+        />
+        <i></i>
+        Relay Tx?
+      </label>
     </div>
   );
 }
 
-export default Register;
+export default Enter;

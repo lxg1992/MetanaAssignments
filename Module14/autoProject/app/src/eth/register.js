@@ -30,7 +30,12 @@ async function sendMetaTx(lottery, provider, signer, guess) {
   });
 }
 
-export async function registerName(lottery, provider, guess) {
+export async function registerName(
+  lottery,
+  provider,
+  guess,
+  isTxRelayed = false
+) {
   if (!guess) throw new Error(`guess cannot be empty`);
   if (!window.ethereum) throw new Error(`User wallet not found`);
 
@@ -41,10 +46,10 @@ export async function registerName(lottery, provider, guess) {
     throw new Error(`Please switch to Goerli for signing`);
 
   const signer = userProvider.getSigner();
-  const from = await signer.getAddress();
-  const balance = await provider.getBalance(from);
+  // const from = await signer.getAddress();
+  // const balance = await provider.getBalance(from);
 
-  const canSendTx = balance.gt(1e15);
-  if (canSendTx) return sendTx(lottery.connect(signer), guess);
-  else return sendMetaTx(lottery, provider, signer, guess);
+  // const canSendTx = balance.gt(1e15);
+  if (isTxRelayed) return sendMetaTx(lottery, provider, signer, guess);
+  else return sendTx(lottery.connect(signer), guess);
 }

@@ -3,8 +3,8 @@ import { createProvider } from "../eth/provider";
 import { createInstance } from "../eth/registry";
 
 import "./App.css";
-import Registrations from "./Registrations";
-import Register from "./Register";
+import Entries from "./Entries";
+import Enter from "./Enter";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,13 +17,12 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Names Registry</h1>
-        <p>powered by Defender Relayer meta-transactions</p>
+        <h1>AutoLottery</h1>
       </header>
       <section className="App-content">
         <EthereumContext.Provider value={ethereumContext}>
-          <Register />
-          <Registrations />
+          <Enter />
+          <Entries />
         </EthereumContext.Provider>
       </section>
       <ToastContainer hideProgressBar={true} />
