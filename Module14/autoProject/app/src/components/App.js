@@ -6,6 +6,7 @@ import "./App.css";
 import Entries from "./Entries";
 import Enter from "./Enter";
 
+import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +15,14 @@ function App() {
   const lottery = createInstance(provider);
   const ethereumContext = { provider, lottery };
 
+  const [roundNumber, setRoundNumber] = useState(undefined);
+
+  useEffect(() => {
+    lottery.roundNumber().then((rnum) => {
+      setRoundNumber(rnum);
+    });
+  }, [lottery]);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -21,8 +30,8 @@ function App() {
       </header>
       <section className="App-content">
         <EthereumContext.Provider value={ethereumContext}>
-          <Enter />
-          <Entries />
+          <Enter roundNumber={roundNumber} />
+          <Entries roundNumber={roundNumber} />
         </EthereumContext.Provider>
       </section>
       <ToastContainer hideProgressBar={true} />

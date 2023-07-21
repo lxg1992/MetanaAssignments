@@ -28,4 +28,10 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 - Alter UI in order to accommodate the guessing game
 - Make an AUTO submitted that hits at a time hour every night.
+- Make entry possibility conditional (check to see if current address is withing the latest entrants)
+- Make a way to see the latest entrants
+- See latest guesses
+
+## DONE:
+
 - Make toggle between free and paid entry

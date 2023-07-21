@@ -1,3 +1,5 @@
+
+
 form {
   display: flex;
   justify-content: center;
@@ -32,14 +34,22 @@ button:hover {
 }
 
 .Container {
-  background: white;
+  background: rgb(236, 236, 236);
   border-radius: 1rem;
-  padding: 3rem;
+  padding: 2rem;
   box-shadow: 0px 8px 16px rgba(44, 55, 75, 0.16);
   z-index: 2;
-  margin: 0 2rem;
+  max-width: 400px;
+  margin: 0 auto;
   margin-top: -4rem;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
 }
+
+/* .centered {
+  margin: 0 auto;
+} */
 
 h4 {
   margin: 0;

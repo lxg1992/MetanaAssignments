@@ -4,7 +4,7 @@ import { EthereumContext } from "../eth/context";
 import { toast } from "react-toastify";
 import "./Enter.css";
 
-function Enter() {
+function Enter({ roundNumber }) {
   const guessInput = useRef(null);
   const [relayTx, setRelayTx] = useState(false);
 
@@ -37,6 +37,7 @@ function Enter() {
 
   return (
     <div className="Container">
+      <h3 className="centered">Round: {roundNumber}</h3>
       <form onSubmit={sendTx}>
         <input
           required={true}
@@ -44,7 +45,7 @@ function Enter() {
           ref={guessInput}
         ></input>
         <button type="submit" disabled={submitting}>
-          {submitting ? "Registering..." : "Enter"}
+          {submitting ? "Entering..." : "Enter"}
         </button>
       </form>
       <label className="form-switch">
