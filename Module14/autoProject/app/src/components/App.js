@@ -16,12 +16,51 @@ function App() {
   const ethereumContext = { provider, lottery };
 
   const [roundNumber, setRoundNumber] = useState(undefined);
+  const [entrants, setEntrants] = useState(undefined);
+  const [picks, setPicks] = useState(undefined);
+  const [previousWinners, setPreviousWinners] = useState(undefined);
+  const [previousPicks, setPreviousPicks] = useState(undefined);
+  //const [trigger, setTrigger] = useState(0);
 
-  useEffect(() => {
-    lottery.roundNumber().then((rnum) => {
-      setRoundNumber(rnum);
-    });
-  }, [lottery]);
+  useEffect(
+    () => {
+      lottery.roundNumber().then((rnum) => {
+        console.log("Round number", rnum);
+        setRoundNumber(rnum);
+      });
+
+      lottery.getLatestEntrants().then((entrants) => {
+        console.log("Entrants", entrants);
+        setEntrants(entrants);
+      });
+
+      lottery.getLatestPicks().then((picks) => {
+        console.log("Picks", picks);
+        setPicks(picks);
+      });
+
+      // lottery.getPreviousWinners().then((previousWinners) => {
+      //   console.log("Previous Winners", previousWinners);
+      //   setPreviousWinners(previousWinners);
+      // });
+
+      // lottery.getPreviousPicks().then((previousPicks) => {
+      //   console.log("Previous Picks", previousPicks);
+      //   setPreviousPicks(previousPicks);
+      // });
+    },
+    [
+      /*,trigger*/
+    ]
+  );
+
+  const props = {
+    roundNumber,
+    entrants,
+    picks,
+    previousWinners,
+    previousPicks,
+  };
 
   return (
     <div className="App">
@@ -30,8 +69,8 @@ function App() {
       </header>
       <section className="App-content">
         <EthereumContext.Provider value={ethereumContext}>
-          <Enter roundNumber={roundNumber} />
-          <Entries roundNumber={roundNumber} />
+          <Enter {...props} />
+          <Entries {...props} />
         </EthereumContext.Provider>
       </section>
       <ToastContainer hideProgressBar={true} />

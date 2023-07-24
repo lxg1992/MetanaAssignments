@@ -11,39 +11,46 @@ const mapEvent = (event) => ({
   id: `${event.blockHash}/${event.transactionIndex}/${event.logIndex}`,
 });
 
-function Entries({ roundNumber }) {
+function Entries({
+  roundNumber,
+  entrants,
+  picks,
+  previousWinners,
+  previousPicks,
+}) {
   const { lottery } = useContext(EthereumContext);
-  const [entries, setEntries] = useState(undefined);
+  const [entriesEv, setEntriesEv] = useState(undefined);
 
   console.log("Filters", lottery.filters);
 
   // Entered Events
   useEffect(() => {
     const filter = lottery.filters.Entered();
+    console.log("Filter", filter);
 
     const listener = (...args) => {
       const event = args[args.length - 1];
-      setEntries((rs) => [mapEvent(event), ...(rs || [])]);
+      setEntriesEv((rs) => [mapEvent(event), ...(rs || [])]);
     };
 
     const subscribe = async () => {
       const past = await lottery.queryFilter(filter);
       console.log({ past });
-      setEntries((past.reverse() || []).map(mapEvent));
+      setEntriesEv((past.reverse() || []).map(mapEvent));
       lottery.on(filter, listener);
     };
 
     subscribe();
     return () => lottery.off(filter, listener);
-  }, [lottery]);
+  }, []);
 
   return (
     <div className="Registrations">
       <h3>Last entries 📝</h3>
-      {entries === undefined && <span>Loading..</span>}
-      {entries && (
+      {entriesEv === undefined && <span>Loading..</span>}
+      {entriesEv && (
         <ul>
-          {entries.map((e) => (
+          {entriesEv.map((e) => (
             <li key={e.id}>
               {console.log(e)}
               <span className="address">

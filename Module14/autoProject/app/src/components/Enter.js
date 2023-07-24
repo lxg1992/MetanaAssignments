@@ -4,15 +4,26 @@ import { EthereumContext } from "../eth/context";
 import { toast } from "react-toastify";
 import "./Enter.css";
 
-function Enter({ roundNumber }) {
+function Enter({ roundNumber, entrants, picks }) {
   const guessInput = useRef(null);
   const [relayTx, setRelayTx] = useState(false);
 
+  const [isSubmissionAllowed, setSubmissionAllowed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { lottery, provider } = useContext(EthereumContext);
 
   const handleRelayCheckboxChange = (event) => {
     setRelayTx(event.target.checked);
+  };
+
+  const handleInputChange = (event) => {
+    const curVal = guessInput.current.value;
+    console.log({ curVal });
+    if (picks.includes(Number(curVal))) {
+      setSubmissionAllowed(false);
+      return;
+    }
+    setSubmissionAllowed(true);
   };
 
   const sendTx = async (event) => {
@@ -43,8 +54,9 @@ function Enter({ roundNumber }) {
           required={true}
           placeholder="Enter your guess here"
           ref={guessInput}
+          onChange={handleInputChange}
         ></input>
-        <button type="submit" disabled={submitting}>
+        <button type="submit" disabled={submitting || !isSubmissionAllowed}>
           {submitting ? "Entering..." : "Enter"}
         </button>
       </form>

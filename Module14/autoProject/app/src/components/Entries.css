@@ -6,22 +6,23 @@ ul {
 }
 
 li {
-  color: #2C374B;
+  color: #2c374b;
 }
 
 .address {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: "Courier New", Courier, monospace;
   text-align: left;
   margin-right: 1vmin;
-  color: #575C66;
+  color: #575c66;
 }
 
-.Registrations h3 {
+/* .Registrations h3 {
   text-align: center;
   margin: 3rem 0 0;
-  color: #575C66;
-}
+  color: #575c66;
+} */
 
 .Registrations {
   padding: 0 2rem;
+  width: 100%;
 }
