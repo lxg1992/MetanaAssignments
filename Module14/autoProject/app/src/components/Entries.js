@@ -45,8 +45,8 @@ function Entries({
   }, []);
 
   return (
-    <div className="Registrations">
-      <h3>Last entries 📝</h3>
+    <div className="Entrants-Item">
+      <h3>Last entries logged📝</h3>
       {entriesEv === undefined && <span>Loading..</span>}
       {entriesEv && (
         <ul>

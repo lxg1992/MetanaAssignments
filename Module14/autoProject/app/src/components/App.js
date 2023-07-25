@@ -5,6 +5,7 @@ import { createInstance } from "../eth/registry";
 import "./App.css";
 import Entries from "./Entries";
 import Enter from "./Enter";
+import LatestEntrants from "./LatestEntrants";
 
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
@@ -70,7 +71,12 @@ function App() {
       <section className="App-content">
         <EthereumContext.Provider value={ethereumContext}>
           <Enter {...props} />
-          <Entries {...props} />
+          <div className="Flex-row">
+            <div className="Flex-column">
+              <LatestEntrants {...props} />
+            </div>
+            <Entries {...props} />
+          </div>
         </EthereumContext.Provider>
       </section>
       <ToastContainer hideProgressBar={true} />

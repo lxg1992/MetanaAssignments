@@ -34,8 +34,27 @@ body {
   color: #61dafb;
 }
 
-.App-content {
+/* .App-content {
   max-width: 60rem;
   margin: auto;
   text-align: left;
+} */
+
+.App-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.Flex-row {
+  display: flex;
+  flex-direction: row;
+  /* align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap; */
+}
+
+.Flex-column {
+  display: flex;
+  flex-direction: column;
 }
