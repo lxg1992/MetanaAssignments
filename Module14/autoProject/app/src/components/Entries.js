@@ -46,18 +46,18 @@ function Entries({
 
   return (
     <div className="Entrants-Item">
-      <h3>Last entries logged📝</h3>
+      <h3>Last entries logged (guess, address, isPaid)</h3>
       {entriesEv === undefined && <span>Loading..</span>}
       {entriesEv && (
         <ul>
           {entriesEv.map((e) => (
             <li key={e.id}>
               {console.log(e)}
-              <span className="address">
+              <div className="address">
                 {e.guess} {e.who}
                 &nbsp;
                 {e.isPaid.toString()}
-              </span>
+              </div>
             </li>
           ))}
         </ul>

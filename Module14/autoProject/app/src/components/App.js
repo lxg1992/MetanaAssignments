@@ -10,6 +10,7 @@ import LatestEntrants from "./LatestEntrants";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PreviousWinners from "./PreviousWinners";
 
 function App() {
   const provider = createProvider();
@@ -40,15 +41,15 @@ function App() {
         setPicks(picks);
       });
 
-      // lottery.getPreviousWinners().then((previousWinners) => {
-      //   console.log("Previous Winners", previousWinners);
-      //   setPreviousWinners(previousWinners);
-      // });
+      lottery.getPreviousWinners().then((previousWinners) => {
+        console.log("Previous Winners", previousWinners);
+        setPreviousWinners(previousWinners);
+      });
 
-      // lottery.getPreviousPicks().then((previousPicks) => {
-      //   console.log("Previous Picks", previousPicks);
-      //   setPreviousPicks(previousPicks);
-      // });
+      lottery.getPreviousWinningPicks().then((previousPicks) => {
+        console.log("Previous Picks", previousPicks);
+        setPreviousPicks(previousPicks);
+      });
     },
     [
       /*,trigger*/
@@ -72,11 +73,12 @@ function App() {
         <EthereumContext.Provider value={ethereumContext}>
           <Enter {...props} />
           <div className="Flex-row">
-            <div className="Flex-column">
-              <LatestEntrants {...props} />
-            </div>
-            <Entries {...props} />
+            {/* <div className="Flex-column"> */}
+            <LatestEntrants {...props} />
+            {/* </div> */}
+            <PreviousWinners {...props} />
           </div>
+          <Entries {...props} />
         </EthereumContext.Provider>
       </section>
       <ToastContainer hideProgressBar={true} />
