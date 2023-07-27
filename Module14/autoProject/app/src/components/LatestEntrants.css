@@ -11,10 +11,18 @@
 }
 
 .pseudo-You {
-  background-color: #f5f5f5;
-  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.25);
+  color: #6130f4;
+  position: relative;
 }
 
-.pseudo-You::after {
-  content: "<- You";
+.pseudo-You:hover::after {
+  content: ".you.";
+  position: absolute;
+  top: 0;
+  right: -2rem;
+  font-size: 0.75rem;
+  color: black;
+  border: 1px #aaaaaa solid;
+  border-radius: 5px;
+  background-color: #ffffcc;
 }

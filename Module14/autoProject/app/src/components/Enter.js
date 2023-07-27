@@ -18,8 +18,7 @@ function Enter({ roundNumber, entrants, picks }) {
 
   const handleInputChange = (event) => {
     const curVal = guessInput.current.value;
-    console.log({ curVal });
-    if (picks.includes(Number(curVal))) {
+    if (picks.includes(Number(curVal)) || curVal < 0 || curVal > 99) {
       setSubmissionAllowed(false);
       return;
     }

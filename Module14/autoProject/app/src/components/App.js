@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import { ethers } from "ethers";
+
 import { EthereumContext } from "../eth/context";
 import { createProvider } from "../eth/provider";
 import { createInstance } from "../eth/registry";
@@ -7,8 +11,6 @@ import Entries from "./Entries";
 import Enter from "./Enter";
 import LatestEntrants from "./LatestEntrants";
 
-import { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PreviousWinners from "./PreviousWinners";
 
@@ -22,39 +24,41 @@ function App() {
   const [picks, setPicks] = useState(undefined);
   const [previousWinners, setPreviousWinners] = useState(undefined);
   const [previousPicks, setPreviousPicks] = useState(undefined);
-  //const [trigger, setTrigger] = useState(0);
+  const [address, setAddress] = useState(undefined);
+  const [trigger, setTrigger] = useState(0);
 
-  useEffect(
-    () => {
-      lottery.roundNumber().then((rnum) => {
-        console.log("Round number", rnum);
-        setRoundNumber(rnum);
-      });
+  useEffect(() => {
+    lottery.roundNumber().then((rnum) => {
+      setRoundNumber(rnum);
+    });
 
-      lottery.getLatestEntrants().then((entrants) => {
-        console.log("Entrants", entrants);
-        setEntrants(entrants);
-      });
+    lottery.getLatestEntrants().then((entrants) => {
+      setEntrants(entrants);
+    });
 
-      lottery.getLatestPicks().then((picks) => {
-        console.log("Picks", picks);
-        setPicks(picks);
-      });
+    lottery.getLatestPicks().then((picks) => {
+      setPicks(picks);
+    });
 
-      lottery.getPreviousWinners().then((previousWinners) => {
-        console.log("Previous Winners", previousWinners);
-        setPreviousWinners(previousWinners);
-      });
+    lottery.getPreviousWinners().then((previousWinners) => {
+      setPreviousWinners(previousWinners);
+    });
 
-      lottery.getPreviousWinningPicks().then((previousPicks) => {
-        console.log("Previous Picks", previousPicks);
-        setPreviousPicks(previousPicks);
-      });
-    },
-    [
-      /*,trigger*/
-    ]
-  );
+    lottery.getPreviousWinningPicks().then((previousPicks) => {
+      setPreviousPicks(previousPicks);
+    });
+  }, [trigger]);
+
+  useEffect(() => {
+    async function getAddress() {
+      await window.ethereum.enable();
+      const userProvider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = userProvider.getSigner();
+      const from = await signer.getAddress();
+      setAddress(from);
+    }
+    getAddress();
+  }, [trigger]);
 
   const props = {
     roundNumber,
@@ -62,6 +66,8 @@ function App() {
     picks,
     previousWinners,
     previousPicks,
+    setTrigger,
+    address: address ? address : "0x",
   };
 
   return (

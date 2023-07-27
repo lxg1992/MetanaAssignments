@@ -11,31 +11,22 @@ const mapEvent = (event) => ({
   id: `${event.blockHash}/${event.transactionIndex}/${event.logIndex}`,
 });
 
-function Entries({
-  roundNumber,
-  entrants,
-  picks,
-  previousWinners,
-  previousPicks,
-}) {
+function Entries({ setTrigger }) {
   const { lottery } = useContext(EthereumContext);
   const [entriesEv, setEntriesEv] = useState(undefined);
-
-  console.log("Filters", lottery.filters);
 
   // Entered Events
   useEffect(() => {
     const filter = lottery.filters.Entered();
-    console.log("Filter", filter);
 
     const listener = (...args) => {
       const event = args[args.length - 1];
       setEntriesEv((rs) => [mapEvent(event), ...(rs || [])]);
+      setTrigger((t) => t + 1);
     };
 
     const subscribe = async () => {
       const past = await lottery.queryFilter(filter);
-      console.log({ past });
       setEntriesEv((past.reverse() || []).map(mapEvent));
       lottery.on(filter, listener);
     };
@@ -52,7 +43,6 @@ function Entries({
         <ul>
           {entriesEv.map((e) => (
             <li key={e.id}>
-              {console.log(e)}
               <div className="address">
                 {e.guess} {e.who}
                 &nbsp;

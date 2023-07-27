@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import { EthereumContext } from "../eth/context";
 import "./LatestEntrants.css";
 import { f6l4 } from "../helpers/string";
 
@@ -8,9 +10,8 @@ const LatestEntrants = ({
   picks,
   previousWinners,
   previousPicks,
+  address,
 }) => {
-  console.log({ roundNumber });
-  console.log({ entrants });
   const rows = [];
   if (picks && entrants) {
     for (let i = 0; i < picks.length; i++) {
@@ -21,10 +22,10 @@ const LatestEntrants = ({
     <div className="LatestEntrants-Item">
       <h3> Latest Round Entrants-Picks</h3>
       {rows.length === 0 && <span>Loading..</span>}
-      {rows?.map((e) => {
+      {rows?.map((r, i) => {
         return (
-          <div className="address">
-            {f6l4(e.entrant)}-{e.pick}
+          <div key={i} className={address === r.entrant ? "pseudo-You" : ""}>
+            {f6l4(r.entrant)} picked {r.pick}
           </div>
         );
       })}
