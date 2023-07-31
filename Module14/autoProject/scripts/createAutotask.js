@@ -19,8 +19,6 @@ async function main() {
     },
     paused: false,
   });
-  //   console.log("Autotask created with ID ", at.autotaskId);
-  console.log({ at });
   appendFileSync(".env", `\nAUTOTASK_ID="${at.autotaskId}"`, function (err) {
     if (err) throw err;
   });
