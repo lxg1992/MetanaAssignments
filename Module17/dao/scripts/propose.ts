@@ -40,14 +40,10 @@ export async function propose(
   let proposals = JSON.parse(
     fs.readFileSync(__dirname + proposalsFile, { encoding: "utf8", flag: "r" })
   );
-  console.log({ proposals });
-  console.log({ loc: 2 });
-  console.log({ network: network.config.chainId });
   if (proposals[network.config.chainId!.toString()] === undefined) {
     proposals[network.config.chainId!.toString()] = [];
   }
   proposals[network.config.chainId!.toString()].push(proposalId.toString());
-  console.log({ loc: 3 });
 
   fs.writeFileSync(__dirname + proposalsFile, JSON.stringify(proposals));
 }
