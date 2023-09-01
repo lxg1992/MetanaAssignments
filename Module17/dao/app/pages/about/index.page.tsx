@@ -1,3 +1,5 @@
+import { useMetaMask } from "metamask-react";
+
 export { Page };
 
 function Page() {
