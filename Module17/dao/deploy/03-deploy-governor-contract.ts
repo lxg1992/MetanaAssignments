@@ -6,6 +6,7 @@ import {
   VOTING_PERIOD,
   QUORUM_PERCENTAGE,
 } from "../helper-hardhat-config";
+import { writeArtifact } from "../utils/files";
 
 const deployGovernorContract: DeployFunction = async (
   hre: HardhatRuntimeEnvironment
@@ -27,6 +28,8 @@ const deployGovernorContract: DeployFunction = async (
     ],
     log: true,
   });
+  writeArtifact(governorContract, network);
+  log("Deployed GovernorContract to:", governorContract.address);
 };
 
 export default deployGovernorContract;

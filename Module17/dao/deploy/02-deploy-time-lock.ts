@@ -1,6 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { MIN_DELAY } from "../helper-hardhat-config";
+import { writeArtifact } from "../utils/files";
 
 const deployTimeLock: DeployFunction = async (
   hre: HardhatRuntimeEnvironment
@@ -16,6 +17,8 @@ const deployTimeLock: DeployFunction = async (
     args: [MIN_DELAY, [], [], deployer],
     log: true,
   });
+  writeArtifact(timelock, network);
+  log("Deployed TimeLock to:", timelock.address);
 };
 
 export default deployTimeLock;
