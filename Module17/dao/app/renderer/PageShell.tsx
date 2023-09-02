@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { PageContextProvider } from "./usePageContext.js";
 import type { PageContext } from "./types.js";
 import "./PageShell.css";
@@ -6,6 +6,7 @@ import { MetaMaskProvider } from "metamask-react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Layout } from "../layout/Layout.js";
 import { Navbar } from "../layout/Navbar.js";
+
 
 export { PageShell };
 

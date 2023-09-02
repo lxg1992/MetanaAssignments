@@ -1,11 +1,14 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
+import { writeFileSync } from "fs";
+import path from "path";
 
 const deployGovernanceToken: DeployFunction = async (
   hre: HardhatRuntimeEnvironment
 ) => {
   const { deployments, getNamedAccounts, network } = hre;
+  console.log({ network });
   const { deploy, log } = deployments;
   const { deployer } = await getNamedAccounts();
   log("Deploying Governance Token...");
@@ -15,7 +18,17 @@ const deployGovernanceToken: DeployFunction = async (
     log: true,
     // waitConfirmations: 1
   });
+  const writeObj = {
+    address: governanceToken.address,
+    abi: governanceToken.abi,
+  };
+  const loc = path.resolve(
+    __dirname,
+    `../app/abi/${network.name}/governanceToken.json`
+  );
+  writeFileSync(loc, JSON.stringify(governanceToken.abi));
   log("Deployed Governance Token to:", governanceToken.address);
+  console.dir(governanceToken.abi, { depth: 2 });
   await delegate(governanceToken.address, deployer);
 };
 
