@@ -13,15 +13,15 @@ async function render(pageContext: PageContextClient) {
       "Client-side render() hook expects pageContext.Page to be defined"
     );
 
-  let signer: ethers.Signer | undefined;
-  let address: string | undefined;
-  let provider: ethers.providers.Web3Provider | undefined;
+  // let signer: ethers.Signer | undefined;
+  // let address: string | undefined;
+  // let provider: ethers.providers.Web3Provider | undefined;
 
-  if (typeof window !== "undefined" && window.ethereum) {
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
-    address = await signer.getAddress();
-  }
+  // if (typeof window !== "undefined" && window.ethereum) {
+  //   pageProps?.provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   pageProps?.signer = provider.getSigner();
+  //   pageProps?.address = await signer.getAddress();
+  // }
   const root = document.getElementById("react-root");
   if (!root) throw new Error("DOM element #react-root not found");
   hydrateRoot(

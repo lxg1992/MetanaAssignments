@@ -2,9 +2,12 @@ import React from "react";
 import { useMetaMask } from "metamask-react";
 import { Link, Flex, Box, Text, Tooltip } from "@chakra-ui/react";
 import { f4l4 } from "../utils/str.ts";
+import { usePageContext } from "../renderer/usePageContext.tsx";
 
 export function Navbar() {
   const { status, connect, account, chainId, ethereum } = useMetaMask();
+  // const pc = usePageContext();
+  // console.log({ pc });
   return (
     <Flex
       style={{
