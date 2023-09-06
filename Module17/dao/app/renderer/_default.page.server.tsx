@@ -8,6 +8,32 @@ import { escapeInject, dangerouslySkipEscape } from "vite-plugin-ssr/server";
 import logoUrl from "./logo.svg";
 import type { PageContextServer } from "./types";
 
+export { onBeforeRender };
+async function onBeforeRender(pageContext: PageContextServer) {
+  const mode = import.meta.env.NETWORK_MODE || "hardhat";
+  const governanceToken = await import(
+    `../ethereum/${mode}/GovernanceToken.json`
+  );
+  const governorContract = await import(
+    `../ethereum/${mode}/GovernorContract.json`
+  );
+  const timeLock = await import(`../ethereum/${mode}/TimeLock.json`);
+
+  const pageProps = {
+    governanceToken,
+    governorContract,
+    timeLock,
+  };
+
+  console.log({ governanceToken });
+
+  return {
+    pageContext: {
+      pageProps,
+    },
+  };
+}
+
 async function render(pageContext: PageContextServer) {
   const { Page, pageProps } = pageContext;
   // This render() hook only supports SSR, see https://vite-plugin-ssr.com/render-modes for how to modify render() to support SPA

@@ -2,7 +2,8 @@ import { useMetaMask } from "metamask-react";
 
 export { Page };
 
-function Page() {
+function Page(pageProps) {
+  console.log({ pageProps });
   return (
     <>
       <h1>About</h1>
