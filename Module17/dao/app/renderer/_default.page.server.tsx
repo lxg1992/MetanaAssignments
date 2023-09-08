@@ -25,7 +25,6 @@ async function onBeforeRender(pageContext: PageContextServer) {
     timeLock,
   };
 
-  console.log({ governanceToken });
 
   return {
     pageContext: {

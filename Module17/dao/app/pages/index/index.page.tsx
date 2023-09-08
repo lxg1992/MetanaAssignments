@@ -2,8 +2,9 @@ import { Container, Text, Button, Box } from "@chakra-ui/react";
 import { useMetaMask } from "metamask-react";
 export { Page };
 
-function Page() {
-  const { status, connect, account, chainId, ethereum } = useMetaMask();
+function Page(pageProps) {
+  const { status, connect, account, chainId, ethereum, switchChain } =
+    useMetaMask();
 
   if (status === "unavailable") return <Text>MetaMask is not installed</Text>;
 
@@ -16,6 +17,12 @@ function Page() {
 
   if (status === "connected") {
     console.log({ account, chainId, ethereum });
+    if (chainId === "0x5") {
+      console.log("isGoerli");
+    }
+    if (chainId === "0x7a69") {
+      console.log("isLocal");
+    }
     return (
       <Box>
         <Text>Welcome</Text>
