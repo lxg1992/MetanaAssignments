@@ -1,39 +1,37 @@
-import { useMetaMask } from "metamask-react";
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
-import {
-  useConnection,
-  useReadContract,
-  useWriteContract,
-} from "../../hooks/blockchain.ts";
-
+import { useConnection } from "../../hooks/blockchain.ts";
+import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
+import { Contract } from "ethers";
 export { Page };
 
 function Page(pageProps) {
   const { governanceToken, governorContract, timeLock } = pageProps;
   const { provider, signer, userAddress, cxLoading } = useConnection();
-  const { rContract, cLoading } = useReadContract(
-    governanceToken.address,
-    governanceToken.abi,
-    provider
-  );
-  const { wContract, wLoading } = useWriteContract(
-    governanceToken.address,
-    governanceToken.abi,
-    signer
-  );
+  const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
+  const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
 
   useEffect(() => {
     const asyncAction = async () => {
       if (!cxLoading) {
-        const name = await rContract.name();
-        console.log({ name });
+        const readToken = fetchReadContract(
+          governanceToken.address,
+          governanceToken.abi,
+          provider
+        );
+        setRCToken(readToken);
+        const writeToken = fetchWriteContract(
+          governanceToken.address,
+          governanceToken.abi,
+          signer
+        );
+        setWCToken(writeToken);
+        const bal = await readToken.balanceOf(userAddress);
+        console.log({ bal });
       }
     };
     asyncAction();
-  }, [cxLoading]);
-
+  }, [cxLoading, provider, signer]);
 
   console.log({ pageProps });
   if (cxLoading) {

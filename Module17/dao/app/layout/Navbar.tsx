@@ -5,9 +5,7 @@ import { f4l4 } from "../utils/str.ts";
 import { usePageContext } from "../renderer/usePageContext.tsx";
 
 export function Navbar() {
-  const { status, connect, account, chainId, ethereum } = useMetaMask();
-  // const pc = usePageContext();
-  // console.log({ pc });
+  const { account } = useMetaMask();
   return (
     <Flex
       style={{

@@ -1,14 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import {
-  BrowserProvider,
-  JsonRpcSigner,
-  Interface,
-  InterfaceAbi,
-  Contract,
-  JsonRpcProvider,
-} from "ethers";
+import { BrowserProvider, JsonRpcSigner } from "ethers";
 
 export const useConnection = () => {
   //TODO: FIX THE SIGNER AND THE PROVIDER NOT BEING AVAILABLE FOR CONSUMPTION
@@ -42,40 +35,4 @@ export const useConnection = () => {
   return { provider, signer, userAddress, cxLoading };
 };
 
-export const useReadContract = (
-  address: string,
-  abi: Interface | InterfaceAbi,
-  provider: BrowserProvider | undefined
-) => {
-  const [contract, setContract] = useState<Contract | undefined>(undefined);
-  const [cLoading, setLoading] = useState<boolean>(true);
-
-  console.log({ provider });
-
-  useEffect(() => {
-    setLoading(true);
-    const eContract = new ethers.Contract(address, abi, provider);
-    setContract(eContract);
-    setLoading(false);
-  }, [address]);
-
-  return { rContract: contract, cLoading };
-};
-
-export const useWriteContract = (
-  address: string,
-  abi: Interface | InterfaceAbi,
-  signer: JsonRpcSigner | undefined
-) => {
-  const [contract, setContract] = useState<Contract | undefined>(undefined);
-  const [cLoading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    setLoading(true);
-    const eContract = new ethers.Contract(address, abi, signer);
-    setContract(eContract);
-    setLoading(false);
-  }, [address]);
-
-  return { wContract: contract, cLoading };
-};
+//TODO: IMPLEMENT fetchReadContract and fetchWriteContract instead of useReadContract and useWriteContract
