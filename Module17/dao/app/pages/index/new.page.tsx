@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
-import { Contract } from "ethers";
 import { useConnection } from "../../hooks/blockchain.ts";
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
+import { Contract } from "ethers";
 export { Page };
-
 
 function Page(pageProps) {
   const { governanceToken, governorContract, timeLock } = pageProps;
@@ -34,16 +33,14 @@ function Page(pageProps) {
     asyncAction();
   }, [cxLoading, provider, signer]);
 
-  if (cxLoading) {
-    return <Box>Loading...</Box>;
-  }
 
-  //TODO: Set up proposals, test proposals, 
 
   return (
     <>
       <h1>About</h1>
-
+      <p>
+        Example of using <code>vite-plugin-ssr</code>.
+      </p>
     </>
   );
 }

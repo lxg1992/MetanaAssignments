@@ -18,16 +18,19 @@ async function onBeforeRender(pageContext: PageContextServer) {
     `../ethereum/${mode}/GovernorContract.json`
   );
   const timeLock = await import(`../ethereum/${mode}/TimeLock.json`);
+  const box = await import(`../ethereum/${mode}/Box.json`);
 
   const pageProps = {
     governanceToken,
     governorContract,
     timeLock,
+    box,
+    mode
   };
-
 
   return {
     pageContext: {
+      pageContext,
       pageProps,
     },
   };
