@@ -7,7 +7,6 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Layout } from "../layout/Layout.js";
 import { Navbar } from "../layout/Navbar.js";
 
-
 export { PageShell };
 
 function PageShell({
@@ -37,7 +36,7 @@ function Content({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        margin: "0 10%",
+        margin: "0 1% 0 10%",
         padding: 20,
         // paddingBottom: 50,
         border: "1px solid red",

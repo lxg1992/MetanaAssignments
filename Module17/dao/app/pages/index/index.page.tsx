@@ -1,10 +1,44 @@
-import { Container, Text, Button, Box } from "@chakra-ui/react";
+import { Container, Text, Button, Box, Flex, Card } from "@chakra-ui/react";
 import { useMetaMask } from "metamask-react";
+import { Contract } from "ethers";
+import { useEffect, useState } from "react";
+
+import { ProposalDashboard } from "../../components/ProposalDashboard.tsx";
+import { PageProps } from "../../renderer/types.ts";
+import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
+import { useConnection } from "../../hooks/blockchain.ts";
+import { Profile } from "../../components/Profile.tsx";
 export { Page };
 
-function Page(pageProps) {
+function Page(pageProps: PageProps) {
+  const { governanceToken, governorContract, timeLock } = pageProps;
   const { status, connect, account, chainId, ethereum, switchChain } =
     useMetaMask();
+  const { provider, signer, userAddress, cxLoading } = useConnection();
+  const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
+  const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
+
+  useEffect(() => {
+    const asyncAction = async () => {
+      if (!cxLoading) {
+        const readToken = fetchReadContract(
+          governanceToken.address,
+          governanceToken.abi,
+          provider
+        );
+        setRCToken(readToken);
+        const writeToken = fetchWriteContract(
+          governanceToken.address,
+          governanceToken.abi,
+          signer
+        );
+        setWCToken(writeToken);
+        const bal = await readToken.balanceOf(userAddress);
+        console.log({ bal });
+      }
+    };
+    asyncAction();
+  }, [cxLoading, provider, signer]);
 
   if (status === "unavailable") return <Text>MetaMask is not installed</Text>;
 
@@ -36,10 +70,16 @@ function Page(pageProps) {
         </Box>
       );
     }
+
     return (
-      <Box>
-        <Text>Welcome</Text>
-      </Box>
+      <Flex>
+        <Card>
+          <ProposalDashboard />
+        </Card>
+        <Card>
+          <Profile />
+        </Card>
+      </Flex>
     );
   }
 

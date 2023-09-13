@@ -1,8 +1,8 @@
 import { usePageContext } from "../renderer/usePageContext.js";
 import { Box, Text } from "@chakra-ui/react";
-export { ProposalDashboard };
+export { Profile };
 
-function ProposalDashboard() {
+function Profile() {
   //   const pageContext = usePageContext();
   //   const className = [
   //     props.className,
@@ -12,8 +12,7 @@ function ProposalDashboard() {
   // .join(" ");
   return (
     <Box>
-      <Text>Proposal Dashboard</Text>
-      
+      <Text>Profile Dashboard</Text>
     </Box>
   );
 }

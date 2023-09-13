@@ -3,10 +3,11 @@ import { Box } from "@chakra-ui/react";
 import { Contract } from "ethers";
 import { useConnection } from "../../hooks/blockchain.ts";
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
+import { PageProps } from "../../renderer/types.ts";
 export { Page };
 
 
-function Page(pageProps) {
+function Page(pageProps: PageProps) {
   const { governanceToken, governorContract, timeLock } = pageProps;
   const { provider, signer, userAddress, cxLoading } = useConnection();
   const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token

@@ -4,7 +4,6 @@ import { ethers } from "ethers";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 
 export const useConnection = () => {
-  //TODO: FIX THE SIGNER AND THE PROVIDER NOT BEING AVAILABLE FOR CONSUMPTION
   const [provider, setProvider] = useState<BrowserProvider | undefined>(
     undefined
   );
@@ -35,4 +34,4 @@ export const useConnection = () => {
   return { provider, signer, userAddress, cxLoading };
 };
 
-//TODO: IMPLEMENT fetchReadContract and fetchWriteContract instead of useReadContract and useWriteContract
+

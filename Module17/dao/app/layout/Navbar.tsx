@@ -10,8 +10,6 @@ export function Navbar() {
     <Flex
       style={{
         padding: 20,
-        background:
-          "linear-gradient(90deg, rgba(173,173,173,1) 0%, rgba(255,255,255,1) 45%, rgba(249,249,249,1) 55%, rgba(166,166,166,1) 100%)",
       }}
       margin={"1vh 1vw"}
       borderRadius={"10px"}
