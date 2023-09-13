@@ -6,7 +6,6 @@ import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
 import { PageProps } from "../../renderer/types.ts";
 export { Page };
 
-
 function Page(pageProps: PageProps) {
   const { governanceToken, governorContract, timeLock } = pageProps;
   const { provider, signer, userAddress, cxLoading } = useConnection();
@@ -29,7 +28,6 @@ function Page(pageProps: PageProps) {
         );
         setWCToken(writeToken);
         const bal = await readToken.balanceOf(userAddress);
-        console.log({ bal });
       }
     };
     asyncAction();
@@ -39,12 +37,11 @@ function Page(pageProps: PageProps) {
     return <Box>Loading...</Box>;
   }
 
-  //TODO: Set up proposals, test proposals, 
+  //TODO: Set up proposals, test proposals,
 
   return (
     <>
       <h1>About</h1>
-
     </>
   );
 }

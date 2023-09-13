@@ -36,10 +36,11 @@ function Content({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        margin: "0 1% 0 10%",
-        padding: 20,
+        margin: "0 1% 0 1%",
+
         // paddingBottom: 50,
         border: "1px solid red",
+        borderRadius: "5px",
         // minHeight: "80vh",
       }}
     >

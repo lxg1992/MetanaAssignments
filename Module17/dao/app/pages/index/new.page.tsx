@@ -27,7 +27,6 @@ function Page(pageProps) {
         );
         setWCToken(writeToken);
         const bal = await readToken.balanceOf(userAddress);
-        console.log({ bal });
       }
     };
     asyncAction();

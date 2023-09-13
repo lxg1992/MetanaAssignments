@@ -1,4 +1,4 @@
-import { Container, Text, Button, Box, Flex, Card } from "@chakra-ui/react";
+import { Text, Button, Box, Grid, GridItem } from "@chakra-ui/react";
 import { useMetaMask } from "metamask-react";
 import { Contract } from "ethers";
 import { useEffect, useState } from "react";
@@ -8,16 +8,33 @@ import { PageProps } from "../../renderer/types.ts";
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
 import { useConnection } from "../../hooks/blockchain.ts";
 import { Profile } from "../../components/Profile.tsx";
+
 export { Page };
 
 function Page(pageProps: PageProps) {
-  const { governanceToken, governorContract, timeLock } = pageProps;
+  const {
+    governanceToken,
+    governorContract,
+    timeLock,
+    box,
+  }: {
+    governanceToken: any;
+    governorContract: any;
+    timeLock: any;
+    box: any;
+  } = pageProps;
   const { status, connect, account, chainId, ethereum, switchChain } =
     useMetaMask();
   const { provider, signer, userAddress, cxLoading } = useConnection();
-  const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
-  const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
 
+  const [rToken, setRToken] = useState<Contract | undefined>(undefined);
+  const [wToken, setWToken] = useState<Contract | undefined>(undefined);
+  const [rGovernor, setRGovernor] = useState<Contract | undefined>(undefined);
+  const [wGovernor, setWGovernor] = useState<Contract | undefined>(undefined);
+  const [rTimeLock, setRTimeLock] = useState<Contract | undefined>(undefined);
+  const [wTimeLock, setWTimeLock] = useState<Contract | undefined>(undefined);
+  const [rBox, setRBox] = useState<Contract | undefined>(undefined);
+  const [wBox, setWBox] = useState<Contract | undefined>(undefined);
   useEffect(() => {
     const asyncAction = async () => {
       if (!cxLoading) {
@@ -26,15 +43,44 @@ function Page(pageProps: PageProps) {
           governanceToken.abi,
           provider
         );
-        setRCToken(readToken);
         const writeToken = fetchWriteContract(
           governanceToken.address,
           governanceToken.abi,
           signer
         );
-        setWCToken(writeToken);
-        const bal = await readToken.balanceOf(userAddress);
-        console.log({ bal });
+        setRToken(readToken);
+        setWToken(writeToken);
+        const readGovernor = fetchReadContract(
+          governorContract.address,
+          governorContract.abi,
+          provider
+        );
+        const writeGovernor = fetchWriteContract(
+          governorContract.address,
+          governorContract.abi,
+          signer
+        );
+        setRGovernor(readGovernor);
+        setWGovernor(writeGovernor);
+        const readTimeLock = fetchReadContract(
+          timeLock.address,
+          timeLock.abi,
+          provider
+        );
+        const writeTimeLock = fetchWriteContract(
+          timeLock.address,
+          timeLock.abi,
+          signer
+        );
+        setRTimeLock(readTimeLock);
+        setWTimeLock(writeTimeLock);
+        const readBox = fetchReadContract(box.address, box.abi, provider);
+        const writeBox = fetchWriteContract(box.address, box.abi, signer);
+        setRBox(readBox);
+        setWBox(writeBox);
+
+        // const bal = await readToken.balanceOf(userAddress);
+        // console.log({ bal });
       }
     };
     asyncAction();
@@ -45,7 +91,12 @@ function Page(pageProps: PageProps) {
   if (status === "initializing") return <Text>Initializing...</Text>;
 
   if (status === "notConnected")
-    return <Button onClick={connect}>Connect to Metamask</Button>;
+    return (
+      <Box>
+        <Text>Please connect your MetaMask to access this app</Text>
+        <Button onClick={connect}>Connect to Metamask</Button>
+      </Box>
+    );
 
   if (status === "connecting") return <Text>Connecting...</Text>;
 
@@ -72,16 +123,21 @@ function Page(pageProps: PageProps) {
     }
 
     return (
-      <Flex>
-        <Card>
+      <Grid templateColumns="150px 1fr 150px" gap={2} height={150}>
+        <GridItem bg="orange.300">
+          <Box>Stuff</Box>
+        </GridItem>
+        <GridItem bg="pink.200">
           <ProposalDashboard />
-        </Card>
-        <Card>
-          <Profile />
-        </Card>
-      </Flex>
+        </GridItem>
+        <GridItem bg="blue.100">
+          <Profile rToken={rToken} userAddress={userAddress} />
+        </GridItem>
+      </Grid>
     );
   }
+
+  //TODO: FETCH PROPOSALS FROM EVENTS
 
   return <Text>Metamask Error</Text>;
 }
