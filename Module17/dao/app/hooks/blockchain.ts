@@ -3,12 +3,11 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 
-export const useConnection = () => {
+export const useConnection = (account: string | null) => {
   const [provider, setProvider] = useState<BrowserProvider | undefined>(
     undefined
   );
   const [signer, setSigner] = useState<JsonRpcSigner | undefined>(undefined);
-  const [userAddress, setUserAddress] = useState<string | undefined>("");
   const [cxLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -19,19 +18,15 @@ export const useConnection = () => {
           window.ethereum /*'goerli'^*/
         );
         const eSigner = await eProvider.getSigner();
-        const eUserAddress = await eSigner.getAddress();
         setProvider(eProvider);
         setSigner(eSigner);
-        setUserAddress(eUserAddress);
         setLoading(false);
       }
       setLoading(false);
     };
 
     asyncAction();
-  }, []);
+  }, [account]);
 
-  return { provider, signer, userAddress, cxLoading };
+  return { provider, signer, cxLoading };
 };
-
-

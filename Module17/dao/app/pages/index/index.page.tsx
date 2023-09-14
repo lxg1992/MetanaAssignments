@@ -3,6 +3,7 @@ import { useMetaMask } from "metamask-react";
 import { Contract } from "ethers";
 import { useEffect, useState } from "react";
 
+import { EventFeed } from "../../components/EventFeed.tsx";
 import { ProposalDashboard } from "../../components/ProposalDashboard.tsx";
 import { PageProps } from "../../renderer/types.ts";
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
@@ -25,7 +26,8 @@ function Page(pageProps: PageProps) {
   } = pageProps;
   const { status, connect, account, chainId, ethereum, switchChain } =
     useMetaMask();
-  const { provider, signer, userAddress, cxLoading } = useConnection();
+
+  const { provider, signer, cxLoading } = useConnection(account);
 
   const [rToken, setRToken] = useState<Contract | undefined>(undefined);
   const [wToken, setWToken] = useState<Contract | undefined>(undefined);
@@ -125,13 +127,13 @@ function Page(pageProps: PageProps) {
     return (
       <Grid templateColumns="150px 1fr 150px" gap={2} height={150}>
         <GridItem bg="orange.300">
-          <Box>Stuff</Box>
+          <EventFeed />
         </GridItem>
         <GridItem bg="pink.200">
           <ProposalDashboard />
         </GridItem>
         <GridItem bg="blue.100">
-          <Profile rToken={rToken} userAddress={userAddress} />
+          <Profile rToken={rToken} account={account} />
         </GridItem>
       </Grid>
     );

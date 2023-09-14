@@ -3,17 +3,22 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
 import { ADDRESS_ZERO } from "../helper-hardhat-config";
 import { writeArtifact } from "../utils/files";
+import { moveBlocks } from "../utils/move-block";
 
 const deployBox: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deployments, getNamedAccounts, network } = hre;
+
   const { deploy, log, get } = deployments;
   const { deployer } = await getNamedAccounts();
   log("Deploying box...");
+
   const box = await deploy("Box", {
     from: deployer,
     args: [],
     log: true,
   });
+  console.log(box);
+
   writeArtifact(box, network);
   log("Deployed Box to:", box.address);
   const timeLock = await ethers.getContract("TimeLock");

@@ -3,7 +3,7 @@ import { usePageContext } from "../renderer/usePageContext.js";
 import { Box, Text } from "@chakra-ui/react";
 export { Profile };
 
-function Profile({ rToken, userAddress }) {
+function Profile({ rToken, account }) {
   const [balance, setBalance] = useState(0);
   //   const pageContext = usePageContext();
   //   const className = [
@@ -13,16 +13,16 @@ function Profile({ rToken, userAddress }) {
   // .filter(Boolean)
   // .join(" ");
   useEffect(() => {
-    if (!rToken) {
+    if (!(rToken && account)) {
       return;
     }
     const asyncAction = async () => {
-      const bal = await rToken.balanceOf(userAddress);
+      const bal = await rToken.balanceOf(account);
       console.log({ bal });
       setBalance(bal);
     };
     asyncAction();
-  }, [rToken]);
+  }, [rToken, account]);
   return (
     <Box>
       <Text>Balance: {balance.toString()}</Text>

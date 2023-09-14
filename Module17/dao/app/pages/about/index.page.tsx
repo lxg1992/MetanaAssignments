@@ -8,7 +8,7 @@ export { Page };
 
 function Page(pageProps: PageProps) {
   const { governanceToken, governorContract, timeLock } = pageProps;
-  const { provider, signer, userAddress, cxLoading } = useConnection();
+  const { provider, signer, cxLoading } = useConnection();
   const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
   const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
 
@@ -27,7 +27,6 @@ function Page(pageProps: PageProps) {
           signer
         );
         setWCToken(writeToken);
-        const bal = await readToken.balanceOf(userAddress);
       }
     };
     asyncAction();

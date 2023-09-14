@@ -6,33 +6,31 @@ import { Contract } from "ethers";
 export { Page };
 
 function Page(pageProps) {
-  const { governanceToken, governorContract, timeLock } = pageProps;
-  const { provider, signer, userAddress, cxLoading } = useConnection();
-  const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
-  const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
+  // const { governanceToken, governorContract, timeLock } = pageProps;
+  // const { provider, signer, cxLoading } = useConnection();
+  // const [rCToken, setRCToken] = useState<Contract | undefined>(undefined); //read contract token
+  // const [wCToken, setWCToken] = useState<Contract | undefined>(undefined); //write contract token
 
-  useEffect(() => {
-    const asyncAction = async () => {
-      if (!cxLoading) {
-        const readToken = fetchReadContract(
-          governanceToken.address,
-          governanceToken.abi,
-          provider
-        );
-        setRCToken(readToken);
-        const writeToken = fetchWriteContract(
-          governanceToken.address,
-          governanceToken.abi,
-          signer
-        );
-        setWCToken(writeToken);
-        const bal = await readToken.balanceOf(userAddress);
-      }
-    };
-    asyncAction();
-  }, [cxLoading, provider, signer]);
-
-
+  // useEffect(() => {
+  //   const asyncAction = async () => {
+  //     if (!cxLoading) {
+  //       const readToken = fetchReadContract(
+  //         governanceToken.address,
+  //         governanceToken.abi,
+  //         provider
+  //       );
+  //       setRCToken(readToken);
+  //       const writeToken = fetchWriteContract(
+  //         governanceToken.address,
+  //         governanceToken.abi,
+  //         signer
+  //       );
+  //       setWCToken(writeToken);
+  //       // const bal = await readToken.balanceOf(userAddress);
+  //     }
+  //   };
+  //   asyncAction();
+  // }, [cxLoading, provider, signer]);
 
   return (
     <>
