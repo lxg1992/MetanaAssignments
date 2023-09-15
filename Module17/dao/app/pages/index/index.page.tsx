@@ -37,6 +37,7 @@ function Page(pageProps: PageProps) {
   const [wTimeLock, setWTimeLock] = useState<Contract | undefined>(undefined);
   const [rBox, setRBox] = useState<Contract | undefined>(undefined);
   const [wBox, setWBox] = useState<Contract | undefined>(undefined);
+
   useEffect(() => {
     const asyncAction = async () => {
       if (!cxLoading) {
@@ -88,6 +89,49 @@ function Page(pageProps: PageProps) {
     asyncAction();
   }, [cxLoading, provider, signer]);
 
+  const propose = async () => {
+    if (!(rGovernor && account && rBox && wGovernor)) {
+      return;
+    }
+    const encodedFunctionCall = rBox.interface.encodeFunctionData("store", [
+      "0x1234",
+    ]);
+
+    await wGovernor.propose([box.address], [0], [encodedFunctionCall], "stuff");
+  };
+
+  useEffect(() => {
+    if (!(rGovernor && account && rBox && wGovernor)) {
+      return;
+    }
+    const asyncAction = async () => {
+      console.log("This triggers");
+      // const bal = await rToken.balanceOf(account); //This has to be an ERC20votes "delegated power" equivalent, not balanceOf
+      // console.log({ bal });
+      // const filters = rGovernor.filters.ProposalCreated;
+
+      // console.log({ filters });
+
+      rGovernor.on("*", (args) => {
+        console.log({
+          args,
+        });
+      });
+
+      // rBox.interface.encodeFunctionData("store", ["0x1234"]);
+
+      // if (!isSet) {
+      //   await wGovernor.propose([box.address], [0], ["0x1234"], "stuff");
+      //   setIsSet(true);
+      // }
+    };
+    asyncAction();
+
+    return () => {
+      rGovernor.removeAllListeners();
+    };
+  }, [rGovernor, rBox, wGovernor, account]);
+
   if (status === "unavailable") return <Text>MetaMask is not installed</Text>;
 
   if (status === "initializing") return <Text>Initializing...</Text>;
@@ -97,13 +141,13 @@ function Page(pageProps: PageProps) {
       <Box>
         <Text>Please connect your MetaMask to access this app</Text>
         <Button onClick={connect}>Connect to Metamask</Button>
+        <Button onClick={propose}>Propose</Button>
       </Box>
     );
 
   if (status === "connecting") return <Text>Connecting...</Text>;
 
   if (status === "connected") {
-    console.log({ account, chainId, ethereum });
     if (pageProps.mode === "goerli" && chainId !== "0x5") {
       console.log("PROD: Not Goerli");
       return (
@@ -125,11 +169,12 @@ function Page(pageProps: PageProps) {
     }
 
     return (
-      <Grid templateColumns="150px 1fr 150px" gap={2} height={150}>
+      <Grid templateColumns="150px 1fr 150px" gap={2} minHeight={150}>
         <GridItem bg="orange.300">
           <EventFeed />
         </GridItem>
         <GridItem bg="pink.200">
+          <Button onClick={propose}>Propose</Button>
           <ProposalDashboard />
         </GridItem>
         <GridItem bg="blue.100">

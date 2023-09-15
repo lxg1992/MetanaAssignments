@@ -5,27 +5,28 @@ export { Profile };
 
 function Profile({ rToken, account }) {
   const [balance, setBalance] = useState(0);
-  //   const pageContext = usePageContext();
-  //   const className = [
-  //     props.className,
-  //     pageContext.urlPathname === props.href && "is-active",
-  //   ]
-  // .filter(Boolean)
-  // .join(" ");
+
   useEffect(() => {
     if (!(rToken && account)) {
       return;
     }
     const asyncAction = async () => {
-      const bal = await rToken.balanceOf(account);
-      console.log({ bal });
+      const bal = await rToken.balanceOf(account); //This has to be an ERC20votes "delegated power" equivalent, not balanceOf
       setBalance(bal);
     };
     asyncAction();
   }, [rToken, account]);
+
+  useEffect(() => {
+    if (!(rToken && account)) {
+      return;
+    }
+    const asyncAction = async () => {};
+    asyncAction();
+  });
   return (
     <Box>
-      <Text>Balance: {balance.toString()}</Text>
+      <Text>Balance: {balance ? balance.toString() : "loading..."}</Text>
       <Text>Profile </Text>
     </Box>
   );

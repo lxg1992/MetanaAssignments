@@ -35,8 +35,9 @@ export async function propose(
   }
 
   const proposalId = proposeReceipt.events[0].args.proposalId;
+  console.log({ events: proposeReceipt.events });
   console.log({ loc: 1 });
-  console.log({ dirname: __dirname });
+
   let proposals = JSON.parse(
     fs.readFileSync(__dirname + proposalsFile, { encoding: "utf8", flag: "r" })
   );

@@ -17,7 +17,6 @@ const deployBox: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [],
     log: true,
   });
-  console.log(box);
 
   writeArtifact(box, network);
   log("Deployed Box to:", box.address);

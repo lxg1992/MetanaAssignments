@@ -5,7 +5,7 @@ export const writeArtifact = (contract: any, network: { name: string }) => {
   const writeObj = {
     address: contract.address,
     abi: contract.abi,
-    blockNumber: contract.receipt.blockNumber,
+    blockDeployed: contract.receipt.blockNumber,
   };
   const loc = path.resolve(
     __dirname,
