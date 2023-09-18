@@ -17,13 +17,13 @@ function Profile({ rToken, account }) {
     asyncAction();
   }, [rToken, account]);
 
-  useEffect(() => {
-    if (!(rToken && account)) {
-      return;
-    }
-    const asyncAction = async () => {};
-    asyncAction();
-  });
+  // useEffect(() => {
+  //   if (!(rToken && account)) {
+  //     return;
+  //   }
+  //   const asyncAction = async () => {};
+  //   asyncAction();
+  // });
   return (
     <Box>
       <Text>Balance: {balance ? balance.toString() : "loading..."}</Text>

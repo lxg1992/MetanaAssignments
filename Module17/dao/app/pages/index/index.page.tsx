@@ -1,14 +1,14 @@
-import { Text, Button, Box, Grid, GridItem } from "@chakra-ui/react";
+import { Box, Button, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Contract, EventLog, Log } from "ethers";
 import { useMetaMask } from "metamask-react";
-import { Contract } from "ethers";
 import { useEffect, useState } from "react";
 
 import { EventFeed } from "../../components/EventFeed.tsx";
+import { Profile } from "../../components/Profile.tsx";
 import { ProposalDashboard } from "../../components/ProposalDashboard.tsx";
+import { useConnection } from "../../hooks/blockchain.ts";
 import { PageProps } from "../../renderer/types.ts";
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
-import { useConnection } from "../../hooks/blockchain.ts";
-import { Profile } from "../../components/Profile.tsx";
 
 export { Page };
 
@@ -37,6 +37,10 @@ function Page(pageProps: PageProps) {
   const [wTimeLock, setWTimeLock] = useState<Contract | undefined>(undefined);
   const [rBox, setRBox] = useState<Contract | undefined>(undefined);
   const [wBox, setWBox] = useState<Contract | undefined>(undefined);
+  const [govEvents, setGovEvents] = useState<(EventLog | Log)[] | undefined>(
+    undefined
+  );
+  const [ping, setPing] = useState<number>(0);
 
   useEffect(() => {
     const asyncAction = async () => {
@@ -81,56 +85,51 @@ function Page(pageProps: PageProps) {
         const writeBox = fetchWriteContract(box.address, box.abi, signer);
         setRBox(readBox);
         setWBox(writeBox);
-
-        // const bal = await readToken.balanceOf(userAddress);
-        // console.log({ bal });
       }
     };
     asyncAction();
   }, [cxLoading, provider, signer]);
 
   const propose = async () => {
-    if (!(rGovernor && account && rBox && wGovernor)) {
+    if (!(rGovernor && account && wBox && wGovernor)) {
       return;
     }
-    const encodedFunctionCall = rBox.interface.encodeFunctionData("store", [
-      "0x1234",
+    const encodedFunctionCall = wBox.interface.encodeFunctionData("store", [
+      327,
     ]);
-
-    await wGovernor.propose([box.address], [0], [encodedFunctionCall], "stuff");
+    const tx = await wGovernor.propose(
+      [box.address],
+      [0],
+      [encodedFunctionCall],
+      "stujfsf"
+    );
+    console.log({ tx });
+    const receipt = await tx.wait();
+    console.log({ receipt });
+    setPing((ping) => ping + 1);
   };
 
   useEffect(() => {
-    if (!(rGovernor && account && rBox && wGovernor)) {
+    if (!(rGovernor && account && rBox && provider)) {
       return;
     }
     const asyncAction = async () => {
       console.log("This triggers");
-      // const bal = await rToken.balanceOf(account); //This has to be an ERC20votes "delegated power" equivalent, not balanceOf
-      // console.log({ bal });
-      // const filters = rGovernor.filters.ProposalCreated;
-
-      // console.log({ filters });
-
-      rGovernor.on("*", (args) => {
-        console.log({
-          args,
-        });
-      });
-
-      // rBox.interface.encodeFunctionData("store", ["0x1234"]);
-
-      // if (!isSet) {
-      //   await wGovernor.propose([box.address], [0], ["0x1234"], "stuff");
-      //   setIsSet(true);
-      // }
+      const latestBlock = await provider.getBlockNumber();
+      const governorEvents = await rGovernor.queryFilter(
+        "*",
+        governanceToken.blockDeployed,
+        latestBlock
+      );
+      console.log({ governorEvents });
+      setGovEvents(governorEvents);
     };
     asyncAction();
 
     return () => {
       rGovernor.removeAllListeners();
     };
-  }, [rGovernor, rBox, wGovernor, account]);
+  }, [rGovernor, rBox, account, ping]);
 
   if (status === "unavailable") return <Text>MetaMask is not installed</Text>;
 
@@ -171,7 +170,7 @@ function Page(pageProps: PageProps) {
     return (
       <Grid templateColumns="150px 1fr 150px" gap={2} minHeight={150}>
         <GridItem bg="orange.300">
-          <EventFeed />
+          <EventFeed govEvents={govEvents} />
         </GridItem>
         <GridItem bg="pink.200">
           <Button onClick={propose}>Propose</Button>

@@ -23,4 +23,4 @@ export const writeArtifact = (contract: any, network: { name: string }) => {
 //   writeFileSync(loc, JSON.stringify(data, null, 2));
 // };
 
-//TODO: Get the latest deployed block as the basis for the start "block" from which the ProposalCreated events will be tracked. Save this to the pageProps to be passed to the front end and used in the useEffect hook to fetch the events.
+//DONE: Get the latest deployed block as the basis for the start "block" from which the ProposalCreated events will be tracked. Save this to the pageProps to be passed to the front end and used in the useEffect hook to fetch the events.

@@ -36,7 +36,6 @@ function Page(pageProps: PageProps) {
     return <Box>Loading...</Box>;
   }
 
-  //TODO: Set up proposals, test proposals,
 
   return (
     <>

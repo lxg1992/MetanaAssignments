@@ -17,8 +17,8 @@ export async function propose(
   const governor = await ethers.getContract("GovernorContract");
   const box = await ethers.getContract("Box");
   const encodedFunctionCall = box.interface.encodeFunctionData(
-    functionToCall,
-    args
+    functionToCall, // "store"
+    args // 77
   );
   console.log(`Proposing ${functionToCall}(${args})`);
   console.log(`Proposal Description: ${proposalDescription}`);
@@ -36,7 +36,6 @@ export async function propose(
 
   const proposalId = proposeReceipt.events[0].args.proposalId;
   console.log({ events: proposeReceipt.events });
-  console.log({ loc: 1 });
 
   let proposals = JSON.parse(
     fs.readFileSync(__dirname + proposalsFile, { encoding: "utf8", flag: "r" })
