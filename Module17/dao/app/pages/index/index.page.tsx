@@ -101,7 +101,7 @@ function Page(pageProps: PageProps) {
       [box.address],
       [0],
       [encodedFunctionCall],
-      "stujfsf"
+      "wot"
     );
     console.log({ tx });
     const receipt = await tx.wait();
@@ -168,7 +168,7 @@ function Page(pageProps: PageProps) {
     }
 
     return (
-      <Grid templateColumns="150px 1fr 150px" gap={2} minHeight={150}>
+      <Grid templateColumns="300px 1fr 150px" gap={2} minHeight={150}>
         <GridItem bg="orange.300">
           <EventFeed govEvents={govEvents} />
         </GridItem>
