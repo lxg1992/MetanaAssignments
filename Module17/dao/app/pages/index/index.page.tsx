@@ -104,7 +104,7 @@ function Page(pageProps: PageProps) {
       [box.address],
       [0],
       [encodedFunctionCall],
-      "wot"
+      "wosat"
     );
     console.log({ tx });
     const receipt = await tx.wait();
@@ -184,10 +184,7 @@ function Page(pageProps: PageProps) {
         </GridItem>
         <GridItem bg="pink.200">
           <Button onClick={propose}>Propose</Button>
-          <ProposalDashboard
-            proposalEvents={proposalEvents}
-            govEvents={govEvents}
-          />
+          <ProposalDashboard proposalEvents={proposalEvents} />
         </GridItem>
         <GridItem bg="blue.100">
           <Profile rToken={rToken} account={account} />

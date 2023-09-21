@@ -69,6 +69,7 @@ async function render(pageContext: PageContextServer) {
   return {
     documentHtml,
     pageContext: {
+      Page,
       // We can add some `pageContext` here, which is useful if we want to do page redirection https://vite-plugin-ssr.com/page-redirection
     },
   };

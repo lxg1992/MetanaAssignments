@@ -125,6 +125,16 @@ contract GovernorContract is
         return super._executor();
     }
 
+    function batch_state(
+        uint256[] memory proposalIds
+    ) public view returns (ProposalState[] memory) {
+        ProposalState[] memory states = new ProposalState[](proposalIds.length);
+        for (uint256 i = 0; i < proposalIds.length; i++) {
+            states[i] = state(proposalIds[i]);
+        }
+        return states;
+    }
+
     function supportsInterface(
         bytes4 interfaceId
     ) public view override(Governor, GovernorTimelockControl) returns (bool) {

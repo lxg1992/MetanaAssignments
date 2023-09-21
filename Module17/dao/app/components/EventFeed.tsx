@@ -37,7 +37,7 @@ function EventFeed({
     );
   }
 
-  console.log({ govEvents });
+  // console.log({ govEvents });
 
   const reducedEvents = govEvents.reduce((acc, event, idx) => {
     acc[idx] = event.fragment;
@@ -46,12 +46,12 @@ function EventFeed({
     return acc;
   }, []);
 
-  console.log({ reducedEvents });
+  // console.log({ reducedEvents });
 
   //TODO: Make an event feed which is fed all the events for the governor contract (and others?);
   return (
     <Box padding={2}>
-      <Heading padding={1} align={"center"} fontSize={"1rem"}>
+      <Heading padding={1} textAlign={"center"} fontSize={"1rem"}>
         Event Feed
       </Heading>
       <Stack>
