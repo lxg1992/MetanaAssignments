@@ -3,6 +3,8 @@ import {
   Text,
   Container,
   Card,
+  CardBody,
+  CardHeader,
   Popover,
   PopoverTrigger,
   PopoverContent,
@@ -12,6 +14,8 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   PopoverAnchor,
+  Stack,
+  Heading,
 } from "@chakra-ui/react";
 import { EventLog, Log } from "ethers";
 import { useMetaMask } from "metamask-react";
@@ -23,7 +27,7 @@ function EventFeed({
 }: {
   govEvents: (EventLog | Log)[] | undefined;
 }) {
-  const { account } = useMetaMask();
+  // const { account } = useMetaMask();
 
   if (!govEvents) {
     return (
@@ -32,6 +36,8 @@ function EventFeed({
       </Box>
     );
   }
+
+  console.log({ govEvents });
 
   const reducedEvents = govEvents.reduce((acc, event, idx) => {
     acc[idx] = event.fragment;
@@ -44,37 +50,41 @@ function EventFeed({
 
   //TODO: Make an event feed which is fed all the events for the governor contract (and others?);
   return (
-    <Box>
-      <Text align={"center"} fontSize={"1rem"}>
+    <Box padding={2}>
+      <Heading padding={1} align={"center"} fontSize={"1rem"}>
         Event Feed
-      </Text>
-      {reducedEvents.map((event, idx) => (
-        <Popover key={idx} closeOnBlur={true}>
-          <PopoverTrigger>
-            <Container>
-              <Card>
-                <Text fontSize={"0.8rem"}>
-                  #{event.blockNumber} - {event.name}
-                </Text>
-              </Card>
-            </Container>
-          </PopoverTrigger>
-          <PopoverContent>
-            <PopoverArrow />
-            <PopoverHeader>Block #{event.blockNumber}</PopoverHeader>
-            <PopoverHeader>Event: {event.name}</PopoverHeader>
-            <PopoverBody>
-              {event.inputs.map((input, jdx) => (
-                <Box>
-                  <Text>
-                    {input.name}: {event.args[jdx].toString()}
-                  </Text>
-                </Box>
-              ))}
-            </PopoverBody>
-          </PopoverContent>
-        </Popover>
-      ))}
+      </Heading>
+      <Stack>
+        {reducedEvents.map((event, idx) => (
+          <Popover key={idx} closeOnBlur={true}>
+            <PopoverTrigger>
+              <Container>
+                <Card size="sm">
+                  <CardHeader>
+                    <Text fontSize={"0.8rem"}>
+                      #{event.blockNumber} - {event.name}
+                    </Text>
+                  </CardHeader>
+                </Card>
+              </Container>
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverHeader>Block #{event.blockNumber}</PopoverHeader>
+              <PopoverHeader>Event: {event.name}</PopoverHeader>
+              <PopoverBody>
+                {event.inputs.map((input, jdx) => (
+                  <Box key={jdx}>
+                    <Text>
+                      {input.name}: {event.args[jdx].toString()}
+                    </Text>
+                  </Box>
+                ))}
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+        ))}
+      </Stack>
     </Box>
   );
 }

@@ -40,6 +40,9 @@ function Page(pageProps: PageProps) {
   const [govEvents, setGovEvents] = useState<(EventLog | Log)[] | undefined>(
     undefined
   );
+  const [proposalEvents, setProposalEvents] = useState<
+    (EventLog | Log)[] | undefined
+  >(undefined);
   const [ping, setPing] = useState<number>(0);
 
   useEffect(() => {
@@ -109,6 +112,8 @@ function Page(pageProps: PageProps) {
     setPing((ping) => ping + 1);
   };
 
+  //TODO: SET UP PROPOSAL PAGE AND ALLOW TO VOTE ON THEM.
+
   useEffect(() => {
     if (!(rGovernor && account && rBox && provider)) {
       return;
@@ -121,8 +126,13 @@ function Page(pageProps: PageProps) {
         governanceToken.blockDeployed,
         latestBlock
       );
-      console.log({ governorEvents });
+      const proposalEvents = await rGovernor.queryFilter(
+        "ProposalCreated",
+        governorContract.blockDeployed,
+        latestBlock
+      );
       setGovEvents(governorEvents);
+      setProposalEvents(proposalEvents);
     };
     asyncAction();
 
@@ -174,7 +184,10 @@ function Page(pageProps: PageProps) {
         </GridItem>
         <GridItem bg="pink.200">
           <Button onClick={propose}>Propose</Button>
-          <ProposalDashboard />
+          <ProposalDashboard
+            proposalEvents={proposalEvents}
+            govEvents={govEvents}
+          />
         </GridItem>
         <GridItem bg="blue.100">
           <Profile rToken={rToken} account={account} />

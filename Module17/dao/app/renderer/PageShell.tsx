@@ -39,7 +39,7 @@ function Content({ children }: { children: React.ReactNode }) {
         margin: "0 1% 0 1%",
 
         // paddingBottom: 50,
-        border: "1px solid red",
+        // border: "1px solid red",
         borderRadius: "5px",
         // minHeight: "80vh",
       }}
