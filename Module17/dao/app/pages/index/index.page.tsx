@@ -46,49 +46,48 @@ function Page(pageProps: PageProps) {
   const [ping, setPing] = useState<number>(0);
 
   useEffect(() => {
+    if (cxLoading) return;
     const asyncAction = async () => {
-      if (!cxLoading) {
-        const readToken = fetchReadContract(
-          governanceToken.address,
-          governanceToken.abi,
-          provider
-        );
-        const writeToken = fetchWriteContract(
-          governanceToken.address,
-          governanceToken.abi,
-          signer
-        );
-        setRToken(readToken);
-        setWToken(writeToken);
-        const readGovernor = fetchReadContract(
-          governorContract.address,
-          governorContract.abi,
-          provider
-        );
-        const writeGovernor = fetchWriteContract(
-          governorContract.address,
-          governorContract.abi,
-          signer
-        );
-        setRGovernor(readGovernor);
-        setWGovernor(writeGovernor);
-        const readTimeLock = fetchReadContract(
-          timeLock.address,
-          timeLock.abi,
-          provider
-        );
-        const writeTimeLock = fetchWriteContract(
-          timeLock.address,
-          timeLock.abi,
-          signer
-        );
-        setRTimeLock(readTimeLock);
-        setWTimeLock(writeTimeLock);
-        const readBox = fetchReadContract(box.address, box.abi, provider);
-        const writeBox = fetchWriteContract(box.address, box.abi, signer);
-        setRBox(readBox);
-        setWBox(writeBox);
-      }
+      const readToken = fetchReadContract(
+        governanceToken.address,
+        governanceToken.abi,
+        provider
+      );
+      const writeToken = fetchWriteContract(
+        governanceToken.address,
+        governanceToken.abi,
+        signer
+      );
+      setRToken(readToken);
+      setWToken(writeToken);
+      const readGovernor = fetchReadContract(
+        governorContract.address,
+        governorContract.abi,
+        provider
+      );
+      const writeGovernor = fetchWriteContract(
+        governorContract.address,
+        governorContract.abi,
+        signer
+      );
+      setRGovernor(readGovernor);
+      setWGovernor(writeGovernor);
+      const readTimeLock = fetchReadContract(
+        timeLock.address,
+        timeLock.abi,
+        provider
+      );
+      const writeTimeLock = fetchWriteContract(
+        timeLock.address,
+        timeLock.abi,
+        signer
+      );
+      setRTimeLock(readTimeLock);
+      setWTimeLock(writeTimeLock);
+      const readBox = fetchReadContract(box.address, box.abi, provider);
+      const writeBox = fetchWriteContract(box.address, box.abi, signer);
+      setRBox(readBox);
+      setWBox(writeBox);
     };
     asyncAction();
   }, [cxLoading, provider, signer]);
@@ -184,7 +183,11 @@ function Page(pageProps: PageProps) {
         </GridItem>
         <GridItem bg="pink.200">
           <Button onClick={propose}>Propose</Button>
-          <ProposalDashboard proposalEvents={proposalEvents} />
+          <ProposalDashboard
+            rGovernor={rGovernor}
+            wGovernor={wGovernor}
+            proposalEvents={proposalEvents}
+          />
         </GridItem>
         <GridItem bg="blue.100">
           <Profile rToken={rToken} account={account} />

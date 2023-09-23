@@ -24,6 +24,9 @@ export function Navbar() {
         <Link padding="5" href="/about">
           About
         </Link>
+        <Link padding="5" href="/new">
+          New
+        </Link>
       </Box>
       <Box>
         <Tooltip label={account ? account : "No account detected"}>
