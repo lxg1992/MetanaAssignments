@@ -7,9 +7,11 @@ import {
   NumberInputStepper,
 } from "@chakra-ui/react";
 import { useConnection } from "../../hooks/blockchain.ts";
+
 import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
 import { Contract } from "ethers";
 import { useMetaMask } from "metamask-react";
+import { titleCase } from "../../utils/str.ts";
 export { Page };
 
 function Page({ box: { abi } }) {
@@ -17,8 +19,8 @@ function Page({ box: { abi } }) {
     useMetaMask();
   const { provider, signer, cxLoading } = useConnection(account);
 
-  const [mutators, setMutators] = useState<any>(undefined);
-  const [selection, setSelection] = useState<any>(undefined);
+  const [mutators, setMutators] = useState<any>(undefined); // Functions that can mutate state
+  const [selection, setSelection] = useState<any>(undefined); //DDL selected function
 
   useEffect(() => {
     if (cxLoading) return;
@@ -35,6 +37,18 @@ function Page({ box: { abi } }) {
     setSelection(selected);
   };
 
+  const deriveInputs = (arrayOfInputs) => {
+    return arrayOfInputs.map((input) => {
+      return deriveInput(input);
+    });
+  };
+
+  const deriveInput = (inputSelection) => {
+    if (inputSelection.includes('[]')) { //is Array
+      
+    }
+  };
+
   if (!mutators) {
     <Box>No available functions!</Box>;
   }
@@ -42,16 +56,20 @@ function Page({ box: { abi } }) {
   const selectionComponent = (
     <Box>
       <Heading p={6}>Select Function to Call</Heading>
-      <Text>Current selection: {selection ? selection.name : "none"}</Text>
+      <Text>Function selected: {selection ? selection.name : "none"}</Text>
       <Select
         p={6}
         iconColor="white"
         onChange={handleChange}
-        placeholder="Select function"
+        placeholder="Select action"
       >
         {mutators &&
           mutators.map((func) => {
-            return <option value={func.name}>{func.name}</option>;
+            return (
+              <option value={func.name} key={func.name}>
+                {titleCase(func.name)}
+              </option>
+            );
           })}
       </Select>
       {selection && selection.inputs.length ? (

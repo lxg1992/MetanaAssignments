@@ -5,3 +5,8 @@ export function f4l4(str: string): string {
   const last = str.slice(-4);
   return first + "..." + last;
 }
+
+export function titleCase(str: string): string {
+  const result = str.replace(/([A-Z])/g, " $1");
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}

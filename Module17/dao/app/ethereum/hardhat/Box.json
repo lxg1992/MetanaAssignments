@@ -34,29 +34,39 @@
       "type": "event"
     },
     {
-      "inputs": [],
-      "name": "getGoodGuys",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "address[]",
-          "name": "",
-          "type": "address[]"
+          "internalType": "uint256[]",
+          "name": "_indexes",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint8[]",
+          "name": "_values",
+          "type": "uint8[]"
         }
       ],
-      "stateMutability": "view",
+      "name": "alterMultipleNumbers8bit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getName",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_value",
+          "type": "uint8"
         }
       ],
-      "stateMutability": "view",
+      "name": "alterNumber8bit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -70,6 +80,58 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "getPerson",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint8",
+          "name": "",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        },
+        {
+          "internalType": "string[]",
+          "name": "",
+          "type": "string[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "_bytes32Val",
+          "type": "bytes"
+        }
+      ],
+      "name": "keccakBytesHash",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -94,7 +156,7 @@
     },
     {
       "inputs": [],
-      "name": "retrieve",
+      "name": "retrieveValue",
       "outputs": [
         {
           "internalType": "uint256",
@@ -103,32 +165,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "_goodGuys",
-          "type": "address[]"
-        }
-      ],
-      "name": "setGoodGuys",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        }
-      ],
-      "name": "setName",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -147,12 +183,95 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_age",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_heightInCm",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bool",
+          "name": "_senior",
+          "type": "bool"
+        },
+        {
+          "internalType": "string[]",
+          "name": "_hobbies",
+          "type": "string[]"
+        }
+      ],
+      "name": "setPerson",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "uint8",
+              "name": "age",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "heightInCm",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bool",
+              "name": "senior",
+              "type": "bool"
+            },
+            {
+              "internalType": "string[]",
+              "name": "hobbies",
+              "type": "string[]"
+            }
+          ],
+          "internalType": "struct Box.Person",
+          "name": "_person",
+          "type": "tuple"
+        }
+      ],
+      "name": "setPersonStruct",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "newValue",
           "type": "uint256"
         }
       ],
-      "name": "store",
+      "name": "storeValue",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
