@@ -4,7 +4,11 @@ import {
   Select,
   Heading,
   Text,
-  NumberInputStepper,
+  Input,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { useConnection } from "../../hooks/blockchain.ts";
 
@@ -37,15 +41,20 @@ function Page({ box: { abi } }) {
     setSelection(selected);
   };
 
+  console.log({ selection });
+
   const deriveInputs = (arrayOfInputs) => {
+    console.log({ arrayOfInputs });
     return arrayOfInputs.map((input) => {
       return deriveInput(input);
     });
   };
 
-  const deriveInput = (inputSelection) => {
-    if (inputSelection.includes('[]')) { //is Array
-      
+  const deriveInput = (input) => {
+    if (input.type.includes("tuple")) {
+      return <Input placeholder={input.type} />;
+    } else {
+      return <Input placeholder={input.type} />;
     }
   };
 
@@ -64,16 +73,19 @@ function Page({ box: { abi } }) {
         placeholder="Select action"
       >
         {mutators &&
-          mutators.map((func) => {
+          mutators.map((func: { name: string }) => {
             return (
-              <option value={func.name} key={func.name}>
-                {titleCase(func.name)}
+              <option value={func?.name} key={func?.name}>
+                {titleCase(func?.name)}
               </option>
             );
           })}
       </Select>
       {selection && selection.inputs.length ? (
-        <Box>{selection.inputs.length}</Box>
+        <>
+          <Box>{selection.inputs.length}</Box>
+          <FormControl>{deriveInputs(selection.inputs)}</FormControl>
+        </>
       ) : (
         <Box>No inputs</Box>
       )}
