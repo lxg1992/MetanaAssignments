@@ -25,6 +25,7 @@ function Page({ box: { abi } }) {
 
   const [mutators, setMutators] = useState<any>(undefined); // Functions that can mutate state
   const [selection, setSelection] = useState<any>(undefined); //DDL selected function
+  const [formData, setFormData] = useState<any>(undefined); //Form data to be used to call function
 
   useEffect(() => {
     if (cxLoading) return;
@@ -43,18 +44,19 @@ function Page({ box: { abi } }) {
 
   console.log({ selection });
 
-  const deriveInputs = (arrayOfInputs) => {
+  const renderInputs = (arrayOfInputs) => {
     console.log({ arrayOfInputs });
     return arrayOfInputs.map((input) => {
-      return deriveInput(input);
+      return renderInput(input);
     });
   };
 
-  const deriveInput = (input) => {
+  const renderInput = (input) => {
     if (input.type.includes("tuple")) {
       // return <Input placeholder={input.type} />;
+      //TODO: Create a form for the tuple, needs to handle nested data
       return input.components.map((component) => {
-        return deriveInput(component);
+        return renderInput(component);
       });
     }
     if (input.type.includes("[]")) {
@@ -93,7 +95,7 @@ function Page({ box: { abi } }) {
       {selection && selection.inputs.length ? (
         <>
           <Box>{selection.inputs.length}</Box>
-          <FormControl>{deriveInputs(selection.inputs)}</FormControl>
+          <FormControl>{renderInputs(selection.inputs)}</FormControl>
         </>
       ) : (
         <Box>No inputs</Box>
