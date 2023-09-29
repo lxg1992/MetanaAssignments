@@ -52,10 +52,19 @@ function Page({ box: { abi } }) {
 
   const deriveInput = (input) => {
     if (input.type.includes("tuple")) {
-      return <Input placeholder={input.type} />;
-    } else {
-      return <Input placeholder={input.type} />;
+      // return <Input placeholder={input.type} />;
+      return input.components.map((component) => {
+        return deriveInput(component);
+      });
     }
+    if (input.type.includes("[]")) {
+      return (
+        <Input
+          placeholder={`${input.name} - ${input.type} - Separate values by comma`}
+        />
+      );
+    }
+    return <Input placeholder={`${input.name} - ${input.type}`} />;
   };
 
   if (!mutators) {
