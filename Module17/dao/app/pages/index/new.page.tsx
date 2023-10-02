@@ -9,6 +9,12 @@ import {
   FormLabel,
   FormErrorMessage,
   FormHelperText,
+  Checkbox,
+  InputGroup,
+  Stack,
+  StackDivider,
+  VStack,
+  Flex,
 } from "@chakra-ui/react";
 import { useConnection } from "../../hooks/blockchain.ts";
 
@@ -16,6 +22,7 @@ import { fetchReadContract, fetchWriteContract } from "../../utils/contract.ts";
 import { Contract } from "ethers";
 import { useMetaMask } from "metamask-react";
 import { titleCase } from "../../utils/str.ts";
+import { StringLiteral } from "typescript";
 export { Page };
 
 function Page({ box: { abi } }) {
@@ -25,7 +32,7 @@ function Page({ box: { abi } }) {
 
   const [mutators, setMutators] = useState<any>(undefined); // Functions that can mutate state
   const [selection, setSelection] = useState<any>(undefined); //DDL selected function
-  const [formData, setFormData] = useState<any>(undefined); //Form data to be used to call function
+  const [formData, setFormData] = useState<any>({}); //Form data to be used to call function
 
   useEffect(() => {
     if (cxLoading) return;
@@ -36,10 +43,36 @@ function Page({ box: { abi } }) {
     // asyncAction();
   }, [cxLoading]);
 
-  const handleChange = (e: any) => {
+  const handleFunctionChange = (e: any) => {
     const { value } = e.target;
     const selected = mutators.find((x) => x.name === value);
     setSelection(selected);
+    setFormData({});
+  };
+
+  const handleInputChange = (e: any, subsection: string | null) => {
+    console.log({ e });
+    const { value, checked } = e.target;
+    if (value) {
+      if (subsection) {
+        setFormData({
+          ...formData,
+          [subsection]: { ...formData[subsection], [e.target.name]: value },
+        });
+        return;
+      }
+      setFormData({ ...formData, [e.target.name]: value });
+    }
+    if (checked || !value) {
+      if (subsection) {
+        setFormData({
+          ...formData,
+          [subsection]: { ...formData[subsection], [e.target.name]: checked },
+        });
+        return;
+      }
+      setFormData({ ...formData, [e.target.name]: checked });
+    }
   };
 
   console.log({ selection });
@@ -51,22 +84,57 @@ function Page({ box: { abi } }) {
     });
   };
 
-  const renderInput = (input) => {
+  const renderInput = (input, subsection = null) => {
+    //formData[subsection?]= this;
     if (input.type.includes("tuple")) {
+      console.log({ input });
       // return <Input placeholder={input.type} />;
       //TODO: Create a form for the tuple, needs to handle nested data
-      return input.components.map((component) => {
-        return renderInput(component);
-      });
+      return (
+        <Flex alignItems="flex-start">
+          <Text p={4}>{input.name}</Text>
+          {input.components.map((component) => {
+            return renderInput(component, input.name);
+          })}
+        </Flex>
+      );
     }
+
     if (input.type.includes("[]")) {
       return (
         <Input
           placeholder={`${input.name} - ${input.type} - Separate values by comma`}
+          onChange={(e) => handleInputChange(e, subsection)}
+          name={input.name}
+          m={2}
         />
       );
     }
-    return <Input placeholder={`${input.name} - ${input.type}`} />;
+    if (input.type.includes("bool")) {
+      return (
+        <Flex
+          marginTop={2}
+          border="1px"
+          borderColor="gray.200"
+          borderRadius="5px"
+        >
+          <Text m={2}>{input.name}?</Text>
+          <Checkbox
+            m={2}
+            onChange={(e) => handleInputChange(e, subsection)}
+            name={input.name}
+          ></Checkbox>
+        </Flex>
+      );
+    }
+    return (
+      <Input
+        placeholder={`${input.name} - ${input.type}`}
+        onChange={(e) => handleInputChange(e, subsection)}
+        name={input.name}
+        m={2}
+      />
+    );
   };
 
   if (!mutators) {
@@ -80,7 +148,7 @@ function Page({ box: { abi } }) {
       <Select
         p={6}
         iconColor="white"
-        onChange={handleChange}
+        onChange={handleFunctionChange}
         placeholder="Select action"
       >
         {mutators &&
@@ -95,11 +163,16 @@ function Page({ box: { abi } }) {
       {selection && selection.inputs.length ? (
         <>
           <Box>{selection.inputs.length}</Box>
-          <FormControl>{renderInputs(selection.inputs)}</FormControl>
+          <FormControl>
+            <VStack divider={<StackDivider />}>
+              {renderInputs(selection.inputs)}
+            </VStack>
+          </FormControl>
         </>
       ) : (
         <Box>No inputs</Box>
       )}
+      <Box>{JSON.stringify(formData)}</Box>
     </Box>
   );
   //TODO: Create a set of inputs that will be used to call the function
