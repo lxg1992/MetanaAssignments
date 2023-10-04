@@ -25,10 +25,13 @@ import { titleCase } from "../../utils/str.ts";
 import { StringLiteral } from "typescript";
 export { Page };
 
-function Page({ box: { abi } }) {
+function Page({ box, governorContract }) {
   const { status, connect, account, chainId, ethereum, switchChain } =
     useMetaMask();
   const { provider, signer, cxLoading } = useConnection(account);
+
+  const [wBox, setWBox] = useState<Contract | undefined>(undefined);
+  const [wGovernor, setWGovernor] = useState<Contract | undefined>(undefined);
 
   const [mutators, setMutators] = useState<any>(undefined); // Functions that can mutate state
   const [selection, setSelection] = useState<any>(undefined); //DDL selected function
@@ -36,11 +39,22 @@ function Page({ box: { abi } }) {
 
   useEffect(() => {
     if (cxLoading) return;
-    const mutFuncs = abi.filter((x) => x.stateMutability === "nonpayable");
+    const mutFuncs = box.abi.filter((x) => x.stateMutability === "nonpayable");
     console.log({ mutFuncs });
     setMutators(mutFuncs);
     // const asyncAction = async () => {};
     // asyncAction();
+  }, [cxLoading]);
+
+  useEffect(() => {
+    if (cxLoading) return;
+    const asyncAction = async () => {
+      const wBox = fetchWriteContract(box, signer);
+      const wGovernor = fetchWriteContract(governorContract, signer);
+      setWBox(wBox);
+      setWGovernor(wGovernor);
+    };
+    asyncAction();
   }, [cxLoading]);
 
   const handleFunctionChange = (e: any) => {
@@ -107,6 +121,7 @@ function Page({ box: { abi } }) {
           onChange={(e) => handleInputChange(e, subsection)}
           name={input.name}
           m={2}
+          type={input.type.includes("int") ? "number" : "text"}
         />
       );
     }
@@ -133,12 +148,13 @@ function Page({ box: { abi } }) {
         onChange={(e) => handleInputChange(e, subsection)}
         name={input.name}
         m={2}
+        type={input.type.includes("int") ? "number" : "text"}
       />
     );
   };
 
   if (!mutators) {
-    <Box>No available functions!</Box>;
+    return <Box>No available functions!</Box>;
   }
 
   const selectionComponent = (
