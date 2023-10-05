@@ -47,49 +47,46 @@ function Page(pageProps: PageProps) {
 
   useEffect(() => {
     if (cxLoading) return;
-    const asyncAction = async () => {
-      const readToken = fetchReadContract(
-        governanceToken.address,
-        governanceToken.abi,
-        provider
-      );
-      const writeToken = fetchWriteContract(
-        governanceToken.address,
-        governanceToken.abi,
-        signer
-      );
-      setRToken(readToken);
-      setWToken(writeToken);
-      const readGovernor = fetchReadContract(
-        governorContract.address,
-        governorContract.abi,
-        provider
-      );
-      const writeGovernor = fetchWriteContract(
-        governorContract.address,
-        governorContract.abi,
-        signer
-      );
-      setRGovernor(readGovernor);
-      setWGovernor(writeGovernor);
-      const readTimeLock = fetchReadContract(
-        timeLock.address,
-        timeLock.abi,
-        provider
-      );
-      const writeTimeLock = fetchWriteContract(
-        timeLock.address,
-        timeLock.abi,
-        signer
-      );
-      setRTimeLock(readTimeLock);
-      setWTimeLock(writeTimeLock);
-      const readBox = fetchReadContract(box.address, box.abi, provider);
-      const writeBox = fetchWriteContract(box.address, box.abi, signer);
-      setRBox(readBox);
-      setWBox(writeBox);
-    };
-    asyncAction();
+    const readToken = fetchReadContract(
+      governanceToken.address,
+      governanceToken.abi,
+      provider
+    );
+    const writeToken = fetchWriteContract(
+      governanceToken.address,
+      governanceToken.abi,
+      signer
+    );
+    setRToken(readToken);
+    setWToken(writeToken);
+    const readGovernor = fetchReadContract(
+      governorContract.address,
+      governorContract.abi,
+      provider
+    );
+    const writeGovernor = fetchWriteContract(
+      governorContract.address,
+      governorContract.abi,
+      signer
+    );
+    setRGovernor(readGovernor);
+    setWGovernor(writeGovernor);
+    const readTimeLock = fetchReadContract(
+      timeLock.address,
+      timeLock.abi,
+      provider
+    );
+    const writeTimeLock = fetchWriteContract(
+      timeLock.address,
+      timeLock.abi,
+      signer
+    );
+    setRTimeLock(readTimeLock);
+    setWTimeLock(writeTimeLock);
+    const readBox = fetchReadContract(box.address, box.abi, provider);
+    const writeBox = fetchWriteContract(box.address, box.abi, signer);
+    setRBox(readBox);
+    setWBox(writeBox);
   }, [cxLoading, provider, signer]);
 
   const propose = async () => {

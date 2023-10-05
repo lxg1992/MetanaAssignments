@@ -48,13 +48,14 @@ function Page({ box, governorContract }) {
 
   useEffect(() => {
     if (cxLoading) return;
-    const asyncAction = async () => {
-      const wBox = fetchWriteContract(box, signer);
-      const wGovernor = fetchWriteContract(governorContract, signer);
-      setWBox(wBox);
-      setWGovernor(wGovernor);
-    };
-    asyncAction();
+    const wBox = fetchWriteContract(box.address, box.abi, signer);
+    const wGovernor = fetchWriteContract(
+      governorContract.address,
+      governorContract.abi,
+      signer
+    );
+    setWBox(wBox);
+    setWGovernor(wGovernor);
   }, [cxLoading]);
 
   const handleFunctionChange = (e: any) => {
@@ -63,6 +64,17 @@ function Page({ box, governorContract }) {
     setSelection(selected);
     setFormData({});
   };
+
+  const splitStringIntoArray = (str: string) => {
+    return str.split(",");
+  };
+
+  const splitNumbersIntoArray = (numStr: string) => {
+    return numStr.split(",").map((x) => parseInt(x));
+  };
+
+  const commaDigitsRegex = /^[-,0-9]+$/;
+  const commaStringRegex = /^[-,a-zA-Z0-9]+$/;
 
   const handleInputChange = (e: any, subsection: string | null) => {
     console.log({ e });
@@ -98,6 +110,46 @@ function Page({ box, governorContract }) {
     });
   };
 
+  const deriveDefaultVal = (inputName, subsection = null) => {
+    if (subsection) {
+      if (formData[subsection]) {
+        return formData[subsection][inputName];
+      }
+      return "";
+    }
+    if (formData[inputName]) {
+      return formData[inputName];
+    }
+    return "";
+  };
+
+  const deriveDefaultBool = (inputName, subsection = null) => {
+    if (subsection) {
+      if (formData[subsection]) {
+        return formData[subsection][inputName];
+      }
+      return false;
+    }
+    if (formData[inputName]) {
+      return formData[inputName];
+    }
+    return false;
+  };
+  //TODO: default bool stays false, should be changeable
+
+  const deriveDefaultNum = (inputName, subsection = null) => {
+    if (subsection) {
+      if (formData[subsection]) {
+        return parseInt(formData[subsection][inputName]);
+      }
+      return 0;
+    }
+    if (formData[inputName]) {
+      return parseInt(formData[inputName]);
+    }
+    return 0;
+  };
+
   const renderInput = (input, subsection = null) => {
     //formData[subsection?]= this;
     if (input.type.includes("tuple")) {
@@ -115,13 +167,16 @@ function Page({ box, governorContract }) {
     }
 
     if (input.type.includes("[]")) {
+      const val = deriveDefaultVal(input.name, subsection);
       return (
         <Input
           placeholder={`${input.name} - ${input.type} - Separate values by comma`}
           onChange={(e) => handleInputChange(e, subsection)}
           name={input.name}
+          value={val}
           m={2}
-          type={input.type.includes("int") ? "number" : "text"}
+          type={"text"}
+          isarray={"true"}
         />
       );
     }
@@ -137,6 +192,7 @@ function Page({ box, governorContract }) {
           <Checkbox
             m={2}
             onChange={(e) => handleInputChange(e, subsection)}
+            value={deriveDefaultBool(input.name, subsection)}
             name={input.name}
           ></Checkbox>
         </Flex>
@@ -149,6 +205,11 @@ function Page({ box, governorContract }) {
         name={input.name}
         m={2}
         type={input.type.includes("int") ? "number" : "text"}
+        value={
+          input.type.includes("int")
+            ? deriveDefaultNum(input.name, subsection)
+            : deriveDefaultVal(input.name, subsection)
+        }
       />
     );
   };
