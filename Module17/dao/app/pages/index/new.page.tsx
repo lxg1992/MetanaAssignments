@@ -79,6 +79,7 @@ function Page({ box, governorContract }) {
   const handleInputChange = (e: any, subsection: string | null) => {
     console.log({ e });
     const { value, checked } = e.target;
+    console.log({ value, checked });
     if (value) {
       if (subsection) {
         setFormData({
@@ -88,8 +89,10 @@ function Page({ box, governorContract }) {
         return;
       }
       setFormData({ ...formData, [e.target.name]: value });
+      return;
     }
-    if (checked || !value) {
+    if (checked || !checked) {
+      //THIS IS WHERE THE ERROR IS, IT HAS TO CHECK IF IT'S NOT CHECKED
       if (subsection) {
         setFormData({
           ...formData,
@@ -100,8 +103,6 @@ function Page({ box, governorContract }) {
       setFormData({ ...formData, [e.target.name]: checked });
     }
   };
-
-  console.log({ selection });
 
   const renderInputs = (arrayOfInputs) => {
     console.log({ arrayOfInputs });
@@ -126,13 +127,15 @@ function Page({ box, governorContract }) {
   const deriveDefaultBool = (inputName, subsection = null) => {
     if (subsection) {
       if (formData[subsection]) {
-        return formData[subsection][inputName];
+        return Boolean(formData[subsection][inputName]);
       }
       return false;
     }
-    if (formData[inputName]) {
+    if (formData[inputName] !== null) {
+      console.log("true");
       return formData[inputName];
     }
+    console.log("false");
     return false;
   };
   //TODO: default bool stays false, should be changeable
@@ -181,6 +184,7 @@ function Page({ box, governorContract }) {
       );
     }
     if (input.type.includes("bool")) {
+      const val = deriveDefaultBool(input.name, subsection);
       return (
         <Flex
           marginTop={2}
@@ -192,7 +196,7 @@ function Page({ box, governorContract }) {
           <Checkbox
             m={2}
             onChange={(e) => handleInputChange(e, subsection)}
-            value={deriveDefaultBool(input.name, subsection)}
+            checked={val}
             name={input.name}
           ></Checkbox>
         </Flex>
