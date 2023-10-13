@@ -126,6 +126,7 @@ function Page({ box, governorContract }) {
 
   const deriveDefaultBool = (inputName, subsection = null) => {
     if (subsection) {
+      //TODO: FIX BOOLEAN ISSUE NOT REGISTERING I NSUBSECTION
       if (formData[subsection]) {
         return Boolean(formData[subsection][inputName]);
       }
@@ -133,7 +134,7 @@ function Page({ box, governorContract }) {
     }
     if (formData[inputName] !== null) {
       console.log("true");
-      return formData[inputName];
+      return Boolean(formData[inputName]);
     }
     console.log("false");
     return false;
@@ -145,12 +146,12 @@ function Page({ box, governorContract }) {
       if (formData[subsection]) {
         return parseInt(formData[subsection][inputName]);
       }
-      return 0;
+      // return 0;
     }
     if (formData[inputName]) {
       return parseInt(formData[inputName]);
     }
-    return 0;
+    // return 0;
   };
 
   const renderInput = (input, subsection = null) => {
@@ -186,20 +187,23 @@ function Page({ box, governorContract }) {
     if (input.type.includes("bool")) {
       const val = deriveDefaultBool(input.name, subsection);
       return (
-        <Flex
-          marginTop={2}
-          border="1px"
-          borderColor="gray.200"
-          borderRadius="5px"
+        // <Flex
+        //   marginTop={2}
+        //   border="1px"
+        //   borderColor="gray.200"
+        //   borderRadius="5px"
+        // >
+
+        <Select
+          m={2}
+          onChange={(e) => handleInputChange(e, subsection)}
+          name={input.name}
+          placeholder={input.name}
         >
-          <Text m={2}>{input.name}?</Text>
-          <Checkbox
-            m={2}
-            onChange={(e) => handleInputChange(e, subsection)}
-            checked={val}
-            name={input.name}
-          ></Checkbox>
-        </Flex>
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </Select>
+        // </Flex>
       );
     }
     return (
