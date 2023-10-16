@@ -91,23 +91,145 @@ function Page({ box, governorContract }) {
       setFormData({ ...formData, [e.target.name]: value });
       return;
     }
-    if (checked || !checked) {
-      //THIS IS WHERE THE ERROR IS, IT HAS TO CHECK IF IT'S NOT CHECKED
-      if (subsection) {
-        setFormData({
-          ...formData,
-          [subsection]: { ...formData[subsection], [e.target.name]: checked },
-        });
-        return;
-      }
-      setFormData({ ...formData, [e.target.name]: checked });
-    }
+    // if (checked || !checked) {
+    //   //THIS IS WHERE THE ERROR IS, IT HAS TO CHECK IF IT'S NOT CHECKED
+    //   if (subsection) {
+    //     setFormData({
+    //       ...formData,
+    //       [subsection]: { ...formData[subsection], [e.target.name]: checked },
+    //     });
+    //     return;
+    //   }
+    //   setFormData({ ...formData, [e.target.name]: checked });
+    // }
   };
 
   const renderInputs = (arrayOfInputs) => {
     console.log({ arrayOfInputs });
     return arrayOfInputs.map((input) => {
       return renderInput(input);
+    });
+  };
+
+  const renderInput = (input, subsection = null) => {
+    //formData[subsection?]= this;
+    if (input.type.includes("tuple")) {
+      console.log({ input });
+      // return <Input placeholder={input.type} />;
+      //TODO: Create a form for the tuple, needs to handle nested data
+      return (
+        <Flex alignItems="flex-start">
+          <Text p={4}>{input.name}</Text>
+          {input.components.map((component) => {
+            return renderInput(component, input.name);
+          })}
+        </Flex>
+      );
+    }
+
+    if (input.type.includes("[]")) {
+      const val = deriveDefaultVal(input.name, subsection);
+      return (
+        <Input
+          placeholder={`${input.name} - ${input.type} - Separate values by comma`}
+          onChange={(e) => handleInputChange(e, subsection)}
+          name={input.name}
+          value={val}
+          m={2}
+          type={"text"}
+          isarray={"true"}
+        />
+      );
+    }
+
+    //TODO: Prevent re-renders when defaulting state variables
+    if (input.type.includes("bool")) {
+      const val = deriveDefaultBool(input.name, subsection);
+      return (
+        // <Flex
+        //   marginTop={2}
+        //   border="1px"
+        //   borderColor="gray.200"
+        //   borderRadius="5px"
+        // >
+
+        <Select
+          m={2}
+          onChange={(e) => handleInputChange(e, subsection)}
+          name={input.name}
+          placeholder={input.name}
+        >
+          <option value="true">True</option>
+          <option value="false">False</option>
+        </Select>
+        // </Flex>
+      );
+    }
+    return (
+      <Input
+        placeholder={`${input.name} - ${input.type}`}
+        onChange={(e) => handleInputChange(e, subsection)}
+        name={input.name}
+        m={2}
+        type={input.type.includes("int") ? "number" : "text"}
+        value={
+          input.type.includes("int")
+            ? deriveDefaultNum(input.name, subsection)
+            : deriveDefaultVal(input.name, subsection)
+        }
+      />
+    );
+  };
+
+  const setDefaultValuesInputs = (arrayOfInputs) => {
+    arrayOfInputs.forEach((input) => {
+      setDefaultValue(input);
+    });
+  };
+
+  const setDefaultValue = (input, subsection = null) => {
+    if (input.type.includes("tuple")) {
+      return input.components.forEach((component) => {
+        return setDefaultValue(component, input.name);
+      });
+    }
+
+    if (input.type.includes("[]")) {
+      if (subsection) {
+        return setFormData({
+          ...formData,
+          [subsection]: { ...formData[subsection], [input.name]: [] },
+        });
+      }
+      return setFormData({
+        ...formData,
+        [input.name]: [],
+      });
+    }
+
+    if (input.type.includes("bool")) {
+      if (subsection) {
+        return setFormData({
+          ...formData,
+          [subsection]: { ...formData[subsection], [input.name]: false },
+        });
+      }
+      return setFormData({
+        ...formData,
+        [input.name]: false,
+      });
+    }
+
+    if (subsection) {
+      return setFormData({
+        ...formData,
+        [subsection]: { ...formData[subsection], [input.name]: "" },
+      });
+    }
+
+    return setFormData({
+      ...formData,
+      [input.name]: "",
     });
   };
 
@@ -152,74 +274,6 @@ function Page({ box, governorContract }) {
       return parseInt(formData[inputName]);
     }
     // return 0;
-  };
-
-  const renderInput = (input, subsection = null) => {
-    //formData[subsection?]= this;
-    if (input.type.includes("tuple")) {
-      console.log({ input });
-      // return <Input placeholder={input.type} />;
-      //TODO: Create a form for the tuple, needs to handle nested data
-      return (
-        <Flex alignItems="flex-start">
-          <Text p={4}>{input.name}</Text>
-          {input.components.map((component) => {
-            return renderInput(component, input.name);
-          })}
-        </Flex>
-      );
-    }
-
-    if (input.type.includes("[]")) {
-      const val = deriveDefaultVal(input.name, subsection);
-      return (
-        <Input
-          placeholder={`${input.name} - ${input.type} - Separate values by comma`}
-          onChange={(e) => handleInputChange(e, subsection)}
-          name={input.name}
-          value={val}
-          m={2}
-          type={"text"}
-          isarray={"true"}
-        />
-      );
-    }
-    if (input.type.includes("bool")) {
-      const val = deriveDefaultBool(input.name, subsection);
-      return (
-        // <Flex
-        //   marginTop={2}
-        //   border="1px"
-        //   borderColor="gray.200"
-        //   borderRadius="5px"
-        // >
-
-        <Select
-          m={2}
-          onChange={(e) => handleInputChange(e, subsection)}
-          name={input.name}
-          placeholder={input.name}
-        >
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </Select>
-        // </Flex>
-      );
-    }
-    return (
-      <Input
-        placeholder={`${input.name} - ${input.type}`}
-        onChange={(e) => handleInputChange(e, subsection)}
-        name={input.name}
-        m={2}
-        type={input.type.includes("int") ? "number" : "text"}
-        value={
-          input.type.includes("int")
-            ? deriveDefaultNum(input.name, subsection)
-            : deriveDefaultVal(input.name, subsection)
-        }
-      />
-    );
   };
 
   if (!mutators) {
