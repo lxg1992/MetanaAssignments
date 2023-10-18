@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Select,
@@ -63,6 +63,7 @@ function Page({ box, governorContract }) {
     const selected = mutators.find((x) => x.name === value);
     setSelection(selected);
     setFormData({});
+    // setDefaultValuesInputs(selected.inputs);
   };
 
   const splitStringIntoArray = (str: string) => {
@@ -104,14 +105,14 @@ function Page({ box, governorContract }) {
     // }
   };
 
-  const renderInputs = (arrayOfInputs) => {
+  const renderInputs = useCallback((arrayOfInputs) => {
     console.log({ arrayOfInputs });
     return arrayOfInputs.map((input) => {
       return renderInput(input);
     });
-  };
+  }, []);
 
-  const renderInput = (input, subsection = null) => {
+  const renderInput = useCallback((input, subsection = null) => {
     //formData[subsection?]= this;
     if (input.type.includes("tuple")) {
       console.log({ input });
@@ -179,15 +180,15 @@ function Page({ box, governorContract }) {
         }
       />
     );
-  };
+  }, []);
 
-  const setDefaultValuesInputs = (arrayOfInputs) => {
+  const setDefaultValuesInputs = useCallback((arrayOfInputs) => {
     arrayOfInputs.forEach((input) => {
       setDefaultValue(input);
     });
-  };
+  }, []);
 
-  const setDefaultValue = (input, subsection = null) => {
+  const setDefaultValue = useCallback((input, subsection = null) => {
     if (input.type.includes("tuple")) {
       return input.components.forEach((component) => {
         return setDefaultValue(component, input.name);
@@ -220,6 +221,19 @@ function Page({ box, governorContract }) {
       });
     }
 
+    if (input.type.includes("int")) {
+      if (subsection) {
+        return setFormData({
+          ...formData,
+          [subsection]: { ...formData[subsection], [input.name]: 0 },
+        });
+      }
+      return setFormData({
+        ...formData,
+        [input.name]: 0,
+      });
+    }
+
     if (subsection) {
       return setFormData({
         ...formData,
@@ -231,7 +245,7 @@ function Page({ box, governorContract }) {
       ...formData,
       [input.name]: "",
     });
-  };
+  }, []);
 
   const deriveDefaultVal = (inputName, subsection = null) => {
     if (subsection) {
