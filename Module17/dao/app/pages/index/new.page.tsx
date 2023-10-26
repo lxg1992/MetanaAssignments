@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import {
   Box,
   Select,
@@ -36,6 +36,9 @@ function Page({ box, governorContract }) {
   const [mutators, setMutators] = useState<any>(undefined); // Functions that can mutate state
   const [selection, setSelection] = useState<any>(undefined); //DDL selected function
   const [formData, setFormData] = useState<any>({}); //Form data to be used to call function
+  const formDataRef = useRef(formData);
+
+  //TODO: Refactor the function to use formDataRef.current instead of a random object which creates reference issues
 
   useEffect(() => {
     if (cxLoading) return;
@@ -49,7 +52,7 @@ function Page({ box, governorContract }) {
   useEffect(() => {
     //TODO: Create a function that will set the default values for the inputs
     if (selection) {
-      setDefaultValuesInputs(selection.inputs);
+      setFormData(getDefaultValuesInputs(selection.inputs));
     }
   }, [selection]);
 
@@ -70,7 +73,7 @@ function Page({ box, governorContract }) {
     const selected = mutators.find((x) => x.name === value);
     setSelection(selected);
     setFormData({});
-    // setDefaultValuesInputs(selected.inputs);
+    // getDefaultValuesInputs(selected.inputs);
   };
 
   const splitStringIntoArray = (str: string) => {
@@ -115,7 +118,6 @@ function Page({ box, governorContract }) {
   const renderInputs = useCallback(
     (arrayOfInputs) => {
       return arrayOfInputs.map((input) => {
-        setDefaultValue(input);
         return renderInput(input);
       });
     },
@@ -190,70 +192,96 @@ function Page({ box, governorContract }) {
     );
   }, []);
 
-  const setDefaultValuesInputs = useCallback((arrayOfInputs) => {
-    arrayOfInputs.forEach((input) => {
-      setDefaultValue(input);
-    });
-  }, []);
+  const getDefaultValuesInputs = useCallback(
+    (arrayOfInputs) => {
+      return arrayOfInputs.reduce((initObj, input) => {
+        return getDefaultValue(initObj, input);
+      }, formDataRef.current);
+    },
+    [selection]
+  );
 
-  const setDefaultValue = useCallback((input, subsection = null) => {
-    if (input.type.includes("tuple")) {
-      return input.components.forEach((component) => {
-        return setDefaultValue(component, input.name);
-      });
-    }
+  const getDefaultValue = useCallback(
+    (initObj, input, subsection = null) => {
+      if (input.type.includes("tuple")) {
+        return input.components.map((component) => {
+          return getDefaultValue(initObj, component, input.name);
+        });
+      }
 
-    if (input.type.includes("[]")) {
-      if (subsection) {
+      if (input.type.includes("[]")) {
+        if (subsection) {
+          return {
+            ...initObj,
+            [subsection]: { ...initObj[subsection], [input.name]: [] },
+          };
+          return setFormData((formData) => ({
+            ...formData,
+            [subsection]: { ...formData[subsection], [input.name]: [] },
+          }));
+        }
+        return { ...initObj, [input.name]: [] };
         return setFormData((formData) => ({
           ...formData,
-          [subsection]: { ...formData[subsection], [input.name]: [] },
+          [input.name]: [],
         }));
       }
-      return setFormData((formData) => ({
-        ...formData,
-        [input.name]: [],
-      }));
-    }
 
-    if (input.type.includes("bool")) {
-      if (subsection) {
+      if (input.type.includes("bool")) {
+        if (subsection) {
+          return {
+            ...initObj,
+            [subsection]: { ...initObj[subsection], [input.name]: false },
+          };
+          return setFormData((formData) => ({
+            ...formData,
+            [subsection]: { ...formData[subsection], [input.name]: false },
+          }));
+        }
+        return { ...initObj, [input.name]: false };
         return setFormData((formData) => ({
           ...formData,
-          [subsection]: { ...formData[subsection], [input.name]: false },
+          [input.name]: false,
         }));
       }
-      return setFormData((formData) => ({
-        ...formData,
-        [input.name]: false,
-      }));
-    }
 
-    if (input.type.includes("int")) {
-      if (subsection) {
+      if (input.type.includes("int")) {
+        if (subsection) {
+          return {
+            ...initObj,
+            [subsection]: { ...initObj[subsection], [input.name]: 0 },
+          };
+          return setFormData((formData) => ({
+            ...formData,
+            [subsection]: { ...formData[subsection], [input.name]: 0 },
+          }));
+        }
+        return { ...initObj, [input.name]: 0 };
         return setFormData((formData) => ({
           ...formData,
-          [subsection]: { ...formData[subsection], [input.name]: 0 },
+          [input.name]: 0,
         }));
       }
+
+      if (subsection) {
+        return {
+          ...initObj,
+          [subsection]: { ...initObj[subsection], [input.name]: "" },
+        };
+        return setFormData((formData) => ({
+          ...formData,
+          [subsection]: { ...formData[subsection], [input.name]: "" },
+        }));
+      }
+      return { ...initObj, [input.name]: "" };
+
       return setFormData((formData) => ({
         ...formData,
-        [input.name]: 0,
+        [input.name]: "",
       }));
-    }
-
-    if (subsection) {
-      return setFormData((formData) => ({
-        ...formData,
-        [subsection]: { ...formData[subsection], [input.name]: "" },
-      }));
-    }
-
-    return setFormData((formData) => ({
-      ...formData,
-      [input.name]: "",
-    }));
-  }, []);
+    },
+    [selection]
+  );
 
   const deriveDefaultVal = (inputName, subsection = null) => {
     if (subsection) {
@@ -333,7 +361,7 @@ function Page({ box, governorContract }) {
       ) : (
         <Box>No inputs</Box>
       )}
-      <Box>{JSON.stringify(formData)}</Box>
+      <Box>{JSON.stringify(formData, null, "\n")}</Box>
     </Box>
   );
   //TODO: Create a set of inputs that will be used to call the function
