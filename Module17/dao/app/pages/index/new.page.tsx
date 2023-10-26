@@ -47,6 +47,13 @@ function Page({ box, governorContract }) {
   }, [cxLoading]);
 
   useEffect(() => {
+    //TODO: Create a function that will set the default values for the inputs
+    if (selection) {
+      setDefaultValuesInputs(selection.inputs);
+    }
+  }, [selection]);
+
+  useEffect(() => {
     if (cxLoading) return;
     const wBox = fetchWriteContract(box.address, box.abi, signer);
     const wGovernor = fetchWriteContract(
@@ -79,17 +86,17 @@ function Page({ box, governorContract }) {
 
   const handleInputChange = (e: any, subsection: string | null) => {
     console.log({ e });
-    const { value, checked } = e.target;
-    console.log({ value, checked });
+    const { value } = e.target;
+    console.log({ value });
     if (value) {
       if (subsection) {
-        setFormData({
+        setFormData((formData) => ({
           ...formData,
           [subsection]: { ...formData[subsection], [e.target.name]: value },
-        });
+        }));
         return;
       }
-      setFormData({ ...formData, [e.target.name]: value });
+      setFormData((formData) => ({ ...formData, [e.target.name]: value }));
       return;
     }
     // if (checked || !checked) {
@@ -105,17 +112,19 @@ function Page({ box, governorContract }) {
     // }
   };
 
-  const renderInputs = useCallback((arrayOfInputs) => {
-    console.log({ arrayOfInputs });
-    return arrayOfInputs.map((input) => {
-      return renderInput(input);
-    });
-  }, []);
+  const renderInputs = useCallback(
+    (arrayOfInputs) => {
+      return arrayOfInputs.map((input) => {
+        setDefaultValue(input);
+        return renderInput(input);
+      });
+    },
+    [selection]
+  );
 
   const renderInput = useCallback((input, subsection = null) => {
     //formData[subsection?]= this;
     if (input.type.includes("tuple")) {
-      console.log({ input });
       // return <Input placeholder={input.type} />;
       //TODO: Create a form for the tuple, needs to handle nested data
       return (
@@ -129,23 +138,22 @@ function Page({ box, governorContract }) {
     }
 
     if (input.type.includes("[]")) {
-      const val = deriveDefaultVal(input.name, subsection);
+      // const val = deriveDefaultVal(input.name, subsection);
       return (
         <Input
           placeholder={`${input.name} - ${input.type} - Separate values by comma`}
           onChange={(e) => handleInputChange(e, subsection)}
           name={input.name}
-          value={val}
+          // value={val}
           m={2}
           type={"text"}
-          isarray={"true"}
         />
       );
     }
 
     //TODO: Prevent re-renders when defaulting state variables
     if (input.type.includes("bool")) {
-      const val = deriveDefaultBool(input.name, subsection);
+      // const val = deriveDefaultBool(input.name, subsection);
       return (
         // <Flex
         //   marginTop={2}
@@ -173,11 +181,11 @@ function Page({ box, governorContract }) {
         name={input.name}
         m={2}
         type={input.type.includes("int") ? "number" : "text"}
-        value={
-          input.type.includes("int")
-            ? deriveDefaultNum(input.name, subsection)
-            : deriveDefaultVal(input.name, subsection)
-        }
+        // value={
+        //   input.type.includes("int")
+        //     ? deriveDefaultNum(input.name, subsection)
+        //     : deriveDefaultVal(input.name, subsection)
+        // }
       />
     );
   }, []);
@@ -197,54 +205,54 @@ function Page({ box, governorContract }) {
 
     if (input.type.includes("[]")) {
       if (subsection) {
-        return setFormData({
+        return setFormData((formData) => ({
           ...formData,
           [subsection]: { ...formData[subsection], [input.name]: [] },
-        });
+        }));
       }
-      return setFormData({
+      return setFormData((formData) => ({
         ...formData,
         [input.name]: [],
-      });
+      }));
     }
 
     if (input.type.includes("bool")) {
       if (subsection) {
-        return setFormData({
+        return setFormData((formData) => ({
           ...formData,
           [subsection]: { ...formData[subsection], [input.name]: false },
-        });
+        }));
       }
-      return setFormData({
+      return setFormData((formData) => ({
         ...formData,
         [input.name]: false,
-      });
+      }));
     }
 
     if (input.type.includes("int")) {
       if (subsection) {
-        return setFormData({
+        return setFormData((formData) => ({
           ...formData,
           [subsection]: { ...formData[subsection], [input.name]: 0 },
-        });
+        }));
       }
-      return setFormData({
+      return setFormData((formData) => ({
         ...formData,
         [input.name]: 0,
-      });
+      }));
     }
 
     if (subsection) {
-      return setFormData({
+      return setFormData((formData) => ({
         ...formData,
         [subsection]: { ...formData[subsection], [input.name]: "" },
-      });
+      }));
     }
 
-    return setFormData({
+    return setFormData((formData) => ({
       ...formData,
       [input.name]: "",
-    });
+    }));
   }, []);
 
   const deriveDefaultVal = (inputName, subsection = null) => {
