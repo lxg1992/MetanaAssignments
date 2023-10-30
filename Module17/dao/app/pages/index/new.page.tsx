@@ -204,9 +204,9 @@ function Page({ box, governorContract }) {
   const getDefaultValue = useCallback(
     (initObj, input, subsection = null) => {
       if (input.type.includes("tuple")) {
-        return input.components.map((component) => {
+        return input.components.reduce((initObj, component) => {
           return getDefaultValue(initObj, component, input.name);
-        });
+        }, initObj);
       }
 
       if (input.type.includes("[]")) {
