@@ -17,7 +17,7 @@ export async function propose(
   const governor = await ethers.getContract("GovernorContract");
   const box = await ethers.getContract("Box");
   const encodedFunctionCall = box.interface.encodeFunctionData(
-    functionToCall, // "store"
+    functionToCall, // "storeValue"
     args // 77
   );
   console.log(`Proposing ${functionToCall}(${args})`);

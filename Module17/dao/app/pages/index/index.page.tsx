@@ -93,14 +93,24 @@ function Page(pageProps: PageProps) {
     if (!(rGovernor && account && wBox && wGovernor)) {
       return;
     }
-    const encodedFunctionCall = wBox.interface.encodeFunctionData("store", [
-      327,
-    ]);
+    //TODO: Fix the mutation request returning 32603. LATEST Perhaps the reason for this is the function can't be called properly(try deploying new contract with a different function etc)
+    console.log({ trigger: 1 });
+    console.log({ int: wBox.interface });
+    const encodedFunctionCall = wBox.interface.encodeFunctionData(
+      "storeValue",
+      [327]
+    );
+    const overrides = {
+      gasLimit: 10000000,
+    };
+    console.log({ trigger: 2 });
+    console.log({ wGovernor });
     const tx = await wGovernor.propose(
       [box.address],
       [0],
       [encodedFunctionCall],
-      "wosat"
+      "wosat",
+      overrides
     );
     console.log({ tx });
     const receipt = await tx.wait();

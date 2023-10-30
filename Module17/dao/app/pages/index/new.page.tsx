@@ -15,6 +15,7 @@ import {
   StackDivider,
   VStack,
   Flex,
+  Button,
 } from "@chakra-ui/react";
 import { useConnection } from "../../hooks/blockchain.ts";
 
@@ -45,8 +46,6 @@ function Page({ box, governorContract }) {
     const mutFuncs = box.abi.filter((x) => x.stateMutability === "nonpayable");
     console.log({ mutFuncs });
     setMutators(mutFuncs);
-    // const asyncAction = async () => {};
-    // asyncAction();
   }, [cxLoading]);
 
   useEffect(() => {
@@ -66,14 +65,13 @@ function Page({ box, governorContract }) {
     );
     setWBox(wBox);
     setWGovernor(wGovernor);
-  }, [cxLoading]);
+  }, [cxLoading, signer]);
 
   const handleFunctionChange = (e: any) => {
     const { value } = e.target;
     const selected = mutators.find((x) => x.name === value);
     setSelection(selected);
     setFormData({});
-    // getDefaultValuesInputs(selected.inputs);
   };
 
   const splitStringIntoArray = (str: string) => {
@@ -102,17 +100,7 @@ function Page({ box, governorContract }) {
       setFormData((formData) => ({ ...formData, [e.target.name]: value }));
       return;
     }
-    // if (checked || !checked) {
-    //   //THIS IS WHERE THE ERROR IS, IT HAS TO CHECK IF IT'S NOT CHECKED
-    //   if (subsection) {
-    //     setFormData({
-    //       ...formData,
-    //       [subsection]: { ...formData[subsection], [e.target.name]: checked },
-    //     });
-    //     return;
-    //   }
-    //   setFormData({ ...formData, [e.target.name]: checked });
-    // }
+
   };
 
   const renderInputs = useCallback(
@@ -140,13 +128,11 @@ function Page({ box, governorContract }) {
     }
 
     if (input.type.includes("[]")) {
-      // const val = deriveDefaultVal(input.name, subsection);
       return (
         <Input
           placeholder={`${input.name} - ${input.type} - Separate values by comma`}
           onChange={(e) => handleInputChange(e, subsection)}
           name={input.name}
-          // value={val}
           m={2}
           type={"text"}
         />
@@ -155,14 +141,7 @@ function Page({ box, governorContract }) {
 
     //TODO: Prevent re-renders when defaulting state variables
     if (input.type.includes("bool")) {
-      // const val = deriveDefaultBool(input.name, subsection);
       return (
-        // <Flex
-        //   marginTop={2}
-        //   border="1px"
-        //   borderColor="gray.200"
-        //   borderRadius="5px"
-        // >
 
         <Select
           m={2}
@@ -173,7 +152,6 @@ function Page({ box, governorContract }) {
           <option value="true">True</option>
           <option value="false">False</option>
         </Select>
-        // </Flex>
       );
     }
     return (
@@ -183,11 +161,6 @@ function Page({ box, governorContract }) {
         name={input.name}
         m={2}
         type={input.type.includes("int") ? "number" : "text"}
-        // value={
-        //   input.type.includes("int")
-        //     ? deriveDefaultNum(input.name, subsection)
-        //     : deriveDefaultVal(input.name, subsection)
-        // }
       />
     );
   }, []);
@@ -215,16 +188,8 @@ function Page({ box, governorContract }) {
             ...initObj,
             [subsection]: { ...initObj[subsection], [input.name]: [] },
           };
-          return setFormData((formData) => ({
-            ...formData,
-            [subsection]: { ...formData[subsection], [input.name]: [] },
-          }));
         }
         return { ...initObj, [input.name]: [] };
-        return setFormData((formData) => ({
-          ...formData,
-          [input.name]: [],
-        }));
       }
 
       if (input.type.includes("bool")) {
@@ -233,16 +198,8 @@ function Page({ box, governorContract }) {
             ...initObj,
             [subsection]: { ...initObj[subsection], [input.name]: false },
           };
-          return setFormData((formData) => ({
-            ...formData,
-            [subsection]: { ...formData[subsection], [input.name]: false },
-          }));
         }
         return { ...initObj, [input.name]: false };
-        return setFormData((formData) => ({
-          ...formData,
-          [input.name]: false,
-        }));
       }
 
       if (input.type.includes("int")) {
@@ -251,16 +208,8 @@ function Page({ box, governorContract }) {
             ...initObj,
             [subsection]: { ...initObj[subsection], [input.name]: 0 },
           };
-          return setFormData((formData) => ({
-            ...formData,
-            [subsection]: { ...formData[subsection], [input.name]: 0 },
-          }));
         }
         return { ...initObj, [input.name]: 0 };
-        return setFormData((formData) => ({
-          ...formData,
-          [input.name]: 0,
-        }));
       }
 
       if (subsection) {
@@ -268,63 +217,11 @@ function Page({ box, governorContract }) {
           ...initObj,
           [subsection]: { ...initObj[subsection], [input.name]: "" },
         };
-        return setFormData((formData) => ({
-          ...formData,
-          [subsection]: { ...formData[subsection], [input.name]: "" },
-        }));
       }
       return { ...initObj, [input.name]: "" };
-
-      return setFormData((formData) => ({
-        ...formData,
-        [input.name]: "",
-      }));
     },
     [selection]
   );
-
-  const deriveDefaultVal = (inputName, subsection = null) => {
-    if (subsection) {
-      if (formData[subsection]) {
-        return formData[subsection][inputName];
-      }
-      return "";
-    }
-    if (formData[inputName]) {
-      return formData[inputName];
-    }
-    return "";
-  };
-
-  const deriveDefaultBool = (inputName, subsection = null) => {
-    if (subsection) {
-      //TODO: FIX BOOLEAN ISSUE NOT REGISTERING I NSUBSECTION
-      if (formData[subsection]) {
-        return Boolean(formData[subsection][inputName]);
-      }
-      return false;
-    }
-    if (formData[inputName] !== null) {
-      console.log("true");
-      return Boolean(formData[inputName]);
-    }
-    console.log("false");
-    return false;
-  };
-  //TODO: default bool stays false, should be changeable
-
-  const deriveDefaultNum = (inputName, subsection = null) => {
-    if (subsection) {
-      if (formData[subsection]) {
-        return parseInt(formData[subsection][inputName]);
-      }
-      // return 0;
-    }
-    if (formData[inputName]) {
-      return parseInt(formData[inputName]);
-    }
-    // return 0;
-  };
 
   if (!mutators) {
     return <Box>No available functions!</Box>;
@@ -355,6 +252,8 @@ function Page({ box, governorContract }) {
           <FormControl>
             <VStack divider={<StackDivider />}>
               {renderInputs(selection.inputs)}
+              <Button>Propose Change</Button>
+
             </VStack>
           </FormControl>
         </>
